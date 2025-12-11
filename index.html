@@ -3,196 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM HACKED</title>
+    <title>Change the World | coco</title>
     <style>
-        /* --- スタイル設定 --- */
+        /* 高級感を出すためのデザイン設定 */
+        :root {
+            --bg-color: #0a0a0a; /* 漆黒 */
+            --text-color: #f0f0f0; /* オフホワイト */
+            --accent-color: #D4AF37; /* メタリックゴールド */
+            --sub-text: #888888;
+        }
+
         body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: "Yu Mincho", "Hiragino Mincho ProN", serif; /* 明朝体で高級感を演出 */
             margin: 0;
             padding: 0;
-            background-color: black;
-            overflow: hidden; /* スクロールバーを消す */
-            font-family: 'Courier New', Courier, monospace; /* 等幅フォント */
+            line-height: 1.8;
+            letter-spacing: 0.05em;
         }
 
-        /* 背景のマトリックスキャンバス */
-        canvas {
-            display: block;
+        /* レイアウト */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
         }
 
-        /* 前面のメッセージボックス */
-        #terminal {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #0f0;
-            background: rgba(0, 20, 0, 0.8);
-            padding: 20px;
-            border: 1px solid #0f0;
-            box-shadow: 0 0 20px #0f0;
-            max-width: 80%;
-            text-align: left;
-            z-index: 10;
+        /* ヘッダーエリア */
+        header {
+            text-align: center;
+            padding: 100px 0 60px;
+            border-bottom: 1px solid #333;
+            animation: fadeIn 2s ease;
         }
 
         h1 {
-            margin: 0 0 10px 0;
-            font-size: 24px;
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            font-weight: normal;
+            letter-spacing: 0.1em;
+        }
+
+        .subtitle {
+            color: var(--accent-color);
+            font-size: 1.2rem;
             text-transform: uppercase;
-            border-bottom: 1px solid #0f0;
-            padding-bottom: 5px;
-            text-shadow: 0 0 5px #0f0;
+            letter-spacing: 0.2em;
+            margin-bottom: 20px;
+        }
+
+        .name {
+            font-size: 1rem;
+            color: var(--sub-text);
+        }
+
+        /* メインコンテンツ */
+        section {
+            padding: 60px 0;
+            opacity: 0;
+            animation: slideUp 1s ease forwards;
+        }
+        
+        /* アニメーションの遅延設定 */
+        section:nth-child(2) { animation-delay: 0.5s; }
+        section:nth-child(3) { animation-delay: 1.0s; }
+
+        h2 {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            border-left: 3px solid var(--accent-color);
+            padding-left: 15px;
+            margin-bottom: 30px;
+            font-weight: normal;
         }
 
         p {
-            margin: 5px 0;
-            font-size: 16px;
-            line-height: 1.5;
+            margin-bottom: 20px;
+            text-align: justify;
         }
 
-        /* 点滅するカーソル */
-        .cursor {
-            display: inline-block;
-            width: 10px;
-            height: 18px;
-            background-color: #0f0;
-            animation: blink 1s infinite;
-            vertical-align: middle;
+        /* スキルリスト */
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
+        .tag {
+            border: 1px solid var(--sub-text);
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            font-family: sans-serif; /* 英語などは読みやすくゴシックで */
         }
 
-        /* リンクボタン */
-        .btn-group {
-            margin-top: 20px;
+        .tag:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            cursor: default;
+        }
+
+        /* フッター・リンク */
+        footer {
             text-align: center;
+            padding: 80px 0;
+            font-size: 0.9rem;
+            color: var(--sub-text);
         }
-        .btn {
-            display: inline-block;
-            border: 1px solid #0f0;
-            color: #0f0;
-            padding: 10px 20px;
+
+        a {
+            color: var(--text-color);
             text-decoration: none;
-            margin: 5px;
-            transition: 0.3s;
-            background: black;
-            font-weight: bold;
+            border-bottom: 1px solid var(--accent-color);
+            transition: opacity 0.3s;
+            margin: 0 10px;
         }
-        .btn:hover {
-            background: #0f0;
-            color: black;
-            box-shadow: 0 0 15px #0f0;
-            cursor: pointer;
+
+        a:hover {
+            opacity: 0.7;
+        }
+
+        /* アニメーション定義 */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* スマホ対応 */
+        @media (max-width: 600px) {
+            h1 { font-size: 2.5rem; }
+            .container { padding: 20px; }
         }
     </style>
 </head>
 <body>
 
-    <canvas id="matrix"></canvas>
+    <div class="container">
+        <header>
+            <div class="subtitle">Change the World</div>
+            <h1>The Architect</h1>
+            <div class="name">coco / Mechanical Engineering Student</div>
+        </header>
 
-    <div id="terminal">
-        <h1>> SYSTEM ACCESS_</h1>
-        <div id="typewriter"></div>
-        <span class="cursor"></span>
-        
-        <div class="btn-group">
-            <a href="#" class="btn" onclick="alert('アクセス承認されました')">ENTER</a>
-            <a href="https://github.com/" class="btn">GITHUB</a>
-        </div>
+        <section>
+            <h2>Philosophy</h2>
+            <p>
+                機械工学という物理的な力と、AIという知的な力の融合点に立つ。<br>
+                半導体技術の深淵と軍事技術の戦略性を探求し、既存の枠組みを打破する。<br>
+                私の目的は「世界征服」――すなわち、テクノロジーによる不可逆的な変革である。
+            </p>
+            <p>
+                効率を極めるライフハックと、思考を加速させるドライブ。<br>
+                常に最新情報の最前線に身を置き、次世代のスタンダードを構築する。
+            </p>
+        </section>
+
+        <section>
+            <h2>Core Intelligence</h2>
+            <div class="skills">
+                <span class="tag">Mechanical Engineering</span>
+                <span class="tag">Artificial Intelligence</span>
+                <span class="tag">Semiconductors</span>
+                <span class="tag">Military Tech</span>
+                <span class="tag">Life Hacks</span>
+                <span class="tag">Driving</span>
+            </div>
+        </section>
+
+        <section>
+            <h2>Contact</h2>
+            <p>
+                共犯者、あるいは挑戦者へ。
+            </p>
+            <div style="margin-top: 30px; text-align: center;">
+                <a href="https://twitter.com/ReffeQy" target="_blank">X (Twitter): @ReffeQy</a>
+            </div>
+        </section>
+
+        <footer>
+            &copy; 2025 coco / Change the World.
+        </footer>
     </div>
 
-    <script>
-        // --- 1. マトリックスレインのエフェクト ---
-        const canvas = document.getElementById('matrix');
-        const ctx = canvas.getContext('2d');
-
-        // 画面サイズを最大にする
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        // 降らせる文字（カタカナ・数字・アルファベット）
-        const katakana = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        const characters = katakana.split('');
-
-        const fontSize = 16;
-        const columns = canvas.width / fontSize; // 列の数
-
-        const drops = [];
-        // 全ての列の初期位置を0（一番上）にする
-        for (let x = 0; x < columns; x++) {
-            drops[x] = 1;
-        }
-
-        function draw() {
-            // 背景を少し透明な黒で塗りつぶす（残像効果）
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.fillStyle = '#0F0'; // 文字色（緑）
-            ctx.font = fontSize + 'px monospace';
-
-            for (let i = 0; i < drops.length; i++) {
-                // ランダムな文字を選択
-                const text = characters[Math.floor(Math.random() * characters.length)];
-                
-                // 文字を描画
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-                // 画面下まで行ったらランダムに上に戻す
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                    drops[i] = 0;
-                }
-
-                // Y座標を増やす
-                drops[i]++;
-            }
-        }
-
-        // 33ミリ秒ごとに描画（アニメーション）
-        setInterval(draw, 33);
-
-        // ウィンドウサイズが変わったらキャンバスサイズも調整
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
-
-
-        // --- 2. タイピング風テキスト表示 ---
-        const textToType = [
-            "ID: Unknown User...",
-            "Connecting to server...",
-            "Access level: Administrator...",
-            "Welcome to my secret base."
-        ];
-        
-        const typeWriterElement = document.getElementById('typewriter');
-        let lineIndex = 0;
-        let charIndex = 0;
-
-        function typeWriter() {
-            if (lineIndex < textToType.length) {
-                const currentLine = textToType[lineIndex];
-                
-                if (charIndex < currentLine.length) {
-                    typeWriterElement.innerHTML += currentLine.charAt(charIndex);
-                    charIndex++;
-                    setTimeout(typeWriter, 50); // 文字を打つスピード
-                } else {
-                    typeWriterElement.innerHTML += "<br>"; // 次の行へ
-                    lineIndex++;
-                    charIndex = 0;
-                    setTimeout(typeWriter, 500); // 行間の待ち時間
-                }
-            }
-        }
-
-        // 少し待ってからタイピング開始
-        setTimeout(typeWriter, 1000);
-
-    </script>
 </body>
 </html>

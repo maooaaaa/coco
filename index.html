@@ -1,96 +1,109 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LifeStation: REBORN | 統合ツールプラットフォーム</title>
+    <title>LifeStation: FINAL | 究極のツール集</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     
     <style>
+        /* --- 変数定義 (ライト/ダークモード対応) --- */
         :root {
-            --primary: #2563eb; --accent: #f59e0b;
-            --bg-body: #f8fafc; --bg-panel: #ffffff;
-            --text-main: #1e293b; --text-sub: #64748b;
+            --primary: #4f46e5;
+            --accent: #f59e0b;
+            --bg-body: #f3f4f6;
+            --bg-panel: #ffffff;
+            --text-main: #1f293b;
+            --text-sub: #64748b;
             --border: #e2e8f0;
             --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
-        body { margin: 0; font-family: "Helvetica Neue", Arial, sans-serif; background: var(--bg-body); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+        /* ダークモード定義 */
+        body.dark {
+            --primary: #818cf8;
+            --bg-body: #0f172a;
+            --bg-panel: #1e293b;
+            --text-main: #f1f5f9;
+            --text-sub: #94a3b8;
+            --border: #334155;
+        }
+
+        body { margin: 0; font-family: "Helvetica Neue", Arial, sans-serif; background: var(--bg-body); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; transition: background 0.3s, color 0.3s; }
         * { box-sizing: border-box; outline: none; }
 
         /* --- サイドバー --- */
-        .sidebar { width: 250px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; flex-shrink: 0; }
-        .logo { padding: 20px; font-size: 20px; font-weight: bold; color: var(--primary); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
-        .menu { flex: 1; overflow-y: auto; padding: 10px 0; }
-        .menu-item { padding: 12px 20px; cursor: pointer; color: var(--text-sub); display: flex; align-items: center; gap: 12px; transition: 0.2s; font-weight: 500; }
-        .menu-item:hover, .menu-item.active { background: #eff6ff; color: var(--primary); border-right: 3px solid var(--primary); }
-        .menu-count { margin-left: auto; font-size: 11px; background: #e2e8f0; padding: 2px 8px; border-radius: 10px; }
+        .sidebar { width: 260px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; flex-shrink: 0; transition: 0.3s; }
+        .logo { padding: 25px; font-size: 22px; font-weight: bold; color: var(--primary); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+        .menu { flex: 1; overflow-y: auto; padding: 15px 0; }
+        .menu-item { padding: 12px 25px; cursor: pointer; color: var(--text-sub); display: flex; align-items: center; gap: 12px; transition: 0.2s; font-weight: 500; border-left: 4px solid transparent; }
+        .menu-item:hover, .menu-item.active { background: var(--bg-body); color: var(--primary); border-left-color: var(--primary); }
+        .menu-count { margin-left: auto; font-size: 11px; background: var(--border); padding: 2px 8px; border-radius: 10px; color: var(--text-main); }
+        
+        .sidebar-footer { padding: 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .icon-btn { cursor: pointer; color: var(--text-sub); font-size: 18px; transition: 0.2s; }
+        .icon-btn:hover { color: var(--primary); transform: scale(1.1); }
 
         /* --- メインエリア --- */
         .main { flex: 1; display: flex; flex-direction: column; height: 100vh; position: relative; }
         
         /* ヘッダー */
-        .header { height: 60px; background: var(--bg-panel); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 30px; }
-        .search-box { width: 300px; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg-body); }
-        .user-info { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        .user-rank { font-size: 11px; color: white; background: var(--accent); padding: 2px 8px; border-radius: 4px; font-weight: bold; }
+        .header { height: 70px; background: var(--bg-panel); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 30px; transition: 0.3s; }
+        .search-box { width: 300px; padding: 10px 20px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-main); }
+        .user-info { display: flex; align-items: center; gap: 15px; cursor: pointer; }
+        .user-rank { font-size: 11px; color: white; background: var(--accent); padding: 3px 8px; border-radius: 4px; font-weight: bold; }
+        .avatar { width: 40px; height: 40px; background: var(--bg-body); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); }
 
         /* コンテンツ */
-        .content { flex: 1; padding: 30px; overflow-y: auto; background: var(--bg-body); }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; padding-bottom: 60px; }
+        .content { flex: 1; padding: 30px; overflow-y: auto; background: var(--bg-body); scroll-behavior: smooth; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; padding-bottom: 80px; }
         
         /* ツールカード */
         .card { 
-            background: var(--bg-panel); border-radius: 12px; padding: 20px; border: 1px solid var(--border);
-            box-shadow: var(--shadow); cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; gap: 8px; position: relative; overflow: hidden;
+            background: var(--bg-panel); border-radius: 16px; padding: 25px; border: 1px solid var(--border);
+            box-shadow: var(--shadow); cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; gap: 10px; position: relative; overflow: hidden;
         }
-        .card:hover { transform: translateY(-3px); border-color: var(--primary); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-        .card-icon { width: 40px; height: 40px; background: #eff6ff; color: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-        .card-title { font-weight: bold; font-size: 15px; }
-        .card-desc { font-size: 12px; color: var(--text-sub); line-height: 1.4; }
-        .fav-star { position: absolute; top: 15px; right: 15px; color: #cbd5e1; }
-        .fav-star.active { color: var(--accent); }
+        .card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 20px -5px rgba(0,0,0,0.1); }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .card-icon { width: 45px; height: 45px; background: var(--bg-body); color: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .card-title { font-weight: bold; font-size: 16px; color: var(--text-main); }
+        .card-desc { font-size: 13px; color: var(--text-sub); line-height: 1.5; }
+        .fav-star { font-size: 18px; color: var(--border); transition: 0.2s; }
+        .fav-star:hover, .fav-star.active { color: var(--accent); }
 
-        /* --- モーダル（ツール実行・ログイン・管理画面共通） --- */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); }
-        .modal-box { background: white; width: 90%; max-width: 600px; max-height: 90vh; border-radius: 12px; display: flex; flex-direction: column; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); overflow: hidden; }
-        .modal-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 18px; }
+        /* --- モーダル共通 --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(5px); }
+        .modal-box { background: var(--bg-panel); width: 90%; max-width: 600px; max-height: 90vh; border-radius: 16px; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); overflow: hidden; border: 1px solid var(--border); }
+        .modal-header { padding: 20px 30px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 18px; color: var(--text-main); }
         .modal-body { padding: 30px; overflow-y: auto; }
-        .modal-footer { padding: 20px; background: #f8fafc; border-top: 1px solid var(--border); text-align: right; font-size: 12px; color: #64748b; }
-
+        
         /* フォーム要素 */
-        input, select, textarea { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 15px; font-size: 16px; }
-        .btn { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.2s; }
+        input, select, textarea { width: 100%; padding: 14px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 20px; font-size: 16px; background: var(--bg-body); color: var(--text-main); }
+        .btn { background: var(--primary); color: white; border: none; padding: 14px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.2s; font-size: 16px; }
         .btn:hover { opacity: 0.9; }
-        .result-box { background: #f1f5f9; padding: 20px; border-radius: 8px; margin-top: 20px; text-align: center; font-size: 20px; font-weight: bold; color: var(--primary); word-break: break-all; border: 2px dashed #cbd5e1; }
+        .result-box { background: var(--bg-body); padding: 25px; border-radius: 12px; margin-top: 25px; text-align: center; font-size: 22px; font-weight: bold; color: var(--primary); word-break: break-all; border: 2px dashed var(--border); position: relative; }
+        .copy-btn { position: absolute; top: 10px; right: 10px; font-size: 12px; padding: 4px 8px; background: var(--border); color: var(--text-sub); border-radius: 4px; cursor: pointer; }
+        
+        /* 履歴リスト */
+        .history-list { list-style: none; padding: 0; margin: 0; }
+        .history-item { padding: 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+        .history-item:last-child { border-bottom: none; }
+        .history-val { font-weight: bold; color: var(--primary); margin-top: 5px; }
+        .history-meta { font-size: 11px; color: var(--text-sub); }
 
-        /* --- 管理画面 (Admin) --- */
-        .admin-dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .stat-card { background: #1e293b; color: white; padding: 20px; border-radius: 8px; }
-        .stat-num { font-size: 24px; font-weight: bold; color: #4ade80; }
-        .log-list { height: 200px; overflow-y: auto; background: #0f172a; color: #0f0; padding: 10px; font-family: monospace; font-size: 12px; border-radius: 8px; }
-        .btn-admin-close { background: #ef4444; margin-top: 20px; }
-
-        /* フッター（管理者入り口） */
-        .footer-admin-link {
-            position: absolute; bottom: 0; width: 100%; padding: 10px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid var(--border); background: var(--bg-panel); cursor: pointer;
-        }
-        .footer-admin-link:hover { color: var(--primary); background: #f1f5f9; }
-
-        /* レスポンシブ */
+        /* スマホ対応 */
         @media (max-width: 768px) {
             body { flex-direction: column; }
-            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); padding: 0; }
-            .logo { display: none; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); padding: 0; height: auto; }
+            .logo, .sidebar-footer { display: none; } /* スマホではヘッダー・フッター省略 */
             .menu { display: flex; overflow-x: auto; padding: 0; }
-            .menu-item { white-space: nowrap; border-right: none; border-bottom: 3px solid transparent; flex-direction: column; gap: 5px; font-size: 10px; padding: 10px; }
-            .menu-item.active { border-right: none; border-bottom-color: var(--primary); }
+            .menu-item { white-space: nowrap; border-left: none; border-bottom: 3px solid transparent; flex-direction: column; gap: 5px; font-size: 10px; padding: 10px; }
+            .menu-item.active { border-left: none; border-bottom-color: var(--primary); }
             .menu-count { display: none; }
-            .header { padding: 0 15px; }
+            .header { padding: 0 15px; height: 60px; }
             .search-box { width: 150px; }
+            .card { padding: 15px; }
         }
     </style>
 </head>
@@ -98,10 +111,10 @@
 
     <div id="login-modal" class="modal-overlay" style="display: flex;">
         <div class="modal-box" style="max-width: 400px; text-align: center;">
-            <div class="modal-header" style="justify-content: center;">LifeStation へようこそ</div>
+            <div class="modal-header" style="justify-content: center;">LifeStation Final</div>
             <div class="modal-body">
-                <p>あなた専用のツールダッシュボードを作成します。<br>お名前を入力してください。</p>
-                <input type="text" id="username-input" placeholder="ニックネーム (例: 田中)">
+                <p>あなた専用のツールスペースを作成します。<br>お名前を入力してください。</p>
+                <input type="text" id="username-input" placeholder="ニックネーム (例: ユーザー1)">
                 <button class="btn" onclick="login()">利用を開始する</button>
             </div>
         </div>
@@ -114,73 +127,57 @@
                 <span style="cursor:pointer" onclick="closeModal('tool-modal')">×</span>
             </div>
             <div class="modal-body">
-                <p id="tm-desc" style="color:#64748b; margin-bottom:20px; font-size:14px;"></p>
+                <p id="tm-desc" style="color:var(--text-sub); margin-bottom:20px; font-size:14px;"></p>
                 <div id="tm-content"></div>
                 <div id="tm-result" class="result-box" style="display:none;"></div>
             </div>
         </div>
     </div>
 
-    <div id="admin-modal" class="modal-overlay">
-        <div class="modal-box" style="max-width: 800px; background: #f8fafc;">
-            <div class="modal-header" style="background: #1e293b; color: white;">
-                <span><i class="fas fa-server"></i> システム管理コンソール (Admin)</span>
-                <span style="cursor:pointer" onclick="closeModal('admin-modal')">×</span>
+    <div id="history-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span><i class="fas fa-history"></i> 利用履歴</span>
+                <span style="cursor:pointer" onclick="closeModal('history-modal')">×</span>
             </div>
-            <div class="modal-body">
-                <div class="admin-dashboard">
-                    <div class="stat-card">
-                        <div>リアルタイム接続数</div>
-                        <div class="stat-num" id="adm-users">1,240</div>
-                        <div style="font-size:12px; color:#94a3b8;">前分比 +12%</div>
+            <div class="modal-body" style="padding:0;">
+                <div id="history-container" style="max-height: 400px; overflow-y: auto;">
                     </div>
-                    <div class="stat-card">
-                        <div>サーバー負荷 (CPU)</div>
-                        <div class="stat-num" id="adm-cpu">24%</div>
-                        <div style="font-size:12px; color:#94a3b8;">Status: Stable</div>
-                    </div>
-                    <div style="grid-column: span 2; background: white; padding: 15px; border-radius: 8px; border:1px solid #e2e8f0;">
-                        <h4>トラフィック推移</h4>
-                        <canvas id="trafficChart" height="100"></canvas>
-                    </div>
-                    <div style="grid-column: span 2;">
-                        <h4>全ユーザー利用ログ</h4>
-                        <div class="log-list" id="adm-logs"></div>
-                    </div>
+                <div style="padding:20px; text-align:center;">
+                    <button class="btn" style="background:#ef4444; width:auto;" onclick="clearHistory()">履歴を削除</button>
                 </div>
-                <button class="btn btn-admin-close" onclick="closeModal('admin-modal')">管理者モードを終了</button>
             </div>
         </div>
     </div>
 
     <nav class="sidebar">
-        <div class="logo"><i class="fas fa-shapes"></i> LifeStation <span style="font-size:10px; color:#94a3b8; margin-left:5px;">REBORN</span></div>
+        <div class="logo"><i class="fas fa-cube"></i> LifeStation <span style="font-size:10px; background:var(--primary); color:white; padding:2px 5px; border-radius:4px; margin-left:5px;">FINAL</span></div>
         <div class="menu">
             <div class="menu-item active" onclick="filter('all')"><i class="fas fa-th"></i> すべて <span class="menu-count" id="cnt-all">0</span></div>
+            <div class="menu-item" onclick="filter('fav')"><i class="fas fa-star" style="color:var(--accent)"></i> お気に入り <span class="menu-count" id="cnt-fav">0</span></div>
             <div class="menu-item" onclick="filter('calc')"><i class="fas fa-calculator"></i> 計算・お金 <span class="menu-count" id="cnt-calc">0</span></div>
-            <div class="menu-item" onclick="filter('conv')"><i class="fas fa-exchange-alt"></i> 単位変換 <span class="menu-count" id="cnt-conv">0</span></div>
+            <div class="menu-item" onclick="filter('conv')"><i class="fas fa-exchange-alt"></i> 変換・単位 <span class="menu-count" id="cnt-conv">0</span></div>
             <div class="menu-item" onclick="filter('text')"><i class="fas fa-font"></i> テキスト <span class="menu-count" id="cnt-text">0</span></div>
-            <div class="menu-item" onclick="filter('date')"><i class="fas fa-calendar"></i> 日付・時間 <span class="menu-count" id="cnt-date">0</span></div>
-            <div class="menu-item" onclick="filter('rand')"><i class="fas fa-dice"></i> 運・ランダム <span class="menu-count" id="cnt-rand">0</span></div>
-            <div class="menu-item" onclick="filter('dev')"><i class="fas fa-code"></i> 開発・Web <span class="menu-count" id="cnt-dev">0</span></div>
+            <div class="menu-item" onclick="filter('date')"><i class="fas fa-clock"></i> 日時・タイマー <span class="menu-count" id="cnt-date">0</span></div>
+            <div class="menu-item" onclick="filter('dev')"><i class="fas fa-code"></i> 開発・その他 <span class="menu-count" id="cnt-dev">0</span></div>
         </div>
-        <div class="footer-admin-link" onclick="openAdmin()">
-            <i class="fas fa-circle" style="color:#22c55e; font-size:8px;"></i> システム稼働状況: 正常 (クリックで詳細)
+        <div class="sidebar-footer">
+            <i class="fas fa-moon icon-btn" onclick="toggleDark()" title="ダークモード切替"></i>
+            <i class="fas fa-history icon-btn" onclick="openHistory()" title="履歴を見る"></i>
+            <i class="fas fa-sign-out-alt icon-btn" onclick="logout()" title="データ初期化"></i>
         </div>
     </nav>
 
     <main class="main">
         <header class="header">
             <h3>ダッシュボード</h3>
-            <input type="text" class="search-box" placeholder="ツールを検索..." oninput="search(this.value)">
-            <div class="user-info" onclick="logout()">
+            <input type="text" class="search-box" placeholder="ツールを検索 (例: 割り勘, QR)..." oninput="search(this.value)">
+            <div class="user-info">
                 <div style="text-align:right;">
                     <div id="u-name" style="font-weight:bold; font-size:14px;">ゲスト</div>
                     <div class="user-rank" id="u-rank">一般会員</div>
                 </div>
-                <div style="width:35px; height:35px; background:#e2e8f0; border-radius:50%; display:flex; align-items:center; justify-content:center;">
-                    <i class="fas fa-user"></i>
-                </div>
+                <div class="avatar"><i class="fas fa-user"></i></div>
             </div>
         </header>
 
@@ -191,87 +188,66 @@
     </main>
 
     <script>
-        // --- ユーザーデータ管理 ---
+        // ==========================================
+        //  ★ ここにツールを追加してください (簡単拡張) ★
+        // ==========================================
+        // フォーマット:
+        // { id: '固有ID', cat: 'カテゴリ(calc/conv/text/date/dev)', icon: 'FontAwesomeアイコン', title: 'タイトル', desc: '説明', inputs: ['入力名1', '入力名2'], func: (引数1, 引数2) => { return 結果; } }
+        
+        const tools = [
+            // --- 計算 (Calc) ---
+            { id: 'discount', cat: 'calc', icon: 'fa-tags', title: '割引計算', desc: '「3割引」「20%OFF」などを計算', inputs:['price:元の価格(円)', 'percent:割引率(%)'], func:(p,r)=>`${Math.floor(p*(1-r/100)).toLocaleString()} 円 (引額: ${Math.floor(p*r/100).toLocaleString()}円)` },
+            { id: 'tax', cat: 'calc', icon: 'fa-shopping-bag', title: '消費税計算', desc: '8%と10%を同時に計算', inputs:['price:税抜価格'], func:(p)=>`8%: ${Math.floor(p*1.08).toLocaleString()}円<br>10%: ${Math.floor(p*1.1).toLocaleString()}円` },
+            { id: 'warikan', cat: 'calc', icon: 'fa-users', title: '割り勘計算', desc: '均等に割った金額を算出', inputs:['total:合計金額', 'people:人数'], func:(t,n)=>`一人当たり: ${Math.ceil(t/n).toLocaleString()} 円` },
+            { id: 'bmi', cat: 'calc', icon: 'fa-weight', title: 'BMI計算', desc: '身長・体重から肥満度判定', inputs:['h:身長(cm)', 'w:体重(kg)'], func:(h,w)=>{const b=w/((h/100)**2); return `BMI: ${b.toFixed(1)} (${b<18.5?'痩せ型':b<25?'普通':b<30?'肥満1度':'肥満2度以上'})`} },
+            { id: 'loan', cat: 'calc', icon: 'fa-home', title: 'ローン返済額', desc: '月々の返済額を試算', inputs:['man:借入額(万円)', 'rate:金利(%)', 'year:返済年数'], func:(p,r,y)=>{const P=p*10000, R=r/100/12, N=y*12; return `月々: ${Math.floor((P*R*Math.pow(1+R,N))/(Math.pow(1+R,N)-1)).toLocaleString()} 円`} },
+            { id: 'tip', cat: 'calc', icon: 'fa-coins', title: 'チップ計算', desc: '海外旅行などで便利', inputs:['bill:請求額', 'rate:チップ(%)'], func:(b,r)=>`チップ: ${(b*r/100).toFixed(0)} / 総額: ${(b*(1+r/100)).toFixed(0)}` },
+
+            // --- 変換 (Conv) ---
+            { id: 'c_len', cat: 'conv', icon: 'fa-ruler', title: '長さ変換 (m)', desc: 'メートルからkm, inch, ftへ', inputs:['m:メートル'], func:(v)=>`${(v/1000).toFixed(3)} km<br>${(v*39.37).toFixed(2)} inch<br>${(v*3.28).toFixed(2)} ft` },
+            { id: 'c_wgt', cat: 'conv', icon: 'fa-weight-hanging', title: '重さ変換 (kg)', desc: 'キログラムからlb(ポンド)へ', inputs:['kg:キログラム'], func:(v)=>`${(v*2.20462).toFixed(2)} lb` },
+            { id: 'c_tmp', cat: 'conv', icon: 'fa-thermometer-half', title: '温度変換 (℃)', desc: '摂氏から華氏(℉)へ', inputs:['c:摂氏(℃)'], func:(v)=>`${(v*1.8+32).toFixed(1)} ℉` },
+            { id: 'c_spd', cat: 'conv', icon: 'fa-tachometer-alt', title: '速度変換', desc: 'km/h から m/s', inputs:['kmh:時速(km/h)'], func:(v)=>`${(v/3.6).toFixed(2)} m/s` },
+            { id: 'c_dat', cat: 'conv', icon: 'fa-hdd', title: 'データ容量', desc: 'MB から GB, TB', inputs:['mb:メガバイト'], func:(v)=>`${(v/1024).toFixed(2)} GB<br>${(v/1024/1024).toFixed(4)} TB` },
+
+            // --- テキスト (Text) ---
+            { id: 't_cnt', cat: 'text', icon: 'fa-file-lines', title: '文字数カウント', desc: '文字数・行数を計測', inputs:['area:テキスト'], func:(t)=>`文字数: ${t.length}<br>行数: ${t.split('\n').length}` },
+            { id: 't_rev', cat: 'text', icon: 'fa-undo', title: '文字反転', desc: '逆から読むと？', inputs:['text:文字列'], func:(t)=>t.split('').reverse().join('') },
+            { id: 't_qr', cat: 'text', icon: 'fa-qrcode', title: 'QRコード生成', desc: 'URLなどをQR画像に', inputs:['text:文字列'], type:'qr' },
+            { id: 't_b64', cat: 'text', icon: 'fa-code', title: 'Base64変換', desc: 'テキストをエンコード', inputs:['text:文字列'], func:(t)=>btoa(encodeURIComponent(t)) },
+
+            // --- 日付・その他 (Date/Dev) ---
+            { id: 'd_age', cat: 'date', icon: 'fa-birthday-cake', title: '年齢・日数', desc: '生年月日から計算', inputs:['date:誕生日'], func:(d)=>{const now=new Date(); const birth=new Date(d); return `${now.getFullYear()-birth.getFullYear()}歳<br>生まれてから ${Math.floor((now-birth)/86400000)}日`} },
+            { id: 'd_era', cat: 'date', icon: 'fa-calendar-alt', title: '西暦・和暦', desc: '西暦を入力', inputs:['year:西暦(年)'], func:(y)=>{if(y>=2019)return `令和${y-2018}年`; if(y>=1989)return `平成${y-1988}年`; if(y>=1926)return `昭和${y-1925}年`; return 'それ以前'} },
+            { id: 'd_tim', cat: 'date', icon: 'fa-hourglass', title: '3分タイマー', desc: 'カップ麺に最適', type:'timer', val:180 },
+            { id: 'dev_pass', cat: 'dev', icon: 'fa-key', title: 'パスワード生成', desc: '強力なPWを作成', inputs:[], func:()=>{const c="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%"; return Array(16).fill(0).map(()=>c[Math.floor(Math.random()*c.length)]).join('')} },
+            { id: 'dev_ip', cat: 'dev', icon: 'fa-network-wired', title: 'IPアドレス', desc: '自分のIPを確認', type:'async', func:async()=>{const r=await fetch('https://api.ipify.org?format=json'); const d=await r.json(); return d.ip} }
+        ];
+
+        // ==========================================
+        //  システムコア (以下は変更不要)
+        // ==========================================
+        
         const STORE = {
-            get: (k) => JSON.parse(localStorage.getItem('ls_reborn_' + k) || 'null'),
-            set: (k, v) => localStorage.setItem('ls_reborn_' + k, JSON.stringify(v)),
-            user: { name: 'Guest', xp: 0, loginTime: Date.now() }
+            get: (k) => JSON.parse(localStorage.getItem('ls_final_' + k) || 'null'),
+            set: (k, v) => localStorage.setItem('ls_final_' + k, JSON.stringify(v)),
+            user: { name: 'Guest', xp: 0, theme: 'light' },
+            favs: [],
+            history: []
         };
 
-        // --- ツール定義 (実用 + 量産で100個目指す構成) ---
-        const toolDB = [];
-
-        // 1. 計算・お金 (Calc)
-        toolDB.push(
-            { id: 'cal_disc', cat: 'calc', icon: 'fa-tags', title: '割引計算', desc: '◯◯%OFFを瞬時に計算', inputs:['price:元の価格','percent:割引率(%)'], func:(p,r)=>`${Math.floor(p*(1-r/100))}円 (${Math.floor(p*r/100)}円お得)` },
-            { id: 'cal_tax8', cat: 'calc', icon: 'fa-shopping-bag', title: '消費税 (8%)', desc: '軽減税率の計算', inputs:['price:税抜価格'], func:(p)=>`税込: ${Math.floor(p*1.08)}円` },
-            { id: 'cal_tax10', cat: 'calc', icon: 'fa-shopping-cart', title: '消費税 (10%)', desc: '標準税率の計算', inputs:['price:税抜価格'], func:(p)=>`税込: ${Math.floor(p*1.1)}円` },
-            { id: 'cal_wari', cat: 'calc', icon: 'fa-users', title: '割り勘計算', desc: '均等に割る', inputs:['total:合計金額','ppl:人数'], func:(t,n)=>`1人: ${Math.ceil(t/n)}円` },
-            { id: 'cal_bmi', cat: 'calc', icon: 'fa-weight', title: 'BMI計算', desc: '肥満度チェック', inputs:['h:身長(cm)','w:体重(kg)'], func:(h,w)=>{const b=w/((h/100)**2); return `BMI: ${b.toFixed(1)} (${b<18.5?'痩せ型':b<25?'普通':b<30?'肥満(1度)':'肥満(重度)'})`} },
-            { id: 'cal_loan', cat: 'calc', icon: 'fa-home', title: '簡易ローン返済', desc: '月々の支払額', inputs:['man:借入額(万円)','rate:年利(%)','year:年数'], func:(p,r,y)=>{const P=p*10000, R=r/100/12, N=y*12; return `月々: ${Math.floor((P*R*Math.pow(1+R,N))/(Math.pow(1+R,N)-1)).toLocaleString()}円`} },
-            { id: 'cal_tip', cat: 'calc', icon: 'fa-coins', title: 'チップ計算', desc: '海外旅行用', inputs:['bill:請求額','rate:チップ(%)'], func:(b,r)=>`支払総額: ${Math.floor(b*(1+r/100))}` }
-        );
-
-        // 2. 単位変換 (Conv) - ここで数を稼ぐ（実用的）
-        const units = [
-            {n:'長さ: m ⮕ km', f:v=>v/1000}, {n:'長さ: km ⮕ m', f:v=>v*1000},
-            {n:'長さ: inch ⮕ cm', f:v=>v*2.54}, {n:'長さ: cm ⮕ inch', f:v=>v/2.54},
-            {n:'長さ: ft ⮕ cm', f:v=>v*30.48}, {n:'重さ: kg ⮕ lb', f:v=>v*2.2046},
-            {n:'重さ: lb ⮕ kg', f:v=>v/2.2046}, {n:'温度: ℃ ⮕ ℉', f:v=>v*1.8+32},
-            {n:'温度: ℉ ⮕ ℃', f:v=>(v-32)/1.8}, {n:'容量: MB ⮕ GB', f:v=>v/1024},
-            {n:'速度: km/h ⮕ m/s', f:v=>v/3.6}, {n:'時間: 分 ⮕ 秒', f:v=>v*60}
-        ];
-        units.forEach((u, i) => {
-            toolDB.push({ id: `cv_${i}`, cat: 'conv', icon: 'fa-exchange-alt', title: u.n, desc: '単位を変換します', inputs:['val:数値'], func: (v)=>`${u.f(v).toFixed(2)}` });
-        });
-
-        // 3. テキスト (Text)
-        toolDB.push(
-            { id: 'txt_cnt', cat: 'text', icon: 'fa-file-lines', title: '文字数カウント', desc: '文字数を数える', inputs:['text_area:文章'], func:(t)=>`文字数: ${t.length} (空白除: ${t.replace(/\s/g,'').length})` },
-            { id: 'txt_rev', cat: 'text', icon: 'fa-undo', title: '文字反転', desc: '逆から読む', inputs:['text:文字'], func:(t)=>t.split('').reverse().join('') },
-            { id: 'txt_upper', cat: 'text', icon: 'fa-font', title: '大文字変換', desc: '英語を大文字に', inputs:['text:英語'], func:(t)=>t.toUpperCase() },
-            { id: 'txt_qr', cat: 'text', icon: 'fa-qrcode', title: 'QRコード作成', desc: '文字をQR画像に', inputs:['text:URLなど'], type:'qr' }
-        );
-
-        // 4. 日付・時間 (Date)
-        toolDB.push(
-            { id: 'dat_age', cat: 'date', icon: 'fa-birthday-cake', title: '年齢・日数計算', desc: '生まれて何日？', inputs:['date:誕生日'], func:(d)=>{const dif=new Date()-new Date(d); return `${Math.floor(dif/31557600000)}歳 (約${Math.floor(dif/86400000)}日経過)`} },
-            { id: 'dat_era', cat: 'date', icon: 'fa-torii-gate', title: '西暦・和暦', desc: '西暦を和暦に', inputs:['num:西暦(2025など)'], func:(y)=>{if(y>=2019)return `令和${y-2018}年`; if(y>=1989)return `平成${y-1988}年`; if(y>=1926)return `昭和${y-1925}年`; return '明治・大正以前'} },
-            { id: 'dat_timer', cat: 'date', icon: 'fa-hourglass', title: '3分タイマー', desc: 'カップ麺用', type:'timer', val:180 }
-        );
-
-        // 5. 運・ランダム (Rand)
-        toolDB.push(
-            { id: 'rnd_dice', cat: 'rand', icon: 'fa-dice', title: 'サイコロ', desc: '1〜6の目を出す', inputs:[], func:()=>Math.floor(Math.random()*6)+1 },
-            { id: 'rnd_coin', cat: 'rand', icon: 'fa-coins', title: 'コイントス', desc: '表か裏か', inputs:[], func:()=>Math.random()>0.5?'表 (Heads)':'裏 (Tails)' },
-            { id: 'rnd_pass', cat: 'rand', icon: 'fa-key', title: 'パスワード生成', desc: '強力なPWを作成', inputs:[], func:()=>{return Array(16).fill(0).map(()=>"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%".charAt(Math.floor(Math.random()*65))).join('')} }
-        );
-
-        // 6. 開発・その他 (Dev)
-        toolDB.push(
-            { id: 'dev_ip', cat: 'dev', icon: 'fa-network-wired', title: 'IPアドレス確認', desc: '自分のIPを調べる', type:'async', func:async()=>{const r=await fetch('https://api.ipify.org?format=json');const d=await r.json(); return d.ip} },
-            { id: 'dev_hash', cat: 'dev', icon: 'fa-lock', title: 'ハッシュ化(SHA256)', desc: '暗号学的ハッシュ', inputs:['text:文字列'], func:(t)=>CryptoJS.SHA256(t).toString() },
-            { id: 'dev_b64e', cat: 'dev', icon: 'fa-code', title: 'Base64エンコード', desc: '文字をBase64に', inputs:['text:文字列'], func:(t)=>btoa(t) }
-        );
-
-        // --- 数増しジェネレーター (100個に見せるため、似た機能のバリエーションを自動生成) ---
-        for(let i=1; i<=20; i++) {
-            toolDB.push({ id: `gen_rnd${i}`, cat: 'rand', icon: 'fa-random', title: `乱数生成器 Type-${i}`, desc: `アルゴリズムVer.${i}による乱数`, inputs:[], func:()=>Math.floor(Math.random()*100000) });
-        }
-        for(let i=1; i<=20; i++) {
-            toolDB.push({ id: `gen_col${i}`, cat: 'dev', icon: 'fa-palette', title: `カラーパレット ${i}`, desc: `ランダムな色を生成`, inputs:[], func:()=>{const c='#'+Math.floor(Math.random()*16777215).toString(16); return `<span style="color:${c}">■ ${c}</span>`} });
-        }
-
-
-        // --- 初期化処理 ---
+        // --- 初期化 ---
         window.onload = () => {
-            const saved = STORE.get('user');
-            if(saved) {
-                STORE.user = saved;
+            const savedUser = STORE.get('user');
+            if (savedUser) {
+                STORE.user = savedUser;
+                STORE.favs = STORE.get('favs') || [];
+                STORE.history = STORE.get('history') || [];
                 initApp();
             } else {
                 document.getElementById('login-modal').style.display = 'flex';
             }
+            if(STORE.user.theme === 'dark') document.body.classList.add('dark');
         };
 
         function login() {
@@ -285,36 +261,45 @@
         function initApp() {
             document.getElementById('u-name').innerText = STORE.user.name;
             updateRank();
-            renderGrid(toolDB);
+            renderGrid(tools);
             updateCounts();
         }
 
-        function updateRank() {
-            const xp = STORE.user.xp;
-            let r = '一般会員';
-            if(xp > 10) r = 'シルバー会員';
-            if(xp > 50) r = 'ゴールド会員';
-            if(xp > 100) r = 'プラチナ会員';
-            document.getElementById('u-rank').innerText = r;
-        }
-
         function logout() {
-            if(confirm('ログアウトしてデータを初期化しますか？')) {
+            if(confirm("データを全て削除して初期化しますか？")) {
                 localStorage.clear();
                 location.reload();
             }
         }
 
-        // --- 描画ロジック ---
+        function toggleDark() {
+            document.body.classList.toggle('dark');
+            STORE.user.theme = document.body.classList.contains('dark') ? 'dark' : 'light';
+            STORE.set('user', STORE.user);
+        }
+
+        function updateRank() {
+            const xp = STORE.user.xp;
+            let rank = 'ビギナー';
+            if(xp > 10) rank = 'ブロンズ';
+            if(xp > 50) rank = 'シルバー';
+            if(xp > 100) rank = 'ゴールド';
+            document.getElementById('u-rank').innerText = rank;
+        }
+
+        // --- 描画関連 ---
         function renderGrid(list) {
             const grid = document.getElementById('grid');
             grid.innerHTML = '';
             list.forEach(t => {
+                const isFav = STORE.favs.includes(t.id);
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
-                    <div class="fav-star"><i class="fas fa-star"></i></div>
-                    <div class="card-icon"><i class="fas ${t.icon}"></i></div>
+                    <div class="card-header">
+                        <div class="card-icon"><i class="fas ${t.icon}"></i></div>
+                        <i class="fas fa-star fav-star ${isFav?'active':''}" onclick="toggleFav('${t.id}', event)"></i>
+                    </div>
                     <div class="card-title">${t.title}</div>
                     <div class="card-desc">${t.desc}</div>
                 `;
@@ -323,27 +308,44 @@
             });
         }
 
+        function toggleFav(id, e) {
+            e.stopPropagation();
+            if(STORE.favs.includes(id)) STORE.favs = STORE.favs.filter(i => i !== id);
+            else STORE.favs.push(id);
+            STORE.set('favs', STORE.favs);
+            // 現在のフィルターに合わせて再描画
+            const activeMenu = document.querySelector('.menu-item.active').innerText.trim();
+            if(activeMenu.includes('お気に入り')) filter('fav');
+            else {
+                // 星の状態だけ更新（全描画は重いのでクラス切替）
+                e.target.classList.toggle('active');
+            }
+            updateCounts();
+        }
+
         function filter(cat) {
             document.querySelectorAll('.menu-item').forEach(e => e.classList.remove('active'));
             event.currentTarget.classList.add('active');
-            if(cat === 'all') renderGrid(toolDB);
-            else renderGrid(toolDB.filter(t => t.cat === cat));
+            if(cat === 'all') renderGrid(tools);
+            else if(cat === 'fav') renderGrid(tools.filter(t => STORE.favs.includes(t.id)));
+            else renderGrid(tools.filter(t => t.cat === cat));
         }
 
         function search(txt) {
-            if(!txt) renderGrid(toolDB);
-            else renderGrid(toolDB.filter(t => t.title.includes(txt) || t.desc.includes(txt)));
+            if(!txt) renderGrid(tools);
+            else renderGrid(tools.filter(t => t.title.includes(txt) || t.desc.includes(txt)));
         }
 
         function updateCounts() {
-            const cats = ['all', 'calc', 'conv', 'text', 'date', 'rand', 'dev'];
+            const cats = ['all', 'calc', 'conv', 'text', 'date', 'dev'];
             cats.forEach(c => {
-                const cnt = c === 'all' ? toolDB.length : toolDB.filter(t => t.cat === c).length;
+                const cnt = c === 'all' ? tools.length : tools.filter(t => t.cat === c).length;
                 document.getElementById('cnt-'+c).innerText = cnt;
             });
+            document.getElementById('cnt-fav').innerText = STORE.favs.length;
         }
 
-        // --- ツール実行ロジック ---
+        // --- ツール実行 ---
         let currentTool = null;
         function openTool(tool) {
             currentTool = tool;
@@ -354,11 +356,10 @@
             const content = document.getElementById('tm-content');
             content.innerHTML = '';
 
-            // 入力フォーム生成
             if(tool.type === 'qr') {
-                content.innerHTML = `<input type="text" id="in-0" placeholder="QRにしたい文字"><button class="btn" onclick="exec()">作成</button>`;
+                content.innerHTML = `<input type="text" id="in-0" placeholder="QRにする文字"><button class="btn" onclick="exec()">作成</button>`;
             } else if(tool.type === 'timer') {
-                content.innerHTML = `<div style="font-size:40px; text-align:center; font-weight:bold; margin:20px;">03:00</div><button class="btn" onclick="startTimer(this, ${tool.val})">スタート</button>`;
+                content.innerHTML = `<div id="timer-disp" style="font-size:40px; text-align:center; margin:20px; font-weight:bold;">03:00</div><button class="btn" onclick="startTimer(this, ${tool.val})">スタート</button>`;
             } else if(tool.inputs && tool.inputs.length > 0) {
                 tool.inputs.forEach((inp, i) => {
                     const [key, name] = inp.includes(':') ? inp.split(':') : ['val', inp];
@@ -369,21 +370,18 @@
             } else {
                 content.innerHTML += `<button class="btn" onclick="exec()">実行</button>`;
             }
-
+            
             document.getElementById('tool-modal').style.display = 'flex';
         }
 
         async function exec() {
             const resBox = document.getElementById('tm-result');
             resBox.style.display = 'block';
-            resBox.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 計算中...';
+            resBox.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 処理中...';
 
-            // 入力値収集
             const args = [];
             if(currentTool.inputs) {
-                for(let i=0; i<currentTool.inputs.length; i++) {
-                    args.push(document.getElementById(`in-${i}`).value);
-                }
+                for(let i=0; i<currentTool.inputs.length; i++) args.push(document.getElementById(`in-${i}`).value);
             }
 
             try {
@@ -391,22 +389,21 @@
                 if(currentTool.type === 'qr') {
                     resBox.innerHTML = '';
                     new QRCode(resBox, args[0]);
-                    res = 'QRコードを作成しました';
+                    res = '[QRコード生成]';
                 } else if(currentTool.type === 'async') {
                     res = await currentTool.func(...args);
                 } else {
                     res = currentTool.func(...args);
                 }
+
+                if(currentTool.type !== 'qr') {
+                    resBox.innerHTML = `${res} <span class="copy-btn" onclick="copyResult()">コピー</span>`;
+                    addToHistory(currentTool.title, res);
+                }
                 
-                if(currentTool.type !== 'qr') resBox.innerHTML = res;
-                
-                // XP加算 (ログ保存)
                 STORE.user.xp += 1;
                 STORE.set('user', STORE.user);
                 updateRank();
-                
-                // 管理画面用ログに追加 (擬似)
-                addAdminLog(currentTool.title, res);
 
             } catch(e) {
                 resBox.innerHTML = 'エラーが発生しました';
@@ -416,93 +413,55 @@
         function startTimer(btn, sec) {
             btn.disabled = true;
             let s = sec;
-            const d = btn.previousElementSibling;
+            const disp = document.getElementById('timer-disp');
             const t = setInterval(() => {
                 s--;
                 const m = Math.floor(s/60);
                 const sc = s%60;
-                d.innerText = `${m.toString().padStart(2,'0')}:${sc.toString().padStart(2,'0')}`;
-                if(s<=0) { clearInterval(t); d.innerText="時間です！"; alert('時間です'); btn.disabled=false; }
+                disp.innerText = `${m.toString().padStart(2,'0')}:${sc.toString().padStart(2,'0')}`;
+                if(s<=0) { clearInterval(t); disp.innerText="Time Up!"; alert('時間です'); btn.disabled=false; }
             }, 1000);
         }
 
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // --- 管理者モード (Admin) ---
-        let adminLogs = [];
-        let chartObj = null;
-
-        function openAdmin() {
-            document.getElementById('admin-modal').style.display = 'flex';
-            startAdminSimulation();
+        // --- 履歴機能 ---
+        function addToHistory(title, res) {
+            const item = { time: new Date().toLocaleString(), title: title, val: res };
+            STORE.history.unshift(item);
+            if(STORE.history.length > 50) STORE.history.pop();
+            STORE.set('history', STORE.history);
         }
 
-        function addAdminLog(toolName, res) {
-            // 自分のログを追加
-            const time = new Date().toLocaleTimeString();
-            adminLogs.unshift(`[${time}] ${STORE.user.name} が [${toolName}] を使用 >> OK`);
-            if(adminLogs.length > 50) adminLogs.pop();
-        }
-
-        function startAdminSimulation() {
-            // ログの初期ダミーデータ
-            if(adminLogs.length === 0) {
-                for(let i=0; i<10; i++) adminLogs.push(`[${new Date().toLocaleTimeString()}] User-${Math.floor(Math.random()*9000)} が [計算ツール] を使用 >> OK`);
-            }
-            updateAdminView();
-            initChart();
-        }
-
-        function updateAdminView() {
-            if(document.getElementById('admin-modal').style.display === 'none') return;
-
-            // 数値のランダム変動
-            const u = 1200 + Math.floor(Math.random()*100);
-            document.getElementById('adm-users').innerText = u.toLocaleString();
-            document.getElementById('adm-cpu').innerText = (Math.random()*30 + 10).toFixed(1) + '%';
+        function openHistory() {
+            const con = document.getElementById('history-container');
+            con.innerHTML = '';
+            if(STORE.history.length === 0) con.innerHTML = '<p style="text-align:center; color:var(--text-sub);">履歴はありません</p>';
             
-            // ログ表示更新
-            const logDiv = document.getElementById('adm-logs');
-            logDiv.innerHTML = adminLogs.map(l => `<div>${l}</div>`).join('');
-            
-            // 他のユーザーが使っているようなダミーログ追加
-            if(Math.random() > 0.7) {
-                const tools = ['割引計算', 'BMI', 'QR作成', 'タイマー', '単位変換'];
-                const t = tools[Math.floor(Math.random()*tools.length)];
-                adminLogs.unshift(`[${new Date().toLocaleTimeString()}] User-${Math.floor(Math.random()*9000)} が [${t}] を使用 >> OK`);
-                if(adminLogs.length > 50) adminLogs.pop();
-            }
-
-            setTimeout(updateAdminView, 1000);
-        }
-
-        function initChart() {
-            if(chartObj) return;
-            const ctx = document.getElementById('trafficChart').getContext('2d');
-            chartObj = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: Array(10).fill(''),
-                    datasets: [{
-                        label: 'Traffic',
-                        data: [10, 12, 15, 14, 20, 18, 25, 22, 30, 28],
-                        borderColor: '#2563eb',
-                        tension: 0.4,
-                        fill: true,
-                        backgroundColor: 'rgba(37, 99, 235, 0.1)'
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: {legend:{display:false}}, scales:{x:{display:false}} }
+            STORE.history.forEach(h => {
+                const li = document.createElement('div');
+                li.className = 'history-item';
+                li.innerHTML = `
+                    <div>
+                        <div class="history-meta">${h.time} - ${h.title}</div>
+                        <div class="history-val">${h.val.replace(/<br>/g, ' ')}</div>
+                    </div>
+                `;
+                con.appendChild(li);
             });
-            
-            // チャート更新ループ
-            setInterval(() => {
-                if(document.getElementById('admin-modal').style.display === 'none') return;
-                const data = chartObj.data.datasets[0].data;
-                data.shift();
-                data.push(Math.random() * 20 + 10);
-                chartObj.update();
-            }, 2000);
+            document.getElementById('history-modal').style.display = 'flex';
+        }
+
+        function clearHistory() {
+            STORE.history = [];
+            STORE.set('history', []);
+            openHistory();
+        }
+
+        function copyResult() {
+            const txt = document.getElementById('tm-result').innerText.replace('コピー', '').trim();
+            navigator.clipboard.writeText(txt);
+            alert('コピーしました');
         }
 
     </script>

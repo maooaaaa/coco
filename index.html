@@ -256,13 +256,28 @@
         }
 
         /* Tool Specific Styles */
-        .calc-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-        .calc-btn { aspect-ratio: 1.3; font-size: 16px; background: rgba(128,128,128,0.1); color: var(--text-main); border-radius: 8px; border:none; cursor:pointer; transition:0.1s; }
-        .calc-btn:hover { background: rgba(128,128,128,0.2); }
-        .calc-btn.op { color: var(--primary); background: rgba(99,102,241,0.1); font-weight:bold; }
-        .calc-btn.fn { color: var(--accent); background: rgba(236,72,153,0.1); font-size: 14px; }
-        .calc-btn.eq { background: var(--primary); color: white; grid-column: span 1; }
-        .calc-disp { grid-column: span 5; background: rgba(0,0,0,0.05); text-align: right; padding: 15px; font-size: 28px; border-radius: 8px; margin-bottom: 10px; font-family: monospace; overflow: hidden; }
+        .calc-grid { 
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; 
+        }
+        .calc-btn { 
+            aspect-ratio: 1.3; font-size: 18px; border-radius: 12px; border:none; cursor:pointer; 
+            transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-weight: 500;
+            background: rgba(255,255,255,0.6); color: var(--text-main);
+        }
+        body.dark .calc-btn { background: rgba(255,255,255,0.1); }
+        .calc-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .calc-btn:active { transform: translateY(0); }
+        
+        .calc-btn.op { color: white; background: var(--primary); font-weight:bold; }
+        .calc-btn.fn { color: var(--accent); background: rgba(236,72,153,0.1); font-size: 14px; font-weight: bold; }
+        .calc-btn.eq { background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; grid-column: span 1; }
+        .calc-btn.num { font-weight: bold; font-size: 20px; }
+        
+        .calc-disp { 
+            grid-column: span 5; background: rgba(0,0,0,0.05); text-align: right; 
+            padding: 20px; font-size: 32px; border-radius: 12px; margin-bottom: 15px; 
+            font-family: monospace; overflow-x: auto; white-space: nowrap;
+        }
 
         .img-editor-container { max-height: 500px; background: #333; overflow: hidden; display: flex; justify-content: center; align-items: center; border-radius: 8px; }
         #cropper-img { max-width: 100%; max-height: 450px; }
@@ -291,9 +306,11 @@
             .search-container { width: 100%; }
             .content { padding: 20px; }
             #mobile-toggle { display: block; font-size: 20px; color: var(--text-main); }
-            .calc-grid { grid-template-columns: repeat(4, 1fr); }
-            .calc-btn.fn { display: none; }
-            .calc-disp { grid-column: span 4; }
+            .calc-grid { grid-template-columns: repeat(4, 1fr); gap: 8px; }
+            .calc-btn { aspect-ratio: 1.1; font-size: 16px; }
+            .calc-btn.fn { font-size: 12px; }
+            .calc-disp { grid-column: span 4; font-size: 28px; padding: 15px; }
+            /* スマホで一部の高度な関数を隠すなどの調整も可だが今回は全表示 */
         }
         @media (min-width: 769px) { #mobile-toggle { display: none; } }
     </style>
@@ -503,7 +520,7 @@
 
             // --- CALC (計算・分析) ---
             {
-                id: 'calc', cat: 'calc', icon: 'fa-calculator', title: '関数電卓', desc: '科学技術計算に対応した高機能電卓',
+                id: 'calc', cat: 'calc', icon: 'fa-calculator', title: '関数電卓', desc: '科学技術計算・モダンデザイン',
                 type: 'custom',
                 render: (el) => {
                     el.innerHTML = `
@@ -513,7 +530,7 @@
                             <button class="calc-btn fn" onclick="cIn('Math.cos(')">cos</button>
                             <button class="calc-btn fn" onclick="cIn('Math.tan(')">tan</button>
                             <button class="calc-btn fn" onclick="cIn('Math.PI')">π</button>
-                            <button class="calc-btn op" onclick="cIn('C')">AC</button>
+                            <button class="calc-btn op" style="background:var(--danger)" onclick="cIn('C')">AC</button>
                             
                             <button class="calc-btn fn" onclick="cIn('Math.sqrt(')">√</button>
                             <button class="calc-btn fn" onclick="cIn('(')">(</button>
@@ -521,29 +538,111 @@
                             <button class="calc-btn fn" onclick="cIn('**')">^</button>
                             <button class="calc-btn op" onclick="cIn('/')">÷</button>
                             
-                            <button class="calc-btn" onclick="cIn('7')">7</button>
-                            <button class="calc-btn" onclick="cIn('8')">8</button>
-                            <button class="calc-btn" onclick="cIn('9')">9</button>
-                            <button class="calc-btn op" onclick="cIn('Del')">⌫</button>
+                            <button class="calc-btn num" onclick="cIn('7')">7</button>
+                            <button class="calc-btn num" onclick="cIn('8')">8</button>
+                            <button class="calc-btn num" onclick="cIn('9')">9</button>
+                            <button class="calc-btn op" style="background:var(--text-sub)" onclick="cIn('Del')">⌫</button>
                             <button class="calc-btn op" onclick="cIn('*')">×</button>
                             
-                            <button class="calc-btn" onclick="cIn('4')">4</button>
-                            <button class="calc-btn" onclick="cIn('5')">5</button>
-                            <button class="calc-btn" onclick="cIn('6')">6</button>
+                            <button class="calc-btn num" onclick="cIn('4')">4</button>
+                            <button class="calc-btn num" onclick="cIn('5')">5</button>
+                            <button class="calc-btn num" onclick="cIn('6')">6</button>
                             <button class="calc-btn op" onclick="cIn('-')">-</button>
                             <button class="calc-btn op" onclick="cIn('%')">%</button>
                             
-                            <button class="calc-btn" onclick="cIn('1')">1</button>
-                            <button class="calc-btn" onclick="cIn('2')">2</button>
-                            <button class="calc-btn" onclick="cIn('3')">3</button>
+                            <button class="calc-btn num" onclick="cIn('1')">1</button>
+                            <button class="calc-btn num" onclick="cIn('2')">2</button>
+                            <button class="calc-btn num" onclick="cIn('3')">3</button>
                             <button class="calc-btn op" onclick="cIn('+')">+</button>
                             <button class="calc-btn eq" onclick="cIn('=')">=</button>
                             
-                            <button class="calc-btn" onclick="cIn('0')" style="grid-column:span 2;">0</button>
-                            <button class="calc-btn" onclick="cIn('.')">.</button>
+                            <button class="calc-btn num" onclick="cIn('0')" style="grid-column:span 2;">0</button>
+                            <button class="calc-btn num" onclick="cIn('.')">.</button>
                         </div>
                     `;
                     setupCalcKeys();
+                }
+            },
+            {
+                id: 'warikan', cat: 'calc', icon: 'fa-users', title: '割り勘奉行', desc: '飲み会・旅行に！スマート割り勘',
+                type: 'custom',
+                render: (el) => {
+                    el.innerHTML = `
+                        <div style="display:flex; flex-direction:column; gap:15px;">
+                            <div style="display:flex; gap:10px;">
+                                <div style="flex:1;"><label style="font-size:12px; color:var(--text-sub);">合計金額 (円)</label><input type="number" id="w-total" placeholder="12300" style="margin:0;"></div>
+                                <div style="width:100px;"><label style="font-size:12px; color:var(--text-sub);">人数</label><input type="number" id="w-num" placeholder="3" style="margin:0;"></div>
+                            </div>
+                            
+                            <div style="background:rgba(0,0,0,0.03); padding:10px; border-radius:10px;">
+                                <div style="font-size:12px; color:var(--text-sub); margin-bottom:5px;">調整オプション</div>
+                                <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
+                                    <label style="font-size:13px;"><input type="checkbox" id="w-boss-check"> 特定の人が多めに払う</label>
+                                    <input type="number" id="w-boss-pay" placeholder="支払額" style="width:100px; margin:0; display:none;">
+                                </div>
+                                <div style="display:flex; gap:10px; align-items:center;">
+                                    <span style="font-size:13px;">単位:</span>
+                                    <select id="w-unit" style="margin:0; width:auto; padding:5px;">
+                                        <option value="1">1円</option>
+                                        <option value="10">10円</option>
+                                        <option value="100" selected>100円</option>
+                                        <option value="500">500円</option>
+                                        <option value="1000">1000円</option>
+                                    </select>
+                                    <span style="font-size:12px; color:var(--text-sub);">で切り上げ</span>
+                                </div>
+                            </div>
+
+                            <button class="btn" onclick="calcWarikan()">計算する</button>
+                            
+                            <div id="w-result" class="result-area" style="display:none; text-align:left; line-height:1.6;"></div>
+                        </div>
+                    `;
+                    // Checkbox logic
+                    document.getElementById('w-boss-check').onchange = (e) => {
+                        document.getElementById('w-boss-pay').style.display = e.target.checked ? 'block' : 'none';
+                    };
+                    // Calculation Logic embedded for simplicity in tool definition
+                    window.calcWarikan = () => {
+                        const total = parseInt(document.getElementById('w-total').value);
+                        const num = parseInt(document.getElementById('w-num').value);
+                        const unit = parseInt(document.getElementById('w-unit').value);
+                        const isBoss = document.getElementById('w-boss-check').checked;
+                        const bossPay = isBoss ? parseInt(document.getElementById('w-boss-pay').value) : 0;
+                        
+                        if(!total || !num) { alert('金額と人数を入力してください'); return; }
+                        
+                        const resDiv = document.getElementById('w-result');
+                        resDiv.style.display = 'block';
+                        
+                        let restTotal = total;
+                        let regularNum = num;
+                        let msg = '';
+                        
+                        if(isBoss) {
+                            if(!bossPay) { alert('多めに払う金額を入力してください'); return; }
+                            restTotal -= bossPay;
+                            regularNum -= 1;
+                            msg += `👑 <strong>多めに払う人 (1名):</strong> ${bossPay.toLocaleString()}円<br>`;
+                        }
+                        
+                        if(regularNum > 0) {
+                            const perPersonRaw = restTotal / regularNum;
+                            // 切り上げ計算
+                            const perPerson = Math.ceil(perPersonRaw / unit) * unit;
+                            const payTotal = (isBoss ? bossPay : 0) + (perPerson * regularNum);
+                            const pool = payTotal - total;
+                            
+                            msg += `👤 <strong>一人あたり (${regularNum}名):</strong> ${perPerson.toLocaleString()}円<br>`;
+                            msg += `<hr style="margin:10px 0; border:0; border-top:1px dashed var(--success);">`;
+                            msg += `💰 <strong>支払総額:</strong> ${payTotal.toLocaleString()}円<br>`;
+                            if(pool > 0) msg += `🎁 <strong>余り (プール金):</strong> ${pool.toLocaleString()}円`;
+                            else if(pool < 0) msg += `⚠️ <strong>不足:</strong> ${Math.abs(pool).toLocaleString()}円`;
+                            else msg += `✨ <strong>ぴったり！</strong>`;
+                        }
+                        
+                        resDiv.innerHTML = msg;
+                    };
                 }
             },
             {

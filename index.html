@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LifeStation V5 | 統合ワークスペース</title>
+    <title>LifeStation V6 | Ultimate Workspace</title>
     
     <!-- Libraries -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
     
     <style>
         /* --- Core Variables --- */
@@ -19,14 +22,14 @@
             --accent: #8b5cf6;
             --danger: #ef4444;
             --success: #10b981;
-            --bg-grad-1: #eff6ff;
-            --bg-grad-2: #f0f9ff;
-            --glass-bg: rgba(255, 255, 255, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.8);
-            --text-main: #1e293b;
+            --bg-grad-1: #f8fafc;
+            --bg-grad-2: #e2e8f0;
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --text-main: #0f172a;
             --text-sub: #64748b;
-            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            --font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
         }
 
         body.dark {
@@ -35,11 +38,11 @@
             --accent: #a78bfa;
             --bg-grad-1: #0f172a;
             --bg-grad-2: #1e293b;
-            --glass-bg: rgba(30, 41, 59, 0.85);
+            --glass-bg: rgba(30, 41, 59, 0.9);
             --glass-border: rgba(255, 255, 255, 0.08);
-            --text-main: #f1f5f9;
+            --text-main: #f8fafc;
             --text-sub: #94a3b8;
-            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
         }
 
         /* --- Base & Reset --- */
@@ -58,15 +61,15 @@
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         
         /* Scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-thumb { background: var(--text-sub); border-radius: 3px; opacity: 0.3; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-thumb { background: var(--text-sub); border-radius: 4px; opacity: 0.3; }
         ::-webkit-scrollbar-track { background: transparent; }
 
         /* Glassmorphism Class */
         .glass {
             background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--glass-border);
             box-shadow: var(--card-shadow);
         }
@@ -83,7 +86,7 @@
         }
 
         .logo {
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 800;
             color: var(--text-main);
             display: flex;
@@ -93,7 +96,7 @@
         }
         .logo i { color: var(--primary); }
         .version-badge {
-            font-size: 10px; background: linear-gradient(45deg, var(--primary), var(--accent));
+            font-size: 10px; background: linear-gradient(135deg, var(--primary), var(--accent));
             color: white; padding: 2px 8px; border-radius: 12px; font-weight: bold;
         }
 
@@ -119,7 +122,7 @@
         }
         .menu-item:hover { background: rgba(128,128,128, 0.08); color: var(--primary); }
         .menu-item.active { background: var(--primary); color: white; box-shadow: 0 4px 12px var(--primary-glow); }
-        .menu-count { margin-left: auto; font-size: 10px; background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 8px; }
+        .menu-count { margin-left: auto; font-size: 10px; background: rgba(128,128,128,0.1); padding: 2px 6px; border-radius: 8px; }
 
         /* Main Area */
         .main { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; }
@@ -147,7 +150,7 @@
         
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 20px;
             padding-bottom: 80px;
             animation: fadeIn 0.4s ease;
@@ -164,16 +167,16 @@
         .card:hover { transform: translateY(-5px); border-color: var(--primary-glow); box-shadow: 0 10px 25px -5px var(--primary-glow); }
         
         .card-icon-box {
-            width: 44px; height: 44px;
+            width: 48px; height: 48px;
             background: linear-gradient(135deg, var(--bg-grad-1), var(--glass-bg));
             border: 1px solid var(--glass-border);
             color: var(--primary);
             border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 20px;
+            font-size: 22px;
         }
         .card-title { font-weight: bold; font-size: 16px; }
-        .card-desc { font-size: 12px; color: var(--text-sub); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .card-desc { font-size: 13px; color: var(--text-sub); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         
         .fav-btn {
             position: absolute; top: 15px; right: 15px;
@@ -183,13 +186,13 @@
 
         /* Modals */
         .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
             display: none; justify-content: center; align-items: center; z-index: 1000;
             opacity: 0; transition: opacity 0.2s;
         }
         .modal-overlay.show { opacity: 1; }
         .modal-box {
-            width: 95%; max-width: 650px; max-height: 85vh;
+            width: 95%; max-width: 800px; max-height: 90vh;
             border-radius: 20px; display: flex; flex-direction: column;
             transform: scale(0.95); transition: 0.3s cubic-bezier(0.19, 1, 0.22, 1);
             overflow: hidden; background: var(--glass-bg);
@@ -202,51 +205,72 @@
             font-weight: bold; font-size: 18px;
             background: rgba(var(--primary), 0.05);
         }
-        .modal-body { padding: 25px; overflow-y: auto; }
+        .modal-body { padding: 25px; overflow-y: auto; flex: 1; }
 
         /* UI Components */
         .btn {
             background: var(--primary); color: white; border: none; padding: 12px 20px;
-            border-radius: 8px; cursor: pointer; font-weight: 600; width: 100%;
+            border-radius: 10px; cursor: pointer; font-weight: 600; width: 100%;
             transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
         }
         .btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
         .btn:active { transform: scale(0.98); }
+        .btn-sm { padding: 8px 15px; font-size: 13px; }
         .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
         .btn-outline:hover { background: rgba(59, 130, 246, 0.1); }
+        .btn-group { display: flex; gap: 10px; }
 
         input, select, textarea {
             width: 100%; padding: 12px; border: 1px solid var(--glass-border);
-            border-radius: 8px; margin-bottom: 15px; font-size: 14px;
-            background: rgba(255,255,255,0.5); color: var(--text-main);
+            border-radius: 10px; margin-bottom: 15px; font-size: 14px;
+            background: rgba(255,255,255,0.6); color: var(--text-main);
             transition: 0.2s;
         }
-        body.dark input, body.dark textarea { background: rgba(0,0,0,0.2); }
-        input:focus, textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px var(--primary-glow); background: var(--glass-bg); }
+        body.dark input, body.dark textarea, body.dark select { background: rgba(0,0,0,0.3); }
+        input:focus, textarea:focus, select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px var(--primary-glow); background: var(--glass-bg); }
 
         .result-area {
-            background: rgba(16, 185, 129, 0.05); border: 1px dashed var(--success);
-            padding: 15px; border-radius: 8px; margin-top: 15px;
+            background: rgba(16, 185, 129, 0.08); border: 1px dashed var(--success);
+            padding: 15px; border-radius: 10px; margin-top: 15px;
             text-align: center; font-weight: bold; color: var(--success);
             word-break: break-all;
         }
 
         /* Tool Specific Styles */
         /* Calculator Grid */
-        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .calc-btn { aspect-ratio: 1.2; font-size: 18px; background: rgba(128,128,128,0.1); color: var(--text-main); border-radius: 8px; border:none; cursor:pointer; transition:0.1s; }
+        .calc-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+        .calc-btn { 
+            aspect-ratio: 1.3; font-size: 16px; background: rgba(128,128,128,0.1); 
+            color: var(--text-main); border-radius: 8px; border:none; cursor:pointer; transition:0.1s; 
+        }
         .calc-btn:hover { background: rgba(128,128,128,0.2); }
         .calc-btn.op { color: var(--primary); background: rgba(59,130,246,0.1); font-weight:bold; }
-        .calc-btn.eq { background: var(--primary); color: white; grid-column: span 2; }
-        .calc-disp { grid-column: span 4; background: rgba(0,0,0,0.05); text-align: right; padding: 15px; font-size: 24px; border-radius: 8px; margin-bottom: 10px; font-family: monospace; }
+        .calc-btn.fn { color: var(--accent); background: rgba(139, 92, 246, 0.1); font-size: 14px; }
+        .calc-btn.eq { background: var(--primary); color: white; grid-column: span 1; }
+        .calc-disp { 
+            grid-column: span 5; background: rgba(0,0,0,0.05); text-align: right; 
+            padding: 15px; font-size: 28px; border-radius: 8px; margin-bottom: 10px; font-family: monospace; overflow: hidden;
+        }
+
+        /* Image Editor */
+        .img-editor-container { max-height: 500px; background: #333; overflow: hidden; display: flex; justify-content: center; align-items: center; border-radius: 8px; }
+        #cropper-img { max-width: 100%; max-height: 450px; }
 
         /* Todo */
-        .todo-item { display: flex; align-items: center; gap: 10px; padding: 8px; border-bottom: 1px solid var(--glass-border); animation: slideIn 0.2s; }
+        .todo-item { display: flex; align-items: center; gap: 10px; padding: 10px; border-bottom: 1px solid var(--glass-border); animation: slideIn 0.2s; background: rgba(255,255,255,0.05); border-radius: 8px; margin-bottom: 5px; }
         .todo-check { cursor: pointer; color: var(--text-sub); font-size: 18px; }
         .todo-check.done { color: var(--success); }
         .todo-text { flex: 1; }
         .todo-text.done { text-decoration: line-through; opacity: 0.5; }
         @keyframes slideIn { from{opacity:0; transform:translateX(-10px);} to{opacity:1; transform:translateX(0);} }
+
+        /* Markdown Preview */
+        #md-preview { 
+            border: 1px solid var(--glass-border); padding: 15px; border-radius: 8px; 
+            background: rgba(255,255,255,0.2); min-height: 100px; margin-top: 10px;
+        }
+        #md-preview h1 { font-size: 1.5em; border-bottom: 1px solid #ccc; }
+        #md-preview blockquote { border-left: 4px solid #ccc; padding-left: 10px; color: #666; }
 
         /* Mobile Responsive */
         @media (max-width: 768px) {
@@ -258,6 +282,9 @@
             .search-container { width: 100%; }
             .content { padding: 20px; }
             #mobile-toggle { display: block; font-size: 20px; color: var(--text-main); }
+            .calc-grid { grid-template-columns: repeat(4, 1fr); }
+            .calc-btn.fn { display: none; } /* スマホでは簡易モード */
+            .calc-disp { grid-column: span 4; }
         }
         @media (min-width: 769px) { #mobile-toggle { display: none; } }
     </style>
@@ -282,9 +309,9 @@
     <!-- Sidebar -->
     <nav class="sidebar glass">
         <div class="logo">
-            <i class="fas fa-layer-group"></i> 
+            <i class="fas fa-cube"></i> 
             <span>LifeStation</span>
-            <span class="version-badge">V5</span>
+            <span class="version-badge">V6</span>
             <i id="mobile-toggle" class="fas fa-bars" onclick="toggleMenu()" style="margin-left:auto;"></i>
         </div>
         
@@ -294,11 +321,11 @@
             <div class="menu-item" onclick="filter('work')"><i class="fas fa-briefcase"></i> 仕事・効率化 <span class="menu-count" id="c-work">0</span></div>
             <div class="menu-item" onclick="filter('calc')"><i class="fas fa-calculator"></i> 計算・分析 <span class="menu-count" id="c-calc">0</span></div>
             <div class="menu-item" onclick="filter('image')"><i class="fas fa-image"></i> 画像処理 <span class="menu-count" id="c-image">0</span></div>
-            <div class="menu-item" onclick="filter('text')"><i class="fas fa-font"></i> テキスト・PDF <span class="menu-count" id="c-text">0</span></div>
-            <div class="menu-item" onclick="filter('dev')"><i class="fas fa-code"></i> 開発・ツール <span class="menu-count" id="c-dev">0</span></div>
+            <div class="menu-item" onclick="filter('text')"><i class="fas fa-font"></i> テキスト・開発 <span class="menu-count" id="c-text">0</span></div>
             
             <div style="margin-top:auto; padding-top:10px; border-top:1px solid var(--glass-border); display:flex; justify-content:space-between; font-size:18px;">
                 <i class="fas fa-moon" onclick="toggleTheme()" style="cursor:pointer; color:var(--text-sub);" title="ダークモード切替"></i>
+                <i class="fas fa-file-export" onclick="exportData()" style="cursor:pointer; color:var(--text-sub);" title="データ保存"></i>
                 <i class="fas fa-trash-alt" onclick="clearData()" style="cursor:pointer; color:var(--danger);" title="データ初期化"></i>
             </div>
         </div>
@@ -322,7 +349,7 @@
                 <!-- Cards will be injected here -->
             </div>
             <div style="text-align:center; margin-top:50px; color:var(--text-sub); font-size:12px;">
-                LifeStation V5 - Local Storage Based Workspace
+                LifeStation V6 - Ultimate Web Workspace
             </div>
         </div>
     </main>
@@ -331,7 +358,7 @@
         // ============================================
         //  APP STATE & CONFIG
         // ============================================
-        const STORE_KEY = 'lifestation_v5_data';
+        const STORE_KEY = 'lifestation_v6_data';
         let appData = {
             favs: [],
             todos: [],
@@ -339,7 +366,9 @@
             theme: 'light'
         };
         let activeTool = null;
-        let pInterval = null; // Pomodoro Interval
+        let pInterval = null; // Pomodoro
+        let swInterval = null; // Stopwatch
+        let cropper = null; // Image Editor
 
         // ============================================
         //  TOOLS DEFINITION
@@ -347,7 +376,7 @@
         const tools = [
             // --- WORK (仕事・効率化) ---
             {
-                id: 'todo', cat: 'work', icon: 'fa-check-double', title: 'ToDoリスト', desc: 'ドラッグ移動可能なシンプルタスク管理',
+                id: 'todo', cat: 'work', icon: 'fa-check-double', title: 'ToDoリスト', desc: 'ドラッグ移動可能なタスク管理',
                 type: 'custom',
                 render: (el) => {
                     el.innerHTML = `
@@ -355,22 +384,26 @@
                             <input type="text" id="td-in" placeholder="新しいタスク..." onkeypress="if(event.key==='Enter')addTodo()" style="margin:0;">
                             <button class="btn" style="width:auto;" onclick="addTodo()"><i class="fas fa-plus"></i></button>
                         </div>
-                        <div id="td-list" style="margin-top:15px; max-height:300px; overflow-y:auto;"></div>
+                        <div id="td-list" style="margin-top:15px; max-height:400px; overflow-y:auto;"></div>
                     `;
                     renderTodos();
                 }
             },
             {
-                id: 'memo', cat: 'work', icon: 'fa-sticky-note', title: 'クイックメモ', desc: '自動保存されるメモ帳 (テキスト保存可)',
+                id: 'memo', cat: 'work', icon: 'fa-sticky-note', title: 'Markdownメモ', desc: 'プレビュー機能付き高機能メモ',
                 type: 'custom',
                 render: (el) => {
                     el.innerHTML = `
-                        <textarea id="memo-pad" rows="12" placeholder="ここにメモを入力..." oninput="saveMemo()">${appData.memo || ''}</textarea>
-                        <div style="display:flex; gap:10px;">
-                            <button class="btn btn-outline" onclick="downloadMemo()"><i class="fas fa-download"></i> .txtで保存</button>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; height:400px;">
+                            <textarea id="memo-pad" style="resize:none; height:100%;" placeholder="# Markdownが使えます" oninput="updateMemo()">${appData.memo || ''}</textarea>
+                            <div id="md-preview" style="height:100%; overflow-y:auto;"></div>
+                        </div>
+                        <div style="display:flex; gap:10px; margin-top:10px;">
+                            <button class="btn btn-outline" onclick="downloadMemo()"><i class="fas fa-download"></i> .md保存</button>
                             <button class="btn btn-outline" onclick="copyMemo()"><i class="fas fa-copy"></i> コピー</button>
                         </div>
                     `;
+                    updateMemo();
                 }
             },
             {
@@ -379,7 +412,7 @@
                 render: (el) => {
                     el.innerHTML = `
                         <div style="text-align:center;">
-                            <div id="pm-disp" style="font-size:64px; font-weight:800; font-family:monospace; color:var(--primary); margin:20px 0;">25:00</div>
+                            <div id="pm-disp" style="font-size:72px; font-weight:800; font-family:monospace; color:var(--primary); margin:30px 0;">25:00</div>
                             <div style="display:flex; justify-content:center; gap:10px;">
                                 <button class="btn" onclick="startPomo(25)">集中 (25分)</button>
                                 <button class="btn" style="background:var(--success)" onclick="startPomo(5)">休憩 (5分)</button>
@@ -389,94 +422,137 @@
                     `;
                 }
             },
+            {
+                id: 'stopwatch', cat: 'work', icon: 'fa-stopwatch', title: 'ストップウォッチ', desc: 'ラップ計測機能付き',
+                type: 'custom',
+                render: (el) => {
+                    el.innerHTML = `
+                        <div style="text-align:center;">
+                            <div id="sw-disp" style="font-size:60px; font-family:monospace; font-weight:bold; margin:20px 0;">00:00.00</div>
+                            <div style="display:flex; gap:10px; justify-content:center; margin-bottom:20px;">
+                                <button class="btn" onclick="startSW()">Start</button>
+                                <button class="btn" style="background:var(--accent)" onclick="lapSW()">Lap</button>
+                                <button class="btn" style="background:var(--danger)" onclick="stopSW()">Stop/Reset</button>
+                            </div>
+                            <div id="sw-laps" style="max-height:200px; overflow-y:auto; border-top:1px solid var(--glass-border);"></div>
+                        </div>
+                    `;
+                }
+            },
 
             // --- CALC (計算・分析) ---
             {
-                id: 'calc', cat: 'calc', icon: 'fa-calculator', title: '電卓', desc: 'キーボード操作対応の標準電卓',
+                id: 'calc', cat: 'calc', icon: 'fa-calculator', title: '関数電卓', desc: '科学技術計算に対応した高機能電卓',
                 type: 'custom',
                 render: (el) => {
                     el.innerHTML = `
                         <div class="calc-disp" id="c-disp">0</div>
                         <div class="calc-grid">
-                            <button class="calc-btn op" onclick="cIn('C')">C</button>
+                            <button class="calc-btn fn" onclick="cIn('Math.sin(')">sin</button>
+                            <button class="calc-btn fn" onclick="cIn('Math.cos(')">cos</button>
+                            <button class="calc-btn fn" onclick="cIn('Math.tan(')">tan</button>
+                            <button class="calc-btn fn" onclick="cIn('Math.PI')">π</button>
+                            <button class="calc-btn op" onclick="cIn('C')">AC</button>
+                            
+                            <button class="calc-btn fn" onclick="cIn('Math.sqrt(')">√</button>
+                            <button class="calc-btn fn" onclick="cIn('(')">(</button>
+                            <button class="calc-btn fn" onclick="cIn(')')">)</button>
+                            <button class="calc-btn fn" onclick="cIn('**')">^</button>
                             <button class="calc-btn op" onclick="cIn('/')">÷</button>
-                            <button class="calc-btn op" onclick="cIn('*')">×</button>
-                            <button class="calc-btn op" onclick="cIn('Del')">⌫</button>
+                            
                             <button class="calc-btn" onclick="cIn('7')">7</button>
                             <button class="calc-btn" onclick="cIn('8')">8</button>
                             <button class="calc-btn" onclick="cIn('9')">9</button>
-                            <button class="calc-btn op" onclick="cIn('-')">-</button>
+                            <button class="calc-btn op" onclick="cIn('Del')">⌫</button>
+                            <button class="calc-btn op" onclick="cIn('*')">×</button>
+                            
                             <button class="calc-btn" onclick="cIn('4')">4</button>
                             <button class="calc-btn" onclick="cIn('5')">5</button>
                             <button class="calc-btn" onclick="cIn('6')">6</button>
-                            <button class="calc-btn op" onclick="cIn('+')">+</button>
+                            <button class="calc-btn op" onclick="cIn('-')">-</button>
+                            <button class="calc-btn op" onclick="cIn('%')">%</button>
+                            
                             <button class="calc-btn" onclick="cIn('1')">1</button>
                             <button class="calc-btn" onclick="cIn('2')">2</button>
                             <button class="calc-btn" onclick="cIn('3')">3</button>
+                            <button class="calc-btn op" onclick="cIn('+')">+</button>
                             <button class="calc-btn eq" onclick="cIn('=')">=</button>
-                            <button class="calc-btn" onclick="cIn('0')">0</button>
+                            
+                            <button class="calc-btn" onclick="cIn('0')" style="grid-column:span 2;">0</button>
                             <button class="calc-btn" onclick="cIn('.')">.</button>
                         </div>
                     `;
-                    document.onkeydown = (e) => {
-                        const k = e.key;
-                        if((k>='0'&&k<='9')||['+','-','*','/','.','Enter','Backspace','Escape'].includes(k)) {
-                            e.preventDefault();
-                            let map = {'Enter':'=', 'Backspace':'Del', 'Escape':'C'};
-                            cIn(map[k] || k);
-                        }
-                    }
+                    setupCalcKeys();
                 }
             },
-            { id: 'discount', cat: 'calc', icon: 'fa-percent', title: '割引計算', desc: '税込価格と割引額を即座に計算', inputs: ['price:元の価格(円)', 'per:割引率(%)'], func: (p,r) => { const end=Math.floor(p*(1-r/100)); return `支払額: ${end.toLocaleString()}円<br><span style="font-size:12px;color:gray">(${p*r/100}円 お得)</span>`; } },
-            { id: 'date', cat: 'calc', icon: 'fa-calendar-alt', title: '日数計算', desc: '2つの日付の間の日数を計算', inputs:['d1:開始日 (YYYY-MM-DD)', 'd2:終了日 (YYYY-MM-DD)'], func:(d1,d2)=>{ const df=new Date(d2)-new Date(d1); return `差分: ${df/86400000} 日`; } },
-            { id: 'unit', cat: 'calc', icon: 'fa-balance-scale', title: '単位変換', desc: 'インチ⇔センチ、ポンド⇔キロ', type:'custom', render:(el)=>{
+            { id: 'discount', cat: 'calc', icon: 'fa-tags', title: '割引計算', desc: '税込価格と割引額を即座に計算', inputs: ['price:元の価格(円)', 'per:割引率(%)'], func: (p,r) => { const end=Math.floor(p*(1-r/100)); return `支払額: ${end.toLocaleString()}円<br><span style="font-size:12px;color:gray">(${p*r/100}円 お得)</span>`; } },
+            { id: 'age', cat: 'calc', icon: 'fa-birthday-cake', title: '年齢・暦計算', desc: '西暦和暦、年齢、干支を一括計算', inputs:['birth:誕生日 (例: 1990-01-01)'], func:(b)=>{
+                const d = new Date(b); if(isNaN(d)) return '正しい日付を入力してください';
+                const now = new Date();
+                const age = now.getFullYear() - d.getFullYear() - (now < new Date(now.getFullYear(), d.getMonth(), d.getDate()) ? 1 : 0);
+                const eto = ['申','酉','戌','亥','子','丑','寅','卯','辰','巳','午','未'][d.getFullYear()%12];
+                return `年齢: ${age}歳<br>和暦: ${toWareki(d.getFullYear())}<br>干支: ${eto}`;
+            }},
+            { id: 'unit', cat: 'calc', icon: 'fa-balance-scale', title: '単位変換Pro', desc: '長さ/重さ/温度/面積/速度/データ', type:'custom', render:(el)=>{
                 el.innerHTML=`
-                    <div style="display:flex; gap:10px; margin-bottom:10px;">
-                        <select id="u-type"><option value="len">長さ (inch ⇔ cm)</option><option value="wgt">重さ (lb ⇔ kg)</option></select>
-                        <input type="number" id="u-val" placeholder="値">
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                        <select id="u-cat" onchange="updateUnitType()"><option value="len">長さ</option><option value="wgt">重さ</option><option value="tmp">温度</option><option value="area">面積</option><option value="spd">速度</option></select>
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <input type="number" id="u-val" placeholder="値" style="margin:0;">
+                            <select id="u-from" style="margin:0;"></select>
+                            <i class="fas fa-arrow-right"></i>
+                            <select id="u-to" style="margin:0;"></select>
+                        </div>
+                        <button class="btn" onclick="convertUnitPro()">変換</button>
                     </div>
-                    <button class="btn" onclick="convertUnit()">変換</button>
                 `;
+                updateUnitType();
             }},
 
             // --- IMAGE (画像処理) ---
             {
-                id: 'img-filter', cat: 'image', icon: 'fa-magic', title: '画像フィルタ', desc: '画像を読み込みグレースケール/セピア化',
+                id: 'img-editor', cat: 'image', icon: 'fa-crop-alt', title: '画像エディタ', desc: 'トリミング・回転・フィルタ・保存',
                 type: 'custom',
                 render: (el) => {
                     el.innerHTML = `
-                        <input type="file" id="img-in" accept="image/*" onchange="loadImg(this)">
-                        <div style="display:flex; gap:5px; margin-bottom:10px;">
-                            <button class="btn btn-outline" onclick="applyFilter('gray')">モノクロ</button>
-                            <button class="btn btn-outline" onclick="applyFilter('sepia')">セピア</button>
-                            <button class="btn btn-outline" onclick="applyFilter('reset')">リセット</button>
+                        <input type="file" id="img-in" accept="image/*" onchange="initCropper(this)">
+                        <div class="img-editor-container" id="crop-container" style="display:none;">
+                            <img id="cropper-img" src="">
                         </div>
-                        <canvas id="img-can" style="max-width:100%; border:1px solid #ccc; display:none;"></canvas>
-                        <button class="btn" id="img-dl" style="display:none; margin-top:10px;" onclick="dlCanvas()">画像を保存</button>
+                        <div id="editor-controls" style="display:none; margin-top:10px;">
+                            <div class="btn-group" style="margin-bottom:10px; flex-wrap:wrap;">
+                                <button class="btn btn-sm btn-outline" onclick="cropper.rotate(-90)"><i class="fas fa-undo"></i></button>
+                                <button class="btn btn-sm btn-outline" onclick="cropper.rotate(90)"><i class="fas fa-redo"></i></button>
+                                <button class="btn btn-sm btn-outline" onclick="cropper.scaleX(cropper.getData().scaleX*-1)"><i class="fas fa-arrows-alt-h"></i></button>
+                                <button class="btn btn-sm btn-outline" onclick="cropper.reset()">Reset</button>
+                            </div>
+                            <button class="btn" onclick="exportCroppedImage()"><i class="fas fa-file-export"></i> 編集を確定して保存</button>
+                        </div>
                     `;
                 }
             },
             { id: 'qrcode', cat: 'image', icon: 'fa-qrcode', title: 'QR作成', desc: 'テキストやURLからQRコードを生成', inputs:['text:内容'], type:'qr' },
             { id: 'color', cat: 'image', icon: 'fa-palette', title: 'カラーピッカー', desc: '色を選択してHEX/RGBコードを取得', type:'custom', render:(el)=>{
-                el.innerHTML=`<input type="color" style="height:60px; cursor:pointer;" onchange="document.getElementById('c-hex').innerText=this.value.toUpperCase(); document.getElementById('c-rgb').innerText='RGB: '+parseInt(this.value.substr(1,2),16)+','+parseInt(this.value.substr(3,2),16)+','+parseInt(this.value.substr(5,2),16)">
-                <div id="c-hex" style="font-size:24px; font-weight:bold; text-align:center; margin-top:10px;">#000000</div>
-                <div id="c-rgb" style="text-align:center; color:gray;">RGB: 0,0,0</div>`;
+                el.innerHTML=`<input type="color" style="height:80px; cursor:pointer;" onchange="updateColor(this.value)">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+                    <div id="c-hex" style="background:rgba(0,0,0,0.1); padding:10px; text-align:center; border-radius:8px; font-weight:bold;">#000000</div>
+                    <div id="c-rgb" style="background:rgba(0,0,0,0.1); padding:10px; text-align:center; border-radius:8px;">rgb(0,0,0)</div>
+                </div>`;
             }},
 
-            // --- TEXT (テキスト・PDF) ---
-            { id: 'char', cat: 'text', icon: 'fa-text-width', title: '文字数カウント', desc: '文字数、行数、空白なし文字数をカウント', type:'custom', render:(el)=>{
+            // --- TEXT / DEV (テキスト・開発) ---
+            { id: 'regex', cat: 'text', icon: 'fa-search', title: '正規表現テスト', desc: 'リアルタイムマッチング確認', type:'custom', render:(el)=>{
+                el.innerHTML = `<input type="text" id="reg-pat" placeholder="/Pattern/flags" oninput="testRegex()">
+                <textarea id="reg-txt" rows="4" placeholder="対象テキスト" oninput="testRegex()"></textarea>
+                <div id="reg-res" class="result-area" style="text-align:left; white-space:pre-wrap;"></div>`;
+            }},
+            { id: 'char', cat: 'text', icon: 'fa-text-width', title: '文字数カウント', desc: '文字数、行数、原稿用紙枚数', type:'custom', render:(el)=>{
                 el.innerHTML=`<textarea id="txt-c" rows="5" placeholder="テキストを入力..." oninput="countChar()"></textarea><div id="txt-res" style="text-align:right; font-weight:bold;">0 文字</div>`;
             }},
-            { id: 'case', cat: 'text', icon: 'fa-font-case', title: '大文字/小文字', desc: '英語テキストの変換', inputs:['txt:テキスト'], func:(t)=>`UPPER: ${t.toUpperCase()}<br>lower: ${t.toLowerCase()}<br>Capital: ${t.charAt(0).toUpperCase()+t.slice(1)}` },
-            { id: 'json', cat: 'text', icon: 'fa-code', title: 'JSON整形', desc: '崩れたJSONを綺麗にフォーマット', inputs:['json:JSON文字列'], func:(t)=>{try{return `<pre style="text-align:left; overflow:auto;">${JSON.stringify(JSON.parse(t),null,2)}</pre>`}catch(e){return 'Error: Invalid JSON'}} },
-            { id: 'lorem', cat: 'text', icon: 'fa-paragraph', title: 'ダミーテキスト', desc: 'Lorem Ipsumを生成', inputs:['n:パラグラフ数'], func:(n)=>{let s="Lorem ipsum dolor sit amet, consectetur adipiscing elit. "; return s.repeat(n||1);} },
-
-            // --- DEV/TOOLS (開発・ツール) ---
-            { id: 'pass', cat: 'dev', icon: 'fa-key', title: 'パスワード生成', desc: '強力なランダムパスワードを生成', inputs:['len:長さ(8-64)'], func:(l)=>{const c="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*"; let r=""; for(let i=0;i<(l||12);i++) r+=c[Math.floor(Math.random()*c.length)]; return r;} },
-            { id: 'base64', cat: 'dev', icon: 'fa-database', title: 'Base64変換', desc: 'Encode / Decode', inputs:['val:値', 'mode:encode/decode'], func:(v,m)=>m==='decode'?atob(v):btoa(unescape(encodeURIComponent(v))) },
-            { id: 'share', cat: 'dev', icon: 'fa-share-alt', title: 'Web共有', desc: 'OS標準の共有機能(スマホ向け)', inputs:['url:URL', 'title:タイトル'], type:'async', func:async(u,t)=>{ if(navigator.share){ await navigator.share({title:t, url:u}); return '共有メニューを開きました'; } else return 'このブラウザは非対応です'; } },
-            { id: 'ua', cat: 'dev', icon: 'fa-mobile-alt', title: 'デバイス情報', desc: 'UserAgent確認', func:()=>navigator.userAgent },
+            { id: 'json', cat: 'text', icon: 'fa-code', title: 'JSON整形', desc: '崩れたJSONを綺麗にフォーマット', inputs:['json:JSON文字列'], func:(t)=>{try{return `<pre style="text-align:left; overflow:auto; max-height:300px; background:rgba(0,0,0,0.05); padding:10px; border-radius:8px;">${JSON.stringify(JSON.parse(t),null,2)}</pre>`}catch(e){return 'Error: Invalid JSON'}} },
+            { id: 'pass', cat: 'text', icon: 'fa-key', title: 'パスワード生成', desc: '強力なランダムパスワードを生成', inputs:['len:長さ(8-64)'], func:(l)=>{const c="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*"; let r=""; for(let i=0;i<(l||16);i++) r+=c[Math.floor(Math.random()*c.length)]; return r;} },
+            { id: 'base64', cat: 'text', icon: 'fa-database', title: 'Base64変換', desc: 'Encode / Decode', inputs:['val:値', 'mode:encode/decode'], func:(v,m)=>m==='decode'?atob(v):btoa(unescape(encodeURIComponent(v))) },
+            { id: 'share', cat: 'text', icon: 'fa-share-alt', title: 'Web共有', desc: 'スマホ標準の共有メニューを開く', inputs:['url:URL', 'title:タイトル'], type:'async', func:async(u,t)=>{ if(navigator.share){ await navigator.share({title:t, url:u}); return '共有メニューを開きました'; } else return 'このブラウザは非対応です'; } },
         ];
 
         // ============================================
@@ -488,7 +564,6 @@
             renderGrid(tools);
             updateCounts();
             
-            // Global Hotkeys
             document.addEventListener('keydown', (e) => {
                 if(e.ctrlKey && e.key === 'k') { e.preventDefault(); document.getElementById('search-box').focus(); }
                 if(e.key === 'Escape') closeModal();
@@ -504,19 +579,19 @@
                 if(appData.theme === 'dark') document.body.classList.add('dark');
             }
         }
-
-        function saveData() {
-            localStorage.setItem(STORE_KEY, JSON.stringify(appData));
-        }
-
+        function saveData() { localStorage.setItem(STORE_KEY, JSON.stringify(appData)); }
         function updateTime() {
             const now = new Date();
             document.getElementById('clock').innerText = now.toLocaleTimeString('ja-JP', {hour:'2-digit', minute:'2-digit'});
             document.getElementById('date').innerText = now.toLocaleDateString('ja-JP', {month:'short', day:'numeric', weekday:'short'});
         }
+        function exportData() {
+            const b = new Blob([JSON.stringify(appData)], {type:'application/json'});
+            const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download='lifestation_backup.json'; a.click();
+        }
 
         // ============================================
-        //  UI RENDERING
+        //  UI LOGIC
         // ============================================
         function renderGrid(list) {
             const grid = document.getElementById('grid');
@@ -537,32 +612,23 @@
                 grid.appendChild(div);
             });
         }
-
         function filter(cat) {
             document.querySelectorAll('.menu-item').forEach(e => e.classList.remove('active'));
             event.currentTarget.classList.add('active');
-            
-            if(window.innerWidth <= 768) toggleMenu(); // Mobile close
-
+            if(window.innerWidth <= 768) toggleMenu();
             if(cat === 'all') renderGrid(tools);
             else if(cat === 'fav') renderGrid(tools.filter(t => appData.favs.includes(t.id)));
             else renderGrid(tools.filter(t => t.cat === cat));
         }
-
         function searchTools(q) {
             q = q.toLowerCase();
-            const res = tools.filter(t => t.title.toLowerCase().includes(q) || t.desc.toLowerCase().includes(q));
-            renderGrid(res);
+            renderGrid(tools.filter(t => t.title.toLowerCase().includes(q) || t.desc.toLowerCase().includes(q)));
         }
-
         function updateCounts() {
-            ['work','calc','image','text','dev'].forEach(c => {
-                document.getElementById('c-'+c).innerText = tools.filter(t => t.cat === c).length;
-            });
+            ['work','calc','image','text'].forEach(c => document.getElementById('c-'+c).innerText = tools.filter(t => t.cat === c).length);
             document.getElementById('c-all').innerText = tools.length;
             document.getElementById('c-fav').innerText = appData.favs.length;
         }
-
         function toggleFav(id, e) {
             e.stopPropagation();
             if(appData.favs.includes(id)) appData.favs = appData.favs.filter(i => i !== id);
@@ -571,26 +637,16 @@
             e.target.classList.toggle('active');
             updateCounts();
         }
-
         function toggleTheme() {
             document.body.classList.toggle('dark');
             appData.theme = document.body.classList.contains('dark') ? 'dark' : 'light';
             saveData();
         }
-
-        function clearData() {
-            if(confirm('全てのデータを削除して初期化しますか？')) {
-                localStorage.removeItem(STORE_KEY);
-                location.reload();
-            }
-        }
-
-        function toggleMenu() {
-            document.getElementById('nav-menu').classList.toggle('active');
-        }
+        function clearData() { if(confirm('初期化しますか？')) { localStorage.removeItem(STORE_KEY); location.reload(); } }
+        function toggleMenu() { document.getElementById('nav-menu').classList.toggle('active'); }
 
         // ============================================
-        //  TOOL LOGIC
+        //  TOOL EXECUTION
         // ============================================
         function openTool(tool) {
             activeTool = tool;
@@ -602,13 +658,9 @@
             res.style.display = 'none';
             res.innerHTML = '';
             
-            // Clean up old listeners
-            document.onkeydown = (e) => { if(e.key==='Escape') closeModal(); };
-
             if(tool.type === 'custom') {
                 tool.render(ui);
             } else {
-                // Generate Inputs
                 if(tool.inputs) {
                     tool.inputs.forEach((inp, i) => {
                         const [key, ph] = inp.includes(':') ? inp.split(':') : ['v', inp];
@@ -617,7 +669,6 @@
                 }
                 ui.innerHTML += `<button class="btn" onclick="execTool()">実行</button>`;
             }
-
             const modal = document.getElementById('tool-modal');
             modal.style.display = 'flex';
             setTimeout(()=>modal.classList.add('show'), 10);
@@ -628,11 +679,10 @@
             modal.classList.remove('show');
             setTimeout(() => {
                 modal.style.display = 'none';
-                stopPomo(); // Timer cleanup
+                if(cropper) { cropper.destroy(); cropper=null; }
+                stopPomo();
+                stopSW();
             }, 200);
-            document.onkeydown = (e) => {
-                if(e.ctrlKey && e.key === 'k') { e.preventDefault(); document.getElementById('search-box').focus(); }
-            };
         }
 
         async function execTool() {
@@ -640,9 +690,7 @@
             resBox.style.display = 'block';
             try {
                 const args = [];
-                if(activeTool.inputs) {
-                    for(let i=0; i<activeTool.inputs.length; i++) args.push(document.getElementById(`in-${i}`).value);
-                }
+                if(activeTool.inputs) for(let i=0; i<activeTool.inputs.length; i++) args.push(document.getElementById(`in-${i}`).value);
                 
                 if(activeTool.type === 'qr') {
                     resBox.innerHTML = '';
@@ -653,14 +701,10 @@
                 } else {
                     resBox.innerHTML = activeTool.func(...args);
                 }
-            } catch(e) {
-                resBox.innerText = 'Error: 入力を確認してください';
-            }
+            } catch(e) { resBox.innerText = 'Error: 入力を確認してください'; }
         }
 
-        // --- Specific Tool Functions ---
-
-        // ToDo
+        // --- ToDo ---
         function addTodo() {
             const v = document.getElementById('td-in').value;
             if(!v) return;
@@ -688,18 +732,39 @@
         function delTodo(i) { appData.todos.splice(i, 1); saveData(); renderTodos(); }
         function updTodo(i, t) { appData.todos[i].txt = t; saveData(); }
 
-        // Memo
-        function saveMemo() { appData.memo = document.getElementById('memo-pad').value; saveData(); }
-        function copyMemo() { navigator.clipboard.writeText(appData.memo); alert('コピーしました'); }
+        // --- Memo (Markdown) ---
+        function updateMemo() {
+            const txt = document.getElementById('memo-pad').value;
+            document.getElementById('md-preview').innerHTML = marked.parse(txt);
+            appData.memo = txt;
+            saveData();
+        }
+        function copyMemo() { navigator.clipboard.writeText(appData.memo); alert('Copied!'); }
         function downloadMemo() {
-            const blob = new Blob([appData.memo], {type:'text/plain'});
             const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `memo_${new Date().toISOString().slice(0,10)}.txt`;
+            a.href = URL.createObjectURL(new Blob([appData.memo], {type:'text/markdown'}));
+            a.download = `memo_${new Date().toISOString().slice(0,10)}.md`;
             a.click();
         }
 
-        // Pomodoro
+        // --- Stopwatch ---
+        let swStart = 0; let swTime = 0;
+        function startSW() { if(!swInterval) { swStart = Date.now() - swTime; swInterval = setInterval(updSW, 10); } }
+        function stopSW() { 
+            if(swInterval) { clearInterval(swInterval); swInterval=null; } 
+            else { swTime=0; updSW(); document.getElementById('sw-laps').innerHTML=''; } 
+        }
+        function updSW() { 
+            swTime = Date.now() - swStart; 
+            const ms=Math.floor((swTime%1000)/10); const s=Math.floor((swTime/1000)%60); const m=Math.floor(swTime/60000);
+            document.getElementById('sw-disp').innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}.${ms.toString().padStart(2,'0')}`;
+        }
+        function lapSW() { 
+            const t = document.getElementById('sw-disp').innerText; 
+            document.getElementById('sw-laps').innerHTML = `<div style="padding:5px; border-bottom:1px solid #ccc;">${t}</div>` + document.getElementById('sw-laps').innerHTML;
+        }
+
+        // --- Pomodoro ---
         function startPomo(min) {
             stopPomo();
             let s = min * 60;
@@ -707,93 +772,123 @@
             pInterval = setInterval(() => {
                 s--;
                 d.innerText = `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`;
-                if(s<=0) {
-                    stopPomo();
-                    new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg').play();
-                    alert('時間です！');
-                }
+                if(s<=0) { stopPomo(); alert('Time Up!'); }
             }, 1000);
         }
         function stopPomo() { if(pInterval) clearInterval(pInterval); }
 
-        // Calculator
+        // --- Scientific Calculator ---
         let cExp = '';
+        function setupCalcKeys() {
+            document.onkeydown = (e) => {
+                const k = e.key;
+                if((k>='0'&&k<='9')||['+','-','*','/','.','(',')','%'].includes(k)) { e.preventDefault(); cIn(k); }
+                else if(k==='Enter') { e.preventDefault(); cIn('='); }
+                else if(k==='Backspace') { e.preventDefault(); cIn('Del'); }
+                else if(k==='Escape') { e.preventDefault(); cIn('C'); }
+            }
+        }
         function cIn(v) {
             const d = document.getElementById('c-disp');
             if(v==='C') cExp = '';
             else if(v==='Del') cExp = cExp.slice(0,-1);
             else if(v==='=') {
-                try { cExp = String(eval(cExp)); } catch { cExp = 'Error'; }
+                try { 
+                    // Safe Eval for Math
+                    const res = new Function('return ' + cExp.replace(/Math\./g, 'Math.'))();
+                    cExp = String(res);
+                } catch { cExp = 'Error'; }
             } else cExp += v;
             d.innerText = cExp || '0';
         }
 
-        // Unit Converter
-        function convertUnit() {
-            const t = document.getElementById('u-type').value;
+        // --- Unit Converter Pro ---
+        const units = {
+            len: { m:1, cm:100, mm:1000, km:0.001, inch:39.37, ft:3.28, yd:1.09, mile:0.00062 },
+            wgt: { kg:1, g:1000, mg:1000000, lb:2.204, oz:35.27 },
+            tmp: { C:'C', F:'F' },
+            area: { m2:1, tsubo:0.3025, ft2:10.76, acre:0.000247 },
+            spd: { kmh:1, ms:0.277, mph:0.621, knot:0.539 }
+        };
+        function updateUnitType() {
+            const t = document.getElementById('u-cat').value;
+            const ks = Object.keys(units[t]);
+            const mkOpt = (k) => `<option value="${k}">${k}</option>`;
+            document.getElementById('u-from').innerHTML = ks.map(mkOpt).join('');
+            document.getElementById('u-to').innerHTML = ks.map(mkOpt).join('');
+        }
+        function convertUnitPro() {
+            const t = document.getElementById('u-cat').value;
             const v = parseFloat(document.getElementById('u-val').value);
+            const f = document.getElementById('u-from').value;
+            const to = document.getElementById('u-to').value;
             if(isNaN(v)) return;
-            const r = document.getElementById('tm-result');
-            r.style.display = 'block';
-            if(t==='len') r.innerHTML = `${v} in = ${(v*2.54).toFixed(2)} cm <br> ${v} cm = ${(v/2.54).toFixed(2)} in`;
-            else r.innerHTML = `${v} lb = ${(v*0.453).toFixed(2)} kg <br> ${v} kg = ${(v/0.453).toFixed(2)} lb`;
+            
+            let res = 0;
+            if(t === 'tmp') {
+                if(f==='C' && to==='F') res = v*1.8+32;
+                else if(f==='F' && to==='C') res = (v-32)/1.8;
+                else res = v;
+            } else {
+                const base = v / units[t][f];
+                res = base * units[t][to];
+            }
+            alert(`${v}${f} = ${res.toFixed(4)}${to}`);
         }
 
-        // Image Filter
-        let imgObj = new Image();
-        function loadImg(input) {
+        // --- Image Editor (Cropper) ---
+        function initCropper(input) {
+            if(cropper) { cropper.destroy(); cropper=null; }
             if(!input.files[0]) return;
+            const img = document.getElementById('cropper-img');
             const reader = new FileReader();
             reader.onload = (e) => {
-                imgObj.src = e.target.result;
-                imgObj.onload = () => {
-                    const c = document.getElementById('img-can');
-                    const ctx = c.getContext('2d');
-                    // Resize to fit width if huge
-                    const maxW = 500;
-                    const sc = imgObj.width > maxW ? maxW/imgObj.width : 1;
-                    c.width = imgObj.width * sc;
-                    c.height = imgObj.height * sc;
-                    c.style.display = 'block';
-                    document.getElementById('img-dl').style.display = 'block';
-                    ctx.drawImage(imgObj, 0, 0, c.width, c.height);
-                }
+                img.src = e.target.result;
+                document.getElementById('crop-container').style.display='flex';
+                document.getElementById('editor-controls').style.display='block';
+                cropper = new Cropper(img, { viewMode: 1 });
             };
             reader.readAsDataURL(input.files[0]);
         }
-        function applyFilter(type) {
-            const c = document.getElementById('img-can');
-            const ctx = c.getContext('2d');
-            ctx.drawImage(imgObj, 0, 0, c.width, c.height); // reset
-            if(type==='reset') return;
-            
-            const imgD = ctx.getImageData(0, 0, c.width, c.height);
-            const d = imgD.data;
-            for(let i=0; i<d.length; i+=4) {
-                const r=d[i], g=d[i+1], b=d[i+2];
-                if(type==='gray') {
-                    const v = 0.34*r + 0.5*g + 0.16*b;
-                    d[i]=d[i+1]=d[i+2]=v;
-                } else if(type==='sepia') {
-                    d[i] = r*0.393 + g*0.769 + b*0.189;
-                    d[i+1] = r*0.349 + g*0.686 + b*0.168;
-                    d[i+2] = r*0.272 + g*0.534 + b*0.131;
-                }
-            }
-            ctx.putImageData(imgD, 0, 0);
+        function exportCroppedImage() {
+            if(!cropper) return;
+            const canvas = cropper.getCroppedCanvas();
+            const a = document.createElement('a');
+            a.href = canvas.toDataURL('image/png');
+            a.download = 'edited_image.png';
+            a.click();
         }
-        function dlCanvas() {
-            const l = document.createElement('a');
-            l.download = 'edited_image.png';
-            l.href = document.getElementById('img-can').toDataURL();
-            l.click();
+        function updateColor(v) {
+            document.getElementById('c-hex').innerText = v.toUpperCase();
+            const r=parseInt(v.slice(1,3),16), g=parseInt(v.slice(3,5),16), b=parseInt(v.slice(5,7),16);
+            document.getElementById('c-rgb').innerText = `rgb(${r}, ${g}, ${b})`;
         }
 
-        // Char Count
+        // --- Text/Dev ---
         function countChar() {
             const t = document.getElementById('txt-c').value;
-            document.getElementById('txt-res').innerText = `${t.length} 文字 (空白なし: ${t.replace(/\s/g,'').length})`;
+            document.getElementById('txt-res').innerText = `${t.length}字 | 行数:${t.split('\n').length} | 原稿:${Math.ceil(t.length/400)}枚`;
         }
+        function testRegex() {
+            const p = document.getElementById('reg-pat').value;
+            const t = document.getElementById('reg-txt').value;
+            const r = document.getElementById('reg-res');
+            if(!p || !t) { r.innerText=''; return; }
+            try {
+                const parts = p.match(/^\/(.*?)\/([gimsuy]*)$/);
+                const re = parts ? new RegExp(parts[1], parts[2]) : new RegExp(p);
+                const m = t.match(re);
+                r.innerText = m ? `Match Found:\n${JSON.stringify(m,null,2)}` : 'No Match';
+                r.style.color = m ? 'var(--success)' : 'var(--danger)';
+            } catch(e) { r.innerText = 'Invalid Regex'; r.style.color = 'var(--danger)'; }
+        }
+        function toWareki(y) {
+            if(y>=2019) return `令和${y-2018}年`;
+            if(y>=1989) return `平成${y-1988}年`;
+            if(y>=1926) return `昭和${y-1925}年`;
+            return y;
+        }
+
     </script>
 </body>
 </html>

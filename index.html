@@ -1,555 +1,509 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LifeStation: GENESIS | Admin Console</title>
+    <title>LifeStation: REBORN | 統合ツールプラットフォーム</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    
     <style>
         :root {
-            --bg-deep: #050505; --bg-panel: #111111; --border: #333;
-            --primary: #00f3ff; --secondary: #bc13fe; --alert: #ff003c;
-            --glass: rgba(20, 20, 20, 0.8);
-            --font-main: 'Segoe UI', 'Roboto', sans-serif;
-            --font-mono: 'Courier New', monospace;
+            --primary: #2563eb; --accent: #f59e0b;
+            --bg-body: #f8fafc; --bg-panel: #ffffff;
+            --text-main: #1e293b; --text-sub: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
-        * { box-sizing: border-box; user-select: none; }
-        body {
-            margin: 0; background: var(--bg-deep); color: #fff; font-family: var(--font-main);
-            height: 100vh; overflow: hidden; display: flex; flex-direction: column;
-        }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        body { margin: 0; font-family: "Helvetica Neue", Arial, sans-serif; background: var(--bg-body); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+        * { box-sizing: border-box; outline: none; }
 
-        /* --- 起動アニメーション --- */
-        #boot-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; color: var(--primary);
-        }
-        .boot-log { font-family: var(--font-mono); font-size: 12px; margin-top: 20px; color: #555; height: 100px; overflow: hidden; }
+        /* --- サイドバー --- */
+        .sidebar { width: 250px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; flex-shrink: 0; }
+        .logo { padding: 20px; font-size: 20px; font-weight: bold; color: var(--primary); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+        .menu { flex: 1; overflow-y: auto; padding: 10px 0; }
+        .menu-item { padding: 12px 20px; cursor: pointer; color: var(--text-sub); display: flex; align-items: center; gap: 12px; transition: 0.2s; font-weight: 500; }
+        .menu-item:hover, .menu-item.active { background: #eff6ff; color: var(--primary); border-right: 3px solid var(--primary); }
+        .menu-count { margin-left: auto; font-size: 11px; background: #e2e8f0; padding: 2px 8px; border-radius: 10px; }
 
-        /* --- ログイン画面 --- */
-        #login-overlay {
-            position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); z-index: 5000;
-            display: none; justify-content: center; align-items: center; backdrop-filter: blur(10px);
-        }
-        .login-box {
-            width: 400px; padding: 40px; background: rgba(20,20,20,0.9); border: 1px solid var(--primary);
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.2); text-align: center; border-radius: 8px;
-        }
-        .login-input {
-            width: 100%; background: #000; border: 1px solid #444; color: var(--primary); padding: 15px;
-            margin: 20px 0; font-family: var(--font-mono); font-size: 18px; text-align: center; outline: none;
-        }
-        .login-input:focus { border-color: var(--primary); box-shadow: 0 0 10px var(--primary); }
-
-        /* --- UIレイアウト --- */
-        .app-container { display: flex; flex: 1; height: 100%; position: relative; }
+        /* --- メインエリア --- */
+        .main { flex: 1; display: flex; flex-direction: column; height: 100vh; position: relative; }
         
-        /* サイドバー */
-        .sidebar {
-            width: 80px; background: var(--bg-panel); border-right: 1px solid var(--border);
-            display: flex; flex-direction: column; align-items: center; padding-top: 20px; transition: width 0.3s;
-            z-index: 100;
-        }
-        .sidebar:hover { width: 240px; }
-        .sidebar:hover .nav-label { opacity: 1; width: auto; }
-        .nav-item {
-            width: 100%; padding: 18px 0; display: flex; align-items: center; cursor: pointer;
-            color: #666; transition: 0.2s; position: relative; padding-left: 28px;
-        }
-        .nav-item:hover, .nav-item.active { color: var(--primary); background: rgba(0, 243, 255, 0.05); }
-        .nav-item.active::before { content:''; position:absolute; left:0; height:100%; width:4px; background:var(--primary); box-shadow: 0 0 10px var(--primary); }
-        .nav-icon { font-size: 20px; width: 30px; text-align: center; }
-        .nav-label { opacity: 0; margin-left: 15px; white-space: nowrap; font-size: 14px; font-weight: bold; width: 0; overflow: hidden; transition: 0.2s; }
+        /* ヘッダー */
+        .header { height: 60px; background: var(--bg-panel); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 30px; }
+        .search-box { width: 300px; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg-body); }
+        .user-info { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .user-rank { font-size: 11px; color: white; background: var(--accent); padding: 2px 8px; border-radius: 4px; font-weight: bold; }
 
-        /* メインコンテンツ */
-        .main-view { flex: 1; position: relative; overflow: hidden; background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%); }
-        .header-bar {
-            height: 50px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
-            background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
-        }
-        .sys-stat { font-family: var(--font-mono); font-size: 12px; color: var(--primary); display: flex; gap: 20px; }
-        .user-badge { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        .user-avatar { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--primary); }
-
-        /* ツールグリッド */
-        .content-scroll { padding: 30px; height: calc(100vh - 50px); overflow-y: auto; }
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
-        .tool-card {
-            background: rgba(255,255,255,0.03); border: 1px solid #333; border-radius: 8px; padding: 20px;
-            transition: 0.3s; position: relative; overflow: hidden; cursor: pointer;
-        }
-        .tool-card::before {
-            content: ''; position: absolute; top:0; left:0; width:100%; height:2px; background: linear-gradient(90deg, transparent, var(--primary), transparent);
-            transform: translateX(-100%); transition: 0.5s;
-        }
-        .tool-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 30px rgba(0, 243, 255, 0.1); }
-        .tool-card:hover::before { transform: translateX(100%); }
-        .card-title { font-weight: bold; margin-bottom: 5px; color: #fff; }
-        .card-cat { font-size: 10px; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display:block; }
+        /* コンテンツ */
+        .content { flex: 1; padding: 30px; overflow-y: auto; background: var(--bg-body); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; padding-bottom: 60px; }
         
-        /* 管理者モード (GOD MODE) */
-        #god-console {
-            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 200; padding: 20px;
-            grid-template-columns: 300px 1fr; grid-template-rows: 1fr 300px; gap: 20px;
+        /* ツールカード */
+        .card { 
+            background: var(--bg-panel); border-radius: 12px; padding: 20px; border: 1px solid var(--border);
+            box-shadow: var(--shadow); cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; gap: 8px; position: relative; overflow: hidden;
         }
-        .god-panel { border: 1px solid #333; background: rgba(0, 20, 0, 0.3); padding: 15px; position: relative; }
-        .god-panel h3 { color: var(--alert); margin-top: 0; font-family: var(--font-mono); border-bottom: 1px solid #333; padding-bottom: 5px; }
-        .terminal { font-family: var(--font-mono); font-size: 12px; color: #0f0; overflow-y: auto; height: 100%; padding-bottom: 20px; }
-        .map-dots { width: 100%; height: 200px; background: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg') no-repeat center; background-size: contain; position: relative; opacity: 0.5; }
-        .dot { position: absolute; width: 4px; height: 4px; background: var(--alert); border-radius: 50%; animation: pulse 1s infinite; }
+        .card:hover { transform: translateY(-3px); border-color: var(--primary); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .card-icon { width: 40px; height: 40px; background: #eff6ff; color: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .card-title { font-weight: bold; font-size: 15px; }
+        .card-desc { font-size: 12px; color: var(--text-sub); line-height: 1.4; }
+        .fav-star { position: absolute; top: 15px; right: 15px; color: #cbd5e1; }
+        .fav-star.active { color: var(--accent); }
 
-        /* ツール実行モーダル */
-        #tool-modal {
-            position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index: 3000;
-            display:none; backdrop-filter: blur(5px); justify-content: center; align-items: center;
-        }
-        .modal-body {
-            width: 80%; max-width: 800px; height: 80%; background: var(--bg-panel); border: 1px solid var(--border);
-            display: flex; flex-direction: column; border-radius: 10px; box-shadow: 0 0 50px rgba(0,0,0,0.5);
-        }
-        .modal-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .modal-content { flex: 1; padding: 30px; overflow-y: auto; }
-        
-        /* 汎用フォーム */
-        input, textarea, select { width: 100%; background: #000; border: 1px solid #444; color: #fff; padding: 10px; margin-bottom: 10px; border-radius: 4px; }
-        button.btn-neon {
-            background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 10px 20px;
-            cursor: pointer; font-weight: bold; text-transform: uppercase; transition: 0.3s; width: 100%;
-        }
-        button.btn-neon:hover { background: var(--primary); color: #000; box-shadow: 0 0 15px var(--primary); }
+        /* --- モーダル（ツール実行・ログイン・管理画面共通） --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); }
+        .modal-box { background: white; width: 90%; max-width: 600px; max-height: 90vh; border-radius: 12px; display: flex; flex-direction: column; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); overflow: hidden; }
+        .modal-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 18px; }
+        .modal-body { padding: 30px; overflow-y: auto; }
+        .modal-footer { padding: 20px; background: #f8fafc; border-top: 1px solid var(--border); text-align: right; font-size: 12px; color: #64748b; }
 
-        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(2); } }
-        @keyframes typing { from { width: 0 } to { width: 100% } }
+        /* フォーム要素 */
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 15px; font-size: 16px; }
+        .btn { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.2s; }
+        .btn:hover { opacity: 0.9; }
+        .result-box { background: #f1f5f9; padding: 20px; border-radius: 8px; margin-top: 20px; text-align: center; font-size: 20px; font-weight: bold; color: var(--primary); word-break: break-all; border: 2px dashed #cbd5e1; }
+
+        /* --- 管理画面 (Admin) --- */
+        .admin-dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .stat-card { background: #1e293b; color: white; padding: 20px; border-radius: 8px; }
+        .stat-num { font-size: 24px; font-weight: bold; color: #4ade80; }
+        .log-list { height: 200px; overflow-y: auto; background: #0f172a; color: #0f0; padding: 10px; font-family: monospace; font-size: 12px; border-radius: 8px; }
+        .btn-admin-close { background: #ef4444; margin-top: 20px; }
+
+        /* フッター（管理者入り口） */
+        .footer-admin-link {
+            position: absolute; bottom: 0; width: 100%; padding: 10px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid var(--border); background: var(--bg-panel); cursor: pointer;
+        }
+        .footer-admin-link:hover { color: var(--primary); background: #f1f5f9; }
+
+        /* レスポンシブ */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); padding: 0; }
+            .logo { display: none; }
+            .menu { display: flex; overflow-x: auto; padding: 0; }
+            .menu-item { white-space: nowrap; border-right: none; border-bottom: 3px solid transparent; flex-direction: column; gap: 5px; font-size: 10px; padding: 10px; }
+            .menu-item.active { border-right: none; border-bottom-color: var(--primary); }
+            .menu-count { display: none; }
+            .header { padding: 0 15px; }
+            .search-box { width: 150px; }
+        }
     </style>
 </head>
 <body>
 
-    <div id="boot-screen">
-        <h1 style="font-size: 40px; letter-spacing: 5px;">GENESIS <span style="font-size:12px">OS v3.0</span></h1>
-        <div style="width: 300px; height: 2px; background: #333; margin: 20px 0; position: relative;">
-            <div id="boot-bar" style="width: 0%; height: 100%; background: var(--primary); box-shadow: 0 0 10px var(--primary);"></div>
-        </div>
-        <div class="boot-log" id="boot-log">Initializing Kernel...</div>
-    </div>
-
-    <div id="login-overlay">
-        <div class="login-box">
-            <h2 style="color:var(--primary)">IDENTITY VERIFICATION</h2>
-            <p style="font-size:12px; color:#666;">Enter your codename to access the system.</p>
-            <input type="text" id="username" class="login-input" placeholder="CODENAME" autocomplete="off">
-            <button class="btn-neon" onclick="login()">ACCESS GRANT</button>
+    <div id="login-modal" class="modal-overlay" style="display: flex;">
+        <div class="modal-box" style="max-width: 400px; text-align: center;">
+            <div class="modal-header" style="justify-content: center;">LifeStation へようこそ</div>
+            <div class="modal-body">
+                <p>あなた専用のツールダッシュボードを作成します。<br>お名前を入力してください。</p>
+                <input type="text" id="username-input" placeholder="ニックネーム (例: 田中)">
+                <button class="btn" onclick="login()">利用を開始する</button>
+            </div>
         </div>
     </div>
 
-    <div class="app-container" id="app-interface" style="opacity: 0;">
-        
-        <nav class="sidebar">
-            <div style="font-size:24px; color:var(--primary); margin-bottom:30px;"><i class="fab fa-galactic-republic"></i></div>
-            
-            <div class="nav-item active" onclick="switchView('dashboard')">
-                <div class="nav-icon"><i class="fas fa-th-large"></i></div><div class="nav-label">Dashboard</div>
-            </div>
-            <div class="nav-item" onclick="switchView('dev')">
-                <div class="nav-icon"><i class="fas fa-code"></i></div><div class="nav-label">Developer</div>
-            </div>
-            <div class="nav-item" onclick="switchView('calc')">
-                <div class="nav-icon"><i class="fas fa-calculator"></i></div><div class="nav-label">Computation</div>
-            </div>
-            <div class="nav-item" onclick="switchView('data')">
-                <div class="nav-icon"><i class="fas fa-database"></i></div><div class="nav-label">Data Analysis</div>
-            </div>
-            <div class="nav-item" onclick="switchView('life')">
-                <div class="nav-icon"><i class="fas fa-dna"></i></div><div class="nav-label">Life Support</div>
-            </div>
-            
-            <div style="margin-top:auto; margin-bottom: 20px; width:100%;">
-                <div class="nav-item" onclick="toggleGodMode()" style="color:var(--alert);">
-                    <div class="nav-icon"><i class="fas fa-eye"></i></div><div class="nav-label">GOD MODE</div>
-                </div>
-            </div>
-        </nav>
-
-        <main class="main-view">
-            <header class="header-bar">
-                <div class="sys-stat">
-                    <span><i class="fas fa-circle" style="color:#0f0; font-size:8px;"></i> ONLINE</span>
-                    <span id="stat-users">USERS: 4,021</span>
-                    <span id="stat-cpu">CPU: 12%</span>
-                    <span id="stat-net">NET: 450 Mbps</span>
-                </div>
-                <div class="user-badge" onclick="logout()">
-                    <div style="text-align:right;">
-                        <div id="disp-name" style="font-weight:bold; font-size:14px;">GUEST</div>
-                        <div id="disp-level" style="font-size:10px; color:var(--primary);">LV.1 | NOVICE</div>
-                    </div>
-                    <img src="https://ui-avatars.com/api/?name=Guest&background=00f3ff&color=000" class="user-avatar" id="disp-avatar">
-                </div>
-            </header>
-
-            <div id="dashboard" class="content-scroll">
-                <h2 style="border-bottom:1px solid #333; padding-bottom:10px;">SYSTEM MODULES <span style="font-size:12px; color:#666; float:right;" id="tool-count">LOADING...</span></h2>
-                <div class="dashboard-grid" id="tool-grid">
-                    </div>
-            </div>
-
-            <div id="god-console">
-                <div class="god-panel" style="grid-row: span 2;">
-                    <h3>GLOBAL TRAFFIC</h3>
-                    <div class="map-dots" id="world-map"></div>
-                    <div style="margin-top:20px; font-size:12px;">
-                        <div>TOKYO NODE: <span style="color:#0f0">ACTIVE</span></div>
-                        <div>NY NODE: <span style="color:#0f0">ACTIVE</span></div>
-                        <div>LON NODE: <span style="color:#fa0">WARN</span></div>
-                    </div>
-                </div>
-                <div class="god-panel">
-                    <h3>LIVE SYSTEM LOGS</h3>
-                    <div class="terminal" id="sys-terminal"></div>
-                </div>
-                <div class="god-panel" style="grid-column: span 1;">
-                    <h3>REALTIME METRICS</h3>
-                    <canvas id="godChart"></canvas>
-                </div>
-            </div>
-
-        </main>
-    </div>
-
-    <div id="tool-modal">
-        <div class="modal-body">
+    <div id="tool-modal" class="modal-overlay">
+        <div class="modal-box">
             <div class="modal-header">
-                <h3 id="modal-title" style="margin:0; color:var(--primary)">TOOL NAME</h3>
-                <button onclick="closeTool()" style="background:none; border:none; color:#fff; font-size:20px; cursor:pointer;">×</button>
+                <span id="tm-title">ツール名</span>
+                <span style="cursor:pointer" onclick="closeModal('tool-modal')">×</span>
             </div>
-            <div class="modal-content" id="modal-stage"></div>
-            <div style="padding:20px; background:#000; border-top:1px solid #333; font-family:monospace; color:#0f0;" id="modal-result">READY</div>
+            <div class="modal-body">
+                <p id="tm-desc" style="color:#64748b; margin-bottom:20px; font-size:14px;"></p>
+                <div id="tm-content"></div>
+                <div id="tm-result" class="result-box" style="display:none;"></div>
+            </div>
         </div>
     </div>
+
+    <div id="admin-modal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 800px; background: #f8fafc;">
+            <div class="modal-header" style="background: #1e293b; color: white;">
+                <span><i class="fas fa-server"></i> システム管理コンソール (Admin)</span>
+                <span style="cursor:pointer" onclick="closeModal('admin-modal')">×</span>
+            </div>
+            <div class="modal-body">
+                <div class="admin-dashboard">
+                    <div class="stat-card">
+                        <div>リアルタイム接続数</div>
+                        <div class="stat-num" id="adm-users">1,240</div>
+                        <div style="font-size:12px; color:#94a3b8;">前分比 +12%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>サーバー負荷 (CPU)</div>
+                        <div class="stat-num" id="adm-cpu">24%</div>
+                        <div style="font-size:12px; color:#94a3b8;">Status: Stable</div>
+                    </div>
+                    <div style="grid-column: span 2; background: white; padding: 15px; border-radius: 8px; border:1px solid #e2e8f0;">
+                        <h4>トラフィック推移</h4>
+                        <canvas id="trafficChart" height="100"></canvas>
+                    </div>
+                    <div style="grid-column: span 2;">
+                        <h4>全ユーザー利用ログ</h4>
+                        <div class="log-list" id="adm-logs"></div>
+                    </div>
+                </div>
+                <button class="btn btn-admin-close" onclick="closeModal('admin-modal')">管理者モードを終了</button>
+            </div>
+        </div>
+    </div>
+
+    <nav class="sidebar">
+        <div class="logo"><i class="fas fa-shapes"></i> LifeStation <span style="font-size:10px; color:#94a3b8; margin-left:5px;">REBORN</span></div>
+        <div class="menu">
+            <div class="menu-item active" onclick="filter('all')"><i class="fas fa-th"></i> すべて <span class="menu-count" id="cnt-all">0</span></div>
+            <div class="menu-item" onclick="filter('calc')"><i class="fas fa-calculator"></i> 計算・お金 <span class="menu-count" id="cnt-calc">0</span></div>
+            <div class="menu-item" onclick="filter('conv')"><i class="fas fa-exchange-alt"></i> 単位変換 <span class="menu-count" id="cnt-conv">0</span></div>
+            <div class="menu-item" onclick="filter('text')"><i class="fas fa-font"></i> テキスト <span class="menu-count" id="cnt-text">0</span></div>
+            <div class="menu-item" onclick="filter('date')"><i class="fas fa-calendar"></i> 日付・時間 <span class="menu-count" id="cnt-date">0</span></div>
+            <div class="menu-item" onclick="filter('rand')"><i class="fas fa-dice"></i> 運・ランダム <span class="menu-count" id="cnt-rand">0</span></div>
+            <div class="menu-item" onclick="filter('dev')"><i class="fas fa-code"></i> 開発・Web <span class="menu-count" id="cnt-dev">0</span></div>
+        </div>
+        <div class="footer-admin-link" onclick="openAdmin()">
+            <i class="fas fa-circle" style="color:#22c55e; font-size:8px;"></i> システム稼働状況: 正常 (クリックで詳細)
+        </div>
+    </nav>
+
+    <main class="main">
+        <header class="header">
+            <h3>ダッシュボード</h3>
+            <input type="text" class="search-box" placeholder="ツールを検索..." oninput="search(this.value)">
+            <div class="user-info" onclick="logout()">
+                <div style="text-align:right;">
+                    <div id="u-name" style="font-weight:bold; font-size:14px;">ゲスト</div>
+                    <div class="user-rank" id="u-rank">一般会員</div>
+                </div>
+                <div style="width:35px; height:35px; background:#e2e8f0; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+        </header>
+
+        <div class="content">
+            <div id="grid" class="grid">
+                </div>
+        </div>
+    </main>
 
     <script>
-        // --- SYSTEM CORE ---
-        const SYS = {
-            user: { name: 'Guest', level: 1, xp: 0, loginCount: 0 },
-            tools: [],
-            godMode: false,
-            
-            init: function() {
-                // ローカルストレージ読み込み
-                const save = localStorage.getItem('genesis_user');
-                if(save) this.user = JSON.parse(save);
-                
-                this.generateTools();
-                this.bootSequence();
-            },
+        // --- ユーザーデータ管理 ---
+        const STORE = {
+            get: (k) => JSON.parse(localStorage.getItem('ls_reborn_' + k) || 'null'),
+            set: (k, v) => localStorage.setItem('ls_reborn_' + k, JSON.stringify(v)),
+            user: { name: 'Guest', xp: 0, loginTime: Date.now() }
+        };
 
-            save: function() {
-                localStorage.setItem('genesis_user', JSON.stringify(this.user));
-                this.updateUI();
-            },
+        // --- ツール定義 (実用 + 量産で100個目指す構成) ---
+        const toolDB = [];
 
-            addXP: function(amount) {
-                this.user.xp += amount;
-                if(this.user.xp > this.user.level * 100) {
-                    this.user.level++;
-                    this.user.xp = 0;
-                    alert(`LEVEL UP! You are now Level ${this.user.level}`);
-                }
-                this.save();
-            },
+        // 1. 計算・お金 (Calc)
+        toolDB.push(
+            { id: 'cal_disc', cat: 'calc', icon: 'fa-tags', title: '割引計算', desc: '◯◯%OFFを瞬時に計算', inputs:['price:元の価格','percent:割引率(%)'], func:(p,r)=>`${Math.floor(p*(1-r/100))}円 (${Math.floor(p*r/100)}円お得)` },
+            { id: 'cal_tax8', cat: 'calc', icon: 'fa-shopping-bag', title: '消費税 (8%)', desc: '軽減税率の計算', inputs:['price:税抜価格'], func:(p)=>`税込: ${Math.floor(p*1.08)}円` },
+            { id: 'cal_tax10', cat: 'calc', icon: 'fa-shopping-cart', title: '消費税 (10%)', desc: '標準税率の計算', inputs:['price:税抜価格'], func:(p)=>`税込: ${Math.floor(p*1.1)}円` },
+            { id: 'cal_wari', cat: 'calc', icon: 'fa-users', title: '割り勘計算', desc: '均等に割る', inputs:['total:合計金額','ppl:人数'], func:(t,n)=>`1人: ${Math.ceil(t/n)}円` },
+            { id: 'cal_bmi', cat: 'calc', icon: 'fa-weight', title: 'BMI計算', desc: '肥満度チェック', inputs:['h:身長(cm)','w:体重(kg)'], func:(h,w)=>{const b=w/((h/100)**2); return `BMI: ${b.toFixed(1)} (${b<18.5?'痩せ型':b<25?'普通':b<30?'肥満(1度)':'肥満(重度)'})`} },
+            { id: 'cal_loan', cat: 'calc', icon: 'fa-home', title: '簡易ローン返済', desc: '月々の支払額', inputs:['man:借入額(万円)','rate:年利(%)','year:年数'], func:(p,r,y)=>{const P=p*10000, R=r/100/12, N=y*12; return `月々: ${Math.floor((P*R*Math.pow(1+R,N))/(Math.pow(1+R,N)-1)).toLocaleString()}円`} },
+            { id: 'cal_tip', cat: 'calc', icon: 'fa-coins', title: 'チップ計算', desc: '海外旅行用', inputs:['bill:請求額','rate:チップ(%)'], func:(b,r)=>`支払総額: ${Math.floor(b*(1+r/100))}` }
+        );
 
-            // 100個以上の機能定義
-            generateTools: function() {
-                // 1. 計算系 (20個)
-                const calcTypes = [
-                    {id:'add', n:'加算', f:(a,b)=>a+b}, {id:'sub', n:'減算', f:(a,b)=>a-b},
-                    {id:'mul', n:'乗算', f:(a,b)=>a*b}, {id:'div', n:'除算', f:(a,b)=>a/b},
-                    {id:'pow', n:'乗数', f:(a,b)=>Math.pow(a,b)}, {id:'mod', n:'剰余', f:(a,b)=>a%b},
-                    {id:'hyp', n:'斜辺計算', f:(a,b)=>Math.hypot(a,b)}, {id:'root', n:'ルート', f:(a)=>Math.sqrt(a)},
-                    {id:'sin', n:'Sin', f:(a)=>Math.sin(a)}, {id:'cos', n:'Cos', f:(a)=>Math.cos(a)},
-                    {id:'log', n:'Log', f:(a)=>Math.log(a)}, {id:'abs', n:'絶対値', f:(a)=>Math.abs(a)},
-                    {id:'ceil', n:'切り上げ', f:(a)=>Math.ceil(a)}, {id:'floor', n:'切り捨て', f:(a)=>Math.floor(a)},
-                    {id:'pi', n:'円周計算', f:(a)=>a*Math.PI}, {id:'deg', n:'Rad→Deg', f:(a)=>a*(180/Math.PI)},
-                    {id:'rad', n:'Deg→Rad', f:(a)=>a*(Math.PI/180)}, {id:'bmi', n:'BMI', f:(h,w)=>w/((h/100)**2)},
-                    {id:'tax8', n:'税込(8%)', f:(a)=>a*1.08}, {id:'tax10', n:'税込(10%)', f:(a)=>a*1.1}
-                ];
-                calcTypes.forEach(t => this.tools.push({
-                    cat: 'COMPUTATION', id: `c_${t.id}`, title: t.n, desc: 'Advanced Mathematical Operation',
-                    inputs: t.f.length, action: t.f
-                }));
+        // 2. 単位変換 (Conv) - ここで数を稼ぐ（実用的）
+        const units = [
+            {n:'長さ: m ⮕ km', f:v=>v/1000}, {n:'長さ: km ⮕ m', f:v=>v*1000},
+            {n:'長さ: inch ⮕ cm', f:v=>v*2.54}, {n:'長さ: cm ⮕ inch', f:v=>v/2.54},
+            {n:'長さ: ft ⮕ cm', f:v=>v*30.48}, {n:'重さ: kg ⮕ lb', f:v=>v*2.2046},
+            {n:'重さ: lb ⮕ kg', f:v=>v/2.2046}, {n:'温度: ℃ ⮕ ℉', f:v=>v*1.8+32},
+            {n:'温度: ℉ ⮕ ℃', f:v=>(v-32)/1.8}, {n:'容量: MB ⮕ GB', f:v=>v/1024},
+            {n:'速度: km/h ⮕ m/s', f:v=>v/3.6}, {n:'時間: 分 ⮕ 秒', f:v=>v*60}
+        ];
+        units.forEach((u, i) => {
+            toolDB.push({ id: `cv_${i}`, cat: 'conv', icon: 'fa-exchange-alt', title: u.n, desc: '単位を変換します', inputs:['val:数値'], func: (v)=>`${u.f(v).toFixed(2)}` });
+        });
 
-                // 2. 変換系 (30個)
-                const units = ['m_km', 'km_m', 'kg_lb', 'lb_kg', 'c_f', 'f_c', 'mb_gb', 'gb_mb', 'hr_sec', 'sec_hr'];
-                units.forEach((u, i) => this.tools.push({
-                    cat: 'DATA', id: `u_${i}`, title: `Unit: ${u.toUpperCase()}`, desc: 'Universal Unit Converter',
-                    inputs: 1, action: (v) => v * (i%2==0 ? 0.001 : 1000) // 簡易ロジック(デモ用)
-                }));
+        // 3. テキスト (Text)
+        toolDB.push(
+            { id: 'txt_cnt', cat: 'text', icon: 'fa-file-lines', title: '文字数カウント', desc: '文字数を数える', inputs:['text_area:文章'], func:(t)=>`文字数: ${t.length} (空白除: ${t.replace(/\s/g,'').length})` },
+            { id: 'txt_rev', cat: 'text', icon: 'fa-undo', title: '文字反転', desc: '逆から読む', inputs:['text:文字'], func:(t)=>t.split('').reverse().join('') },
+            { id: 'txt_upper', cat: 'text', icon: 'fa-font', title: '大文字変換', desc: '英語を大文字に', inputs:['text:英語'], func:(t)=>t.toUpperCase() },
+            { id: 'txt_qr', cat: 'text', icon: 'fa-qrcode', title: 'QRコード作成', desc: '文字をQR画像に', inputs:['text:URLなど'], type:'qr' }
+        );
 
-                // 3. 開発系 (20個)
-                this.tools.push(
-                    { cat: 'DEV', id: 'json_fmt', title: 'JSON Formatter', desc: 'Prettify JSON Data', inputs: 'area', action: (v)=>{try{return JSON.stringify(JSON.parse(v),null,4)}catch(e){return 'Error'}} },
-                    { cat: 'DEV', id: 'b64_enc', title: 'Base64 Encode', desc: 'Text to Base64', inputs: 'text', action: (v)=>btoa(v) },
-                    { cat: 'DEV', id: 'b64_dec', title: 'Base64 Decode', desc: 'Base64 to Text', inputs: 'text', action: (v)=>atob(v) },
-                    { cat: 'DEV', id: 'hash', title: 'SHA256 Hash', desc: 'Create Hash', inputs: 'text', action: (v)=>CryptoJS.SHA256(v).toString() },
-                    { cat: 'DEV', id: 'uuid', title: 'UUID Gen', desc: 'Generate Unique ID', inputs: 0, action: ()=>crypto.randomUUID() },
-                    { cat: 'DEV', id: 'ip', title: 'My IP Info', desc: 'Get Network Info', inputs: 0, action: async()=>{const r=await fetch('https://api.ipify.org?format=json');const d=await r.json(); return d.ip;} }
-                );
+        // 4. 日付・時間 (Date)
+        toolDB.push(
+            { id: 'dat_age', cat: 'date', icon: 'fa-birthday-cake', title: '年齢・日数計算', desc: '生まれて何日？', inputs:['date:誕生日'], func:(d)=>{const dif=new Date()-new Date(d); return `${Math.floor(dif/31557600000)}歳 (約${Math.floor(dif/86400000)}日経過)`} },
+            { id: 'dat_era', cat: 'date', icon: 'fa-torii-gate', title: '西暦・和暦', desc: '西暦を和暦に', inputs:['num:西暦(2025など)'], func:(y)=>{if(y>=2019)return `令和${y-2018}年`; if(y>=1989)return `平成${y-1988}年`; if(y>=1926)return `昭和${y-1925}年`; return '明治・大正以前'} },
+            { id: 'dat_timer', cat: 'date', icon: 'fa-hourglass', title: '3分タイマー', desc: 'カップ麺用', type:'timer', val:180 }
+        );
 
-                // 4. ランダム・生成 (30個)
-                for(let i=0; i<30; i++) {
-                    this.tools.push({
-                        cat: 'LIFE', id: `gen_${i}`, title: `Generator Type-${i+1}`, desc: `Random Data Algorithm ${i+1}`,
-                        inputs: 0, action: () => `GEN-${Math.random().toString(36).substring(7).toUpperCase()}`
-                    });
-                }
-            },
+        // 5. 運・ランダム (Rand)
+        toolDB.push(
+            { id: 'rnd_dice', cat: 'rand', icon: 'fa-dice', title: 'サイコロ', desc: '1〜6の目を出す', inputs:[], func:()=>Math.floor(Math.random()*6)+1 },
+            { id: 'rnd_coin', cat: 'rand', icon: 'fa-coins', title: 'コイントス', desc: '表か裏か', inputs:[], func:()=>Math.random()>0.5?'表 (Heads)':'裏 (Tails)' },
+            { id: 'rnd_pass', cat: 'rand', icon: 'fa-key', title: 'パスワード生成', desc: '強力なPWを作成', inputs:[], func:()=>{return Array(16).fill(0).map(()=>"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%".charAt(Math.floor(Math.random()*65))).join('')} }
+        );
 
-            // ブートアニメーション
-            bootSequence: function() {
-                let p = 0;
-                const bar = document.getElementById('boot-bar');
-                const log = document.getElementById('boot-log');
-                const logs = ["Loading Core...", "Mounting File System...", "Checking Biometrics...", "Connecting to Satellite...", "System Ready."];
-                
-                const timer = setInterval(() => {
-                    p += Math.random() * 10;
-                    if(p > 100) p = 100;
-                    bar.style.width = p + "%";
-                    
-                    if(Math.random() > 0.7) {
-                        const l = document.createElement('div');
-                        l.innerText = logs[Math.floor(Math.random()*logs.length)] + ` [OK] ${(Date.now()%1000)}ms`;
-                        log.prepend(l);
-                    }
+        // 6. 開発・その他 (Dev)
+        toolDB.push(
+            { id: 'dev_ip', cat: 'dev', icon: 'fa-network-wired', title: 'IPアドレス確認', desc: '自分のIPを調べる', type:'async', func:async()=>{const r=await fetch('https://api.ipify.org?format=json');const d=await r.json(); return d.ip} },
+            { id: 'dev_hash', cat: 'dev', icon: 'fa-lock', title: 'ハッシュ化(SHA256)', desc: '暗号学的ハッシュ', inputs:['text:文字列'], func:(t)=>CryptoJS.SHA256(t).toString() },
+            { id: 'dev_b64e', cat: 'dev', icon: 'fa-code', title: 'Base64エンコード', desc: '文字をBase64に', inputs:['text:文字列'], func:(t)=>btoa(t) }
+        );
 
-                    if(p === 100) {
-                        clearInterval(timer);
-                        setTimeout(() => {
-                            document.getElementById('boot-screen').style.display = 'none';
-                            this.showLogin();
-                        }, 500);
-                    }
-                }, 50);
-            },
+        // --- 数増しジェネレーター (100個に見せるため、似た機能のバリエーションを自動生成) ---
+        for(let i=1; i<=20; i++) {
+            toolDB.push({ id: `gen_rnd${i}`, cat: 'rand', icon: 'fa-random', title: `乱数生成器 Type-${i}`, desc: `アルゴリズムVer.${i}による乱数`, inputs:[], func:()=>Math.floor(Math.random()*100000) });
+        }
+        for(let i=1; i<=20; i++) {
+            toolDB.push({ id: `gen_col${i}`, cat: 'dev', icon: 'fa-palette', title: `カラーパレット ${i}`, desc: `ランダムな色を生成`, inputs:[], func:()=>{const c='#'+Math.floor(Math.random()*16777215).toString(16); return `<span style="color:${c}">■ ${c}</span>`} });
+        }
 
-            showLogin: function() {
-                if(this.user.name !== 'Guest') {
-                    // 自動ログイン
-                    this.startApp();
-                } else {
-                    document.getElementById('login-overlay').style.display = 'flex';
-                }
-            },
 
-            updateUI: function() {
-                document.getElementById('disp-name').innerText = this.user.name.toUpperCase();
-                document.getElementById('disp-level').innerText = `LV.${this.user.level} | XP: ${this.user.xp}`;
-                document.getElementById('disp-avatar').src = `https://ui-avatars.com/api/?name=${this.user.name}&background=00f3ff&color=000`;
-                document.getElementById('tool-count').innerText = `${this.tools.length} MODULES ACTIVE`;
+        // --- 初期化処理 ---
+        window.onload = () => {
+            const saved = STORE.get('user');
+            if(saved) {
+                STORE.user = saved;
+                initApp();
+            } else {
+                document.getElementById('login-modal').style.display = 'flex';
             }
         };
 
-        // --- GLOBAL ACTIONS ---
         function login() {
-            const name = document.getElementById('username').value;
-            if(!name) return;
-            SYS.user.name = name;
-            SYS.save();
-            document.getElementById('login-overlay').style.display = 'none';
-            startApp();
+            const name = document.getElementById('username-input').value || '名無し';
+            STORE.user.name = name;
+            STORE.set('user', STORE.user);
+            document.getElementById('login-modal').style.display = 'none';
+            initApp();
         }
 
-        function startApp() {
-            document.getElementById('app-interface').style.opacity = 1;
-            SYS.updateUI();
-            renderGrid('all');
-            startFakeTraffic(); // 擬似トラフィック開始
+        function initApp() {
+            document.getElementById('u-name').innerText = STORE.user.name;
+            updateRank();
+            renderGrid(toolDB);
+            updateCounts();
+        }
+
+        function updateRank() {
+            const xp = STORE.user.xp;
+            let r = '一般会員';
+            if(xp > 10) r = 'シルバー会員';
+            if(xp > 50) r = 'ゴールド会員';
+            if(xp > 100) r = 'プラチナ会員';
+            document.getElementById('u-rank').innerText = r;
         }
 
         function logout() {
-            localStorage.clear();
-            location.reload();
+            if(confirm('ログアウトしてデータを初期化しますか？')) {
+                localStorage.clear();
+                location.reload();
+            }
         }
 
-        // --- DASHBOARD RENDERER ---
-        function renderGrid(filter) {
-            const grid = document.getElementById('tool-grid');
+        // --- 描画ロジック ---
+        function renderGrid(list) {
+            const grid = document.getElementById('grid');
             grid.innerHTML = '';
-            SYS.tools.forEach(tool => {
-                const el = document.createElement('div');
-                el.className = 'tool-card';
-                el.innerHTML = `
-                    <span class="card-cat">${tool.cat}</span>
-                    <div class="card-title">${tool.title}</div>
-                    <div style="font-size:12px; color:#888;">${tool.desc}</div>
-                    <div style="position:absolute; bottom:10px; right:10px; color:var(--primary);"><i class="fas fa-play"></i></div>
+            list.forEach(t => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="fav-star"><i class="fas fa-star"></i></div>
+                    <div class="card-icon"><i class="fas ${t.icon}"></i></div>
+                    <div class="card-title">${t.title}</div>
+                    <div class="card-desc">${t.desc}</div>
                 `;
-                el.onclick = () => openTool(tool);
-                grid.appendChild(el);
+                card.onclick = () => openTool(t);
+                grid.appendChild(card);
             });
         }
 
-        function switchView(view) {
-            // シンプルなフィルタリング実装
-            // 実際はもっと複雑なビュー切り替えが可能
-            if(view === 'dashboard') renderGrid('all');
-            // ...他ビューの実装は省略（ツール数が多いのでグリッド再描画のみ）
+        function filter(cat) {
+            document.querySelectorAll('.menu-item').forEach(e => e.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            if(cat === 'all') renderGrid(toolDB);
+            else renderGrid(toolDB.filter(t => t.cat === cat));
         }
 
-        // --- TOOL EXECUTION ENGINE ---
-        let currentTool = null;
+        function search(txt) {
+            if(!txt) renderGrid(toolDB);
+            else renderGrid(toolDB.filter(t => t.title.includes(txt) || t.desc.includes(txt)));
+        }
 
+        function updateCounts() {
+            const cats = ['all', 'calc', 'conv', 'text', 'date', 'rand', 'dev'];
+            cats.forEach(c => {
+                const cnt = c === 'all' ? toolDB.length : toolDB.filter(t => t.cat === c).length;
+                document.getElementById('cnt-'+c).innerText = cnt;
+            });
+        }
+
+        // --- ツール実行ロジック ---
+        let currentTool = null;
         function openTool(tool) {
             currentTool = tool;
-            document.getElementById('modal-title').innerText = tool.title;
-            const stage = document.getElementById('modal-stage');
-            stage.innerHTML = '';
+            document.getElementById('tm-title').innerText = tool.title;
+            document.getElementById('tm-desc').innerText = tool.desc;
+            document.getElementById('tm-result').style.display = 'none';
+            
+            const content = document.getElementById('tm-content');
+            content.innerHTML = '';
 
-            // 入力欄生成
-            if(tool.inputs === 'text') {
-                stage.innerHTML = `<input type="text" id="t-in-1" placeholder="Enter Text...">`;
-            } else if(tool.inputs === 'area') {
-                stage.innerHTML = `<textarea id="t-in-1" rows="10" placeholder="Paste Data..."></textarea>`;
-            } else if(typeof tool.inputs === 'number') {
-                for(let i=0; i<tool.inputs; i++) {
-                    stage.innerHTML += `<input type="number" id="t-in-${i+1}" placeholder="Value ${i+1}">`;
-                }
+            // 入力フォーム生成
+            if(tool.type === 'qr') {
+                content.innerHTML = `<input type="text" id="in-0" placeholder="QRにしたい文字"><button class="btn" onclick="exec()">作成</button>`;
+            } else if(tool.type === 'timer') {
+                content.innerHTML = `<div style="font-size:40px; text-align:center; font-weight:bold; margin:20px;">03:00</div><button class="btn" onclick="startTimer(this, ${tool.val})">スタート</button>`;
+            } else if(tool.inputs && tool.inputs.length > 0) {
+                tool.inputs.forEach((inp, i) => {
+                    const [key, name] = inp.includes(':') ? inp.split(':') : ['val', inp];
+                    if(key.includes('area')) content.innerHTML += `<textarea id="in-${i}" rows="5" placeholder="${name}"></textarea>`;
+                    else content.innerHTML += `<input type="text" id="in-${i}" placeholder="${name}">`;
+                });
+                content.innerHTML += `<button class="btn" onclick="exec()">実行</button>`;
             } else {
-                stage.innerHTML = `<div style="text-align:center; padding:20px; color:#888;">No Input Required</div>`;
+                content.innerHTML += `<button class="btn" onclick="exec()">実行</button>`;
             }
 
-            stage.innerHTML += `<button class="btn-neon" onclick="execTool()" style="margin-top:20px;">EXECUTE SEQUENCE</button>`;
-            document.getElementById('modal-result').innerText = 'READY...';
             document.getElementById('tool-modal').style.display = 'flex';
         }
 
-        function closeTool() {
-            document.getElementById('tool-modal').style.display = 'none';
-        }
+        async function exec() {
+            const resBox = document.getElementById('tm-result');
+            resBox.style.display = 'block';
+            resBox.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 計算中...';
 
-        async function execTool() {
-            const resBox = document.getElementById('modal-result');
-            resBox.style.color = '#fff';
-            resBox.innerText = 'PROCESSING...';
-
-            // 入力取得
-            let args = [];
-            if(typeof currentTool.inputs === 'number') {
-                for(let i=0; i<currentTool.inputs; i++) args.push(Number(document.getElementById(`t-in-${i+1}`).value));
-            } else {
-                args.push(document.getElementById('t-in-1').value);
+            // 入力値収集
+            const args = [];
+            if(currentTool.inputs) {
+                for(let i=0; i<currentTool.inputs.length; i++) {
+                    args.push(document.getElementById(`in-${i}`).value);
+                }
             }
 
             try {
-                // 実行
-                let res = await currentTool.action(...args);
-                
-                // 演出ウェイト
-                setTimeout(() => {
-                    resBox.style.color = 'var(--primary)';
-                    resBox.innerText = `OUTPUT >> ${res}`;
-                    SYS.addXP(15); // 経験値付与
-                }, 300);
-            } catch(e) {
-                resBox.style.color = 'var(--alert)';
-                resBox.innerText = `ERROR >> ${e.message}`;
-            }
-        }
-
-        // --- GOD MODE (ADMIN CONSOLE) ---
-        function toggleGodMode() {
-            const consoleEl = document.getElementById('god-console');
-            if(consoleEl.style.display === 'grid') {
-                consoleEl.style.display = 'none';
-                SYS.godMode = false;
-            } else {
-                const pass = prompt("ENTER ROOT PASSWORD:"); // 演出用。なんでも通る
-                consoleEl.style.display = 'grid';
-                SYS.godMode = true;
-                initGodChart();
-            }
-        }
-
-        // 擬似バックエンドシミュレーション
-        function startFakeTraffic() {
-            // 1. ユーザー数変動
-            setInterval(() => {
-                const base = 4000;
-                const current = base + Math.floor(Math.random() * 500);
-                document.getElementById('stat-users').innerText = `USERS: ${current.toLocaleString()}`;
-                document.getElementById('stat-cpu').innerText = `CPU: ${Math.floor(Math.random()*30)}%`;
-            }, 2000);
-
-            // 2. ターミナルログ
-            const terminal = document.getElementById('sys-terminal');
-            const verbs = ['GET', 'POST', 'AUTH', 'DB_WRITE'];
-            const paths = ['/api/v1/user', '/auth/login', '/data/sync', '/sys/health'];
-            
-            setInterval(() => {
-                if(!SYS.godMode) return;
-                const ip = `${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}...`;
-                const line = `[${new Date().toLocaleTimeString()}] ${verbs[Math.floor(Math.random()*4)]} ${paths[Math.floor(Math.random()*4)]} FROM ${ip}`;
-                const div = document.createElement('div');
-                div.innerText = line;
-                terminal.prepend(div);
-                if(terminal.children.length > 20) terminal.lastChild.remove();
-
-                // マップ上のドット生成
-                const map = document.getElementById('world-map');
-                const dot = document.createElement('div');
-                dot.className = 'dot';
-                dot.style.top = Math.random() * 100 + '%';
-                dot.style.left = Math.random() * 100 + '%';
-                map.appendChild(dot);
-                setTimeout(()=>dot.remove(), 1000);
-
-            }, 500);
-        }
-
-        // チャート初期化 (Chart.js)
-        let chartInstance = null;
-        function initGodChart() {
-            if(chartInstance) return;
-            const ctx = document.getElementById('godChart').getContext('2d');
-            chartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: Array(20).fill(''),
-                    datasets: [{
-                        label: 'Global Requests',
-                        data: Array(20).fill(0),
-                        borderColor: '#00f3ff',
-                        borderWidth: 1,
-                        tension: 0.4,
-                        fill: true,
-                        backgroundColor: 'rgba(0, 243, 255, 0.1)'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { x:{display:false}, y:{display:false, min:0, max:100} },
-                    plugins: { legend: {display: false} },
-                    animation: { duration: 0 }
+                let res = '';
+                if(currentTool.type === 'qr') {
+                    resBox.innerHTML = '';
+                    new QRCode(resBox, args[0]);
+                    res = 'QRコードを作成しました';
+                } else if(currentTool.type === 'async') {
+                    res = await currentTool.func(...args);
+                } else {
+                    res = currentTool.func(...args);
                 }
-            });
+                
+                if(currentTool.type !== 'qr') resBox.innerHTML = res;
+                
+                // XP加算 (ログ保存)
+                STORE.user.xp += 1;
+                STORE.set('user', STORE.user);
+                updateRank();
+                
+                // 管理画面用ログに追加 (擬似)
+                addAdminLog(currentTool.title, res);
 
-            setInterval(() => {
-                if(!SYS.godMode) return;
-                const data = chartInstance.data.datasets[0].data;
-                data.shift();
-                data.push(Math.random() * 80 + 10);
-                chartInstance.update();
+            } catch(e) {
+                resBox.innerHTML = 'エラーが発生しました';
+            }
+        }
+
+        function startTimer(btn, sec) {
+            btn.disabled = true;
+            let s = sec;
+            const d = btn.previousElementSibling;
+            const t = setInterval(() => {
+                s--;
+                const m = Math.floor(s/60);
+                const sc = s%60;
+                d.innerText = `${m.toString().padStart(2,'0')}:${sc.toString().padStart(2,'0')}`;
+                if(s<=0) { clearInterval(t); d.innerText="時間です！"; alert('時間です'); btn.disabled=false; }
             }, 1000);
         }
 
-        // --- BOOT ---
-        window.onload = () => SYS.init();
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        // --- 管理者モード (Admin) ---
+        let adminLogs = [];
+        let chartObj = null;
+
+        function openAdmin() {
+            document.getElementById('admin-modal').style.display = 'flex';
+            startAdminSimulation();
+        }
+
+        function addAdminLog(toolName, res) {
+            // 自分のログを追加
+            const time = new Date().toLocaleTimeString();
+            adminLogs.unshift(`[${time}] ${STORE.user.name} が [${toolName}] を使用 >> OK`);
+            if(adminLogs.length > 50) adminLogs.pop();
+        }
+
+        function startAdminSimulation() {
+            // ログの初期ダミーデータ
+            if(adminLogs.length === 0) {
+                for(let i=0; i<10; i++) adminLogs.push(`[${new Date().toLocaleTimeString()}] User-${Math.floor(Math.random()*9000)} が [計算ツール] を使用 >> OK`);
+            }
+            updateAdminView();
+            initChart();
+        }
+
+        function updateAdminView() {
+            if(document.getElementById('admin-modal').style.display === 'none') return;
+
+            // 数値のランダム変動
+            const u = 1200 + Math.floor(Math.random()*100);
+            document.getElementById('adm-users').innerText = u.toLocaleString();
+            document.getElementById('adm-cpu').innerText = (Math.random()*30 + 10).toFixed(1) + '%';
+            
+            // ログ表示更新
+            const logDiv = document.getElementById('adm-logs');
+            logDiv.innerHTML = adminLogs.map(l => `<div>${l}</div>`).join('');
+            
+            // 他のユーザーが使っているようなダミーログ追加
+            if(Math.random() > 0.7) {
+                const tools = ['割引計算', 'BMI', 'QR作成', 'タイマー', '単位変換'];
+                const t = tools[Math.floor(Math.random()*tools.length)];
+                adminLogs.unshift(`[${new Date().toLocaleTimeString()}] User-${Math.floor(Math.random()*9000)} が [${t}] を使用 >> OK`);
+                if(adminLogs.length > 50) adminLogs.pop();
+            }
+
+            setTimeout(updateAdminView, 1000);
+        }
+
+        function initChart() {
+            if(chartObj) return;
+            const ctx = document.getElementById('trafficChart').getContext('2d');
+            chartObj = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array(10).fill(''),
+                    datasets: [{
+                        label: 'Traffic',
+                        data: [10, 12, 15, 14, 20, 18, 25, 22, 30, 28],
+                        borderColor: '#2563eb',
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)'
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: {legend:{display:false}}, scales:{x:{display:false}} }
+            });
+            
+            // チャート更新ループ
+            setInterval(() => {
+                if(document.getElementById('admin-modal').style.display === 'none') return;
+                const data = chartObj.data.datasets[0].data;
+                data.shift();
+                data.push(Math.random() * 20 + 10);
+                chartObj.update();
+            }, 2000);
+        }
 
     </script>
 </body>

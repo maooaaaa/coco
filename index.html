@@ -196,6 +196,15 @@
         
         const tools = [
             // --- 計算 (Calc) ---
+            { 
+        id: 'my_salary', 
+        cat: 'calc', 
+        icon: 'fa-yen-sign', 
+        title: 'バイト給料計算', 
+        desc: '時給と労働時間から日給を計算', 
+        inputs: ['wage:時給(円)', 'hour:働いた時間(h)'], 
+        func: (w, h) => `給料: ${(w * h).toLocaleString()} 円` 
+    },
             { id: 'discount', cat: 'calc', icon: 'fa-tags', title: '割引計算', desc: '「3割引」「20%OFF」などを計算', inputs:['price:元の価格(円)', 'percent:割引率(%)'], func:(p,r)=>`${Math.floor(p*(1-r/100)).toLocaleString()} 円 (引額: ${Math.floor(p*r/100).toLocaleString()}円)` },
             { id: 'tax', cat: 'calc', icon: 'fa-shopping-bag', title: '消費税計算', desc: '8%と10%を同時に計算', inputs:['price:税抜価格'], func:(p)=>`8%: ${Math.floor(p*1.08).toLocaleString()}円<br>10%: ${Math.floor(p*1.1).toLocaleString()}円` },
             { id: 'warikan', cat: 'calc', icon: 'fa-users', title: '割り勘計算', desc: '均等に割った金額を算出', inputs:['total:合計金額', 'people:人数'], func:(t,n)=>`一人当たり: ${Math.ceil(t/n).toLocaleString()} 円` },

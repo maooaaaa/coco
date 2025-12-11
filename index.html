@@ -4,86 +4,141 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Change the World | coco</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
-        /* 高級感を出すためのデザイン設定 */
+        /* --- ゲーミングスタイル定義 --- */
         :root {
-            --bg-color: #0a0a0a; /* 漆黒 */
-            --text-color: #f0f0f0; /* オフホワイト */
-            --accent-color: #D4AF37; /* メタリックゴールド */
-            --sub-text: #888888;
+            --bg-color: #050505; /* ほぼ真っ黒 */
+            --text-primary: #00ff9d; /* ネオングリーン */
+            --text-secondary: #00b8ff; /* ネオンブルー */
+            --accent: #ff00ff; /* ネオンピンク */
+            --font-stack: 'Share Tech Mono', monospace, sans-serif;
         }
 
         body {
             background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: "Yu Mincho", "Hiragino Mincho ProN", serif; /* 明朝体で高級感を演出 */
+            color: var(--text-primary);
+            font-family: var(--font-stack);
             margin: 0;
             padding: 0;
-            line-height: 1.8;
-            letter-spacing: 0.05em;
+            line-height: 1.7;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 画面全体のエフェクト（走査線とノイズ） */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 1px, transparent 1px, transparent 2px);
+            pointer-events: none;
+            z-index: 10;
+            opacity: 0.3;
+        }
+
+        /* 背景のパーティクル用キャンバス */
+        #particle-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
         }
 
         /* レイアウト */
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
-            padding: 40px 20px;
+            padding: 60px 20px;
+            position: relative;
+            z-index: 1;
         }
 
-        /* ヘッダーエリア */
+        /* ヘッダー */
         header {
             text-align: center;
-            padding: 100px 0 60px;
-            border-bottom: 1px solid #333;
-            animation: fadeIn 2s ease;
+            margin-bottom: 80px;
+            text-transform: uppercase;
         }
 
-        h1 {
-            font-size: 3.5rem;
-            margin-bottom: 10px;
-            font-weight: normal;
+        .glitch-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        /* メインタイトルのグリッチ演出 */
+        h1.glitch {
+            font-size: 4rem;
+            margin: 0;
             letter-spacing: 0.1em;
+            position: relative;
+            color: var(--text-primary);
+            text-shadow: 2px 2px var(--accent), -2px -2px var(--text-secondary);
+            animation: glitch-anim 3s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { text-shadow: 2px 2px var(--accent), -2px -2px var(--text-secondary); }
+            25% { text-shadow: -2px 2px var(--accent), 2px -2px var(--text-secondary); clip-path: inset(10% 0 30% 0); transform: translate(-2px, 2px); }
+            50% { text-shadow: 2px -2px var(--accent), -2px 2px var(--text-secondary); clip-path: inset(50% 0 10% 0); transform: translate(2px, -2px); }
+            75% { text-shadow: -2px -2px var(--accent), 2px 2px var(--text-secondary); clip-path: inset(0% 0 60% 0); transform: translate(-2px, -2px); }
+            100% { text-shadow: 2px 2px var(--accent), -2px -2px var(--text-secondary); clip-path: inset(20% 0 20% 0); transform: translate(2px, 2px); }
         }
 
         .subtitle {
-            color: var(--accent-color);
+            color: var(--text-secondary);
             font-size: 1.2rem;
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-            margin-bottom: 20px;
+            letter-spacing: 0.3em;
+            margin-bottom: 15px;
+            display: block;
         }
 
-        .name {
-            font-size: 1rem;
-            color: var(--sub-text);
+        .bio-status {
+            font-size: 0.9rem;
+            color: #888;
+            border: 1px solid var(--text-secondary);
+            padding: 5px 15px;
+            display: inline-block;
+            background: rgba(0, 184, 255, 0.1);
         }
 
-        /* メインコンテンツ */
+        /* セクション共通 */
         section {
-            padding: 60px 0;
-            opacity: 0;
-            animation: slideUp 1s ease forwards;
+            margin-bottom: 80px;
+            border-left: 4px solid var(--text-secondary);
+            padding-left: 25px;
+            background: linear-gradient(90deg, rgba(0,184,255,0.05) 0%, rgba(0,0,0,0) 100%);
         }
-        
-        /* アニメーションの遅延設定 */
-        section:nth-child(2) { animation-delay: 0.5s; }
-        section:nth-child(3) { animation-delay: 1.0s; }
 
         h2 {
-            font-size: 1.5rem;
-            color: var(--accent-color);
-            border-left: 3px solid var(--accent-color);
-            padding-left: 15px;
-            margin-bottom: 30px;
-            font-weight: normal;
+            font-size: 2rem;
+            color: var(--text-secondary);
+            margin-top: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            position: relative;
         }
 
+        /* タイピング風アニメーション用のクラス */
+        .typing-effect {
+            border-right: 2px solid var(--text-primary);
+            white-space: pre-wrap;
+            overflow: hidden;
+            display: inline-block;
+            animation: blink-caret 0.75s step-end infinite;
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: var(--text-primary); }
+        }
+        
         p {
-            margin-bottom: 20px;
-            text-align: justify;
+            font-size: 1.1rem;
+            color: #ccc;
         }
 
-        /* スキルリスト */
+        /* スキルタグ */
         .skills {
             display: flex;
             flex-wrap: wrap;
@@ -91,105 +146,217 @@
         }
 
         .tag {
-            border: 1px solid var(--sub-text);
-            padding: 8px 16px;
-            font-size: 0.9rem;
+            border: 2px solid var(--text-secondary);
+            color: var(--text-secondary);
+            padding: 10px 20px;
+            font-size: 1rem;
+            text-transform: uppercase;
             transition: all 0.3s;
-            font-family: sans-serif; /* 英語などは読みやすくゴシックで */
+            background: rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
         }
 
+        /* タグのホバー演出 */
         .tag:hover {
-            border-color: var(--accent-color);
-            color: var(--accent-color);
-            cursor: default;
+            background: var(--text-secondary);
+            color: var(--bg-color);
+            box-shadow: 0 0 20px var(--text-secondary), 0 0 40px var(--text-secondary);
+            cursor: crosshair;
         }
 
-        /* フッター・リンク */
+        /* リンク */
+        .contact-link a {
+            display: inline-block;
+            color: var(--accent);
+            font-size: 1.5rem;
+            text-decoration: none;
+            border: 2px solid var(--accent);
+            padding: 15px 30px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-link a:hover {
+            background: var(--accent);
+            color: var(--bg-color);
+            box-shadow: 0 0 30px var(--accent);
+        }
+
+        /* フッター */
         footer {
             text-align: center;
-            padding: 80px 0;
+            padding: 40px 0;
             font-size: 0.9rem;
-            color: var(--sub-text);
-        }
-
-        a {
-            color: var(--text-color);
-            text-decoration: none;
-            border-bottom: 1px solid var(--accent-color);
-            transition: opacity 0.3s;
-            margin: 0 10px;
-        }
-
-        a:hover {
-            opacity: 0.7;
-        }
-
-        /* アニメーション定義 */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            color: #666;
+            border-top: 1px solid #333;
         }
 
         /* スマホ対応 */
         @media (max-width: 600px) {
-            h1 { font-size: 2.5rem; }
-            .container { padding: 20px; }
+            h1.glitch { font-size: 2.5rem; }
+            .container { padding: 30px 15px; }
         }
     </style>
 </head>
 <body>
 
+    <canvas id="particle-canvas"></canvas>
+
     <div class="container">
         <header>
-            <div class="subtitle">Change the World</div>
-            <h1>The Architect</h1>
-            <div class="name">coco / Mechanical Engineering Student</div>
+            <span class="subtitle">System Status: Online // Target: Change the World</span>
+            <div class="glitch-wrapper">
+                <h1 class="glitch" data-text="THE ARCHITECT">THE ARCHITECT</h1>
+            </div>
+            <div style="margin-top: 20px;">
+                <span class="bio-status">ID: coco // Mech-Eng Student // AI Operative</span>
+            </div>
         </header>
 
         <section>
-            <h2>Philosophy</h2>
-            <p>
-                機械工学という物理的な力と、AIという知的な力の融合点に立つ。<br>
-                半導体技術の深淵と軍事技術の戦略性を探求し、既存の枠組みを打破する。<br>
-                私の目的は「世界征服」――すなわち、テクノロジーによる不可逆的な変革である。
-            </p>
-            <p>
-                効率を極めるライフハックと、思考を加速させるドライブ。<br>
-                常に最新情報の最前線に身を置き、次世代のスタンダードを構築する。
-            </p>
+            <h2>> Mission Protocol</h2>
+            <p id="typing-text1" style="min-height: 120px;"></p>
         </section>
 
         <section>
-            <h2>Core Intelligence</h2>
+            <h2>> Equipped Database</h2>
             <div class="skills">
-                <span class="tag">Mechanical Engineering</span>
-                <span class="tag">Artificial Intelligence</span>
+                <span class="tag">Mechanical Eng.</span>
+                <span class="tag">A.I. / Deep Learning</span>
                 <span class="tag">Semiconductors</span>
-                <span class="tag">Military Tech</span>
-                <span class="tag">Life Hacks</span>
-                <span class="tag">Driving</span>
+                <span class="tag">Military Tech Strategy</span>
+                <span class="tag">Optimal Life Hacks</span>
+                <span class="tag">High-Speed Driving</span>
             </div>
         </section>
 
         <section>
-            <h2>Contact</h2>
-            <p>
-                共犯者、あるいは挑戦者へ。
-            </p>
-            <div style="margin-top: 30px; text-align: center;">
-                <a href="https://twitter.com/RefeeQy" target="_blank">X (Twitter): @RefeeQy</a>
+            <h2>> Establish Connection</h2>
+            <p>共犯者、あるいは挑戦者へ。信号を受信する。</p>
+            <div class="contact-link" style="margin-top: 30px; text-align: center;">
+                <a href="https://twitter.com/ReffeQy" target="_blank">Connect via X (@ReffeQy)</a>
             </div>
         </section>
 
         <footer>
-            &copy; 2025 coco / Change the World.
+            &copy; 2025 coco // World Domination Project initialized.
         </footer>
     </div>
 
+    <script>
+        // --- 1. タイピング風テキスト表示 ---
+        const text1 = `機械工学という物理的な力と、AIという知的な力の融合点に立つ。\n半導体技術の深淵と軍事技術の戦略性を探求し、既存の枠組みを打破する。\n私の目的は「世界征服」――すなわち、テクノロジーによる不可逆的な変革である。\n\n効率を極めるライフハックと、思考を加速させるドライブ。\n常に最新情報の最前線に身を置き、次世代のスタンダードを構築する。`;
+        const typingElement1 = document.getElementById('typing-text1');
+        let i = 0;
+
+        function typeWriter() {
+            if (i < text1.length) {
+                // 改行コードの処理
+                if(text1.charAt(i) === '\n'){
+                    typingElement1.innerHTML += '<br>';
+                } else {
+                    typingElement1.innerHTML += text1.charAt(i);
+                }
+                i++;
+                setTimeout(typeWriter, 30); // 表示スピード調整（小さいほど速い）
+            }else{
+                // タイピング完了後に点滅カーソルを追加
+                typingElement1.classList.add('typing-effect');
+            }
+        }
+        // ページ読み込み後に開始
+        window.onload = function() {
+            setTimeout(typeWriter, 1000);
+        };
+
+
+        // --- 2. 背景パーティクルエフェクト (Canvas) ---
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particlesArray;
+
+        // パーティクル定義
+        class Particle {
+            constructor(x, y, directionX, directionY, size, color) {
+                this.x = x;
+                this.y = y;
+                this.directionX = directionX;
+                this.directionY = directionY;
+                this.size = size;
+                this.color = color;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+            update() {
+                if (this.x > canvas.width || this.x < 0) { this.directionX = -this.directionX; }
+                if (this.y > canvas.height || this.y < 0) { this.directionY = -this.directionY; }
+                this.x += this.directionX;
+                this.y += this.directionY;
+                this.draw();
+            }
+        }
+
+        function init() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.height * canvas.width) / 9000; // 密度調整
+            for (let i = 0; i < numberOfParticles; i++) {
+                let size = (Math.random() * 2) + 1;
+                let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
+                let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
+                let directionX = (Math.random() * 0.4) - 0.2;
+                let directionY = (Math.random() * 0.4) - 0.2;
+                let color = '#00ff9d'; // パーティクルの色
+                particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.clearRect(0, 0, innerWidth, innerHeight);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+            }
+            connect();
+        }
+
+        // パーティクル同士を線で結ぶ
+        function connect(){
+            let opacityValue = 1;
+            for (let a = 0; a < particlesArray.length; a++) {
+                for (let b = a; b < particlesArray.length; b++) {
+                    let distance = (( particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x))
+                    + ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
+                    if (distance < (canvas.width/7) * (canvas.height/7)) {
+                        opacityValue = 1 - (distance/10000);
+                        ctx.strokeStyle = 'rgba(0, 255, 157,' + opacityValue + ')';
+                        ctx.lineWidth = 0.5;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        window.addEventListener('resize', function(){
+            canvas.width = innerWidth;
+            canvas.height = innerHeight;
+            init();
+        });
+
+        init();
+        animate();
+    </script>
 </body>
 </html>

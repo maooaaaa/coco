@@ -3,414 +3,337 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Tools | 高機能ツール集</title>
+    <title>LifeStation | 万能ツール図鑑</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
-            --primary: #3b82f6;
-            --secondary: #1e40af;
-            --bg: #f8fafc;
-            --text: #1e293b;
-            --sidebar-w: 260px;
+            --primary: #6366f1; --bg: #f3f4f6; --sidebar: #ffffff; --text: #1f2937;
         }
-        * { box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0; display: flex; height: 100vh; background: var(--bg); color: var(--text);
-        }
+        * { box-sizing: border-box; outline: none; }
+        body { margin: 0; font-family: 'Helvetica Neue', Arial, sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
         
         /* サイドバー */
-        .sidebar {
-            width: var(--sidebar-w); background: #0f172a; color: #fff; display: flex; flex-direction: column;
-            padding: 20px 0; flex-shrink: 0; box-shadow: 2px 0 10px rgba(0,0,0,0.2);
-        }
-        .logo { font-size: 20px; font-weight: bold; text-align: center; margin-bottom: 30px; letter-spacing: 1px; color: #60a5fa; }
-        .nav-item {
-            padding: 15px 25px; cursor: pointer; transition: 0.2s; color: #94a3b8; font-size: 15px; display: flex; align-items: center; gap: 10px;
-        }
-        .nav-item:hover, .nav-item.active { background: #1e293b; color: #fff; border-left: 4px solid var(--primary); }
+        .sidebar { width: 240px; background: var(--sidebar); display: flex; flex-direction: column; border-right: 1px solid #e5e7eb; padding: 20px 0; flex-shrink: 0; overflow-y: auto; }
+        .logo { font-size: 22px; font-weight: bold; text-align: center; margin-bottom: 20px; color: var(--primary); }
+        .menu-item { padding: 12px 20px; cursor: pointer; color: #4b5563; font-weight: 500; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+        .menu-item:hover, .menu-item.active { background: #e0e7ff; color: var(--primary); border-right: 3px solid var(--primary); }
         
         /* メインエリア */
-        .main { flex: 1; padding: 40px; overflow-y: auto; }
-        .tool-box { display: none; animation: fadeUp 0.4s ease; max-width: 900px; margin: 0 auto; }
-        .tool-box.active { display: block; }
+        .main { flex: 1; display: flex; flex-direction: column; height: 100vh; }
+        .header { height: 60px; background: white; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; padding: 0 30px; justify-content: space-between; }
+        .search-box { width: 300px; padding: 8px 15px; border-radius: 20px; border: 1px solid #d1d5db; background: #f9fafb; }
         
-        /* コンポーネント共通 */
-        h2 { border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0; color: var(--secondary); }
-        .card { background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 20px; }
-        .input-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; color: #64748b; }
-        input, textarea, select {
-            width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 16px; transition: 0.2s;
-        }
-        input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
-        button.btn {
-            background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;
-        }
-        button.btn:hover { background: var(--secondary); }
-        button.btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
-        button.btn-outline:hover { background: #eff6ff; }
-
-        /* --- 1. 文字数カウンター拡張 --- */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
-        .stat-card { background: #f1f5f9; padding: 15px; border-radius: 8px; text-align: center; }
-        .stat-val { font-size: 24px; font-weight: bold; color: var(--primary); display: block; }
-        .stat-label { font-size: 12px; color: #64748b; }
-
-        /* --- 2. 関数電卓 --- */
-        .calc-wrapper { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
-        .display-area { text-align: right; background: #1e293b; color: #fff; padding: 20px; border-radius: 8px; margin-bottom: 15px; font-family: monospace; }
-        #calc-history { font-size: 14px; color: #94a3b8; min-height: 20px; }
-        #calc-main { font-size: 32px; font-weight: bold; }
-        .keys-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-        .key {
-            padding: 15px; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; background: #f1f5f9; transition: 0.1s;
-        }
-        .key:active { transform: scale(0.95); }
-        .key.fn { background: #e2e8f0; color: #334155; font-size: 14px; }
-        .key.op { background: #dbeafe; color: #2563eb; }
-        .key.eq { background: var(--primary); color: white; grid-column: span 2; }
-        .key.ac { background: #ef4444; color: white; }
-        .history-list { background: #f8fafc; padding: 15px; border-radius: 8px; height: 400px; overflow-y: auto; border: 1px solid #e2e8f0; }
-        .hist-item { padding: 8px; border-bottom: 1px solid #e2e8f0; font-size: 14px; cursor: pointer; }
-        .hist-item:hover { background: #e2e8f0; }
-
-        /* --- 3. 単位変換（マルチ） --- */
-        .unit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
-        .unit-card { background: #eff6ff; padding: 15px; border-radius: 8px; display: flex; flex-direction: column; }
-        .unit-card strong { font-size: 12px; color: #64748b; margin-bottom: 5px; }
-        .unit-card input { background: transparent; border: none; border-bottom: 1px solid #bfdbfe; border-radius: 0; font-weight: bold; color: #1e40af; }
-
-        /* --- 4. 漢字詳細 --- */
-        .kanji-detail { display: flex; gap: 30px; flex-wrap: wrap; }
-        .kanji-big { 
-            font-size: 120px; line-height: 1; border: 2px solid #e2e8f0; width: 150px; height: 150px; 
-            display: flex; align-items: center; justify-content: center; border-radius: 12px;
-        }
-        .kanji-info table { width: 100%; border-collapse: collapse; }
-        .kanji-info th { text-align: left; color: #64748b; padding: 5px 15px 5px 0; width: 80px; }
-        .kanji-info td { padding: 5px 0; }
-        .tags { display: flex; gap: 5px; margin-top: 10px; }
-        .tag { font-size: 11px; padding: 3px 8px; border-radius: 10px; background: #e2e8f0; color: #475569; }
-
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .content { padding: 30px; overflow-y: auto; flex: 1; }
         
+        /* カードグリッド */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .tool-card { 
+            background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+            cursor: pointer; transition: 0.2s; border: 1px solid transparent; display: flex; flex-direction: column; gap: 10px;
+        }
+        .tool-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); border-color: var(--primary); }
+        .card-icon { font-size: 24px; color: var(--primary); background: #e0e7ff; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
+        .card-title { font-weight: bold; font-size: 16px; }
+        .card-desc { font-size: 13px; color: #6b7280; line-height: 1.4; }
+
+        /* 個別ツール画面 */
+        .tool-view { display: none; background: white; padding: 30px; border-radius: 15px; max-width: 800px; margin: 0 auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .tool-view.active { display: block; animation: fadeIn 0.3s; }
+        .back-btn { margin-bottom: 20px; cursor: pointer; color: #6b7280; display: inline-flex; align-items: center; gap: 5px; }
+        .back-btn:hover { color: var(--primary); }
+        
+        /* フォーム部品 */
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; margin-bottom: 15px; font-size: 16px; }
+        button.action-btn { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.2s; }
+        button.action-btn:hover { opacity: 0.9; }
+        .result-area { background: #f8fafc; padding: 20px; border-radius: 8px; margin-top: 20px; border: 1px solid #e2e8f0; font-size: 18px; font-weight: bold; text-align: center; color: #333; word-break: break-all; }
+        
+        /* スマホ対応 */
         @media (max-width: 768px) {
             body { flex-direction: column; }
             .sidebar { width: 100%; height: auto; flex-direction: row; overflow-x: auto; padding: 10px; }
-            .nav-item { white-space: nowrap; border-left: none; border-bottom: 3px solid transparent; padding: 10px 15px; }
-            .nav-item.active { border-left: none; border-bottom-color: var(--primary); }
-            .calc-wrapper { grid-template-columns: 1fr; }
-            .history-list { height: 150px; margin-top: 10px; }
+            .menu-item { white-space: nowrap; border-right: none; border-bottom: 3px solid transparent; }
+            .content { padding: 15px; }
         }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
     </style>
 </head>
 <body>
 
     <nav class="sidebar">
-        <div class="logo">TOOL HUB PRO</div>
-        <div class="nav-item active" onclick="switchTab('text')">📝 高機能テキスト解析</div>
-        <div class="nav-item" onclick="switchTab('calc')">🧮 関数電卓</div>
-        <div class="nav-item" onclick="switchTab('unit')">⚖️ 万能単位変換</div>
-        <div class="nav-item" onclick="switchTab('kanji')">dictionary 漢字辞典</div>
+        <div class="logo">🧬 LifeStation</div>
+        <div class="menu-item active" onclick="filterCategory('all')"><i class="fas fa-th"></i> すべて</div>
+        <div class="menu-item" onclick="filterCategory('calc')"><i class="fas fa-calculator"></i> 計算・お金</div>
+        <div class="menu-item" onclick="filterCategory('date')"><i class="fas fa-calendar-alt"></i> 日付・時間</div>
+        <div class="menu-item" onclick="filterCategory('text')"><i class="fas fa-font"></i> 文字・変換</div>
+        <div class="menu-item" onclick="filterCategory('life')"><i class="fas fa-coffee"></i> 生活・便利</div>
+        <div class="menu-item" onclick="filterCategory('random')"><i class="fas fa-dice"></i> 運・ランダム</div>
     </nav>
 
-    <main class="main">
-        
-        <div id="text" class="tool-box active">
-            <div class="card">
-                <h2>📝 テキスト解析</h2>
-                <textarea id="txtInput" rows="8" placeholder="ここに文章を入力してください..." oninput="analyzeText()"></textarea>
-                <div class="stats-grid">
-                    <div class="stat-card"><span class="stat-label">全文字数</span><span id="c_total" class="stat-val">0</span></div>
-                    <div class="stat-card"><span class="stat-label">空白除外</span><span id="c_nospace" class="stat-val">0</span></div>
-                    <div class="stat-card"><span class="stat-label">行数</span><span id="c_lines" class="stat-val">0</span></div>
-                    <div class="stat-card"><span class="stat-label">段落数</span><span id="c_para" class="stat-val">0</span></div>
-                    <div class="stat-card"><span class="stat-label">原稿用紙 (400字)</span><span id="c_paper" class="stat-val">0枚</span></div>
-                    <div class="stat-card"><span class="stat-label">読了時間 (目安)</span><span id="c_time" class="stat-val">0秒</span></div>
-                    <div class="stat-card"><span class="stat-label">サイズ (UTF-8)</span><span id="c_byte" class="stat-val">0 B</span></div>
-                </div>
-            </div>
+    <div class="main">
+        <header class="header">
+            <h3 id="page-title" style="margin:0;">ダッシュボード</h3>
+            <input type="text" class="search-box" placeholder="ツールを検索 (例: 割り勘, QR)..." oninput="searchTools(this.value)">
+        </header>
+
+        <div class="content">
+            <div id="grid-container" class="grid-container"></div>
+            
+            <div id="tool-stage"></div>
         </div>
-
-        <div id="calc" class="tool-box">
-            <div class="card calc-wrapper">
-                <div>
-                    <h2>🧮 関数電卓</h2>
-                    <div class="display-area">
-                        <div id="calc-history"></div>
-                        <div id="calc-main">0</div>
-                    </div>
-                    <div class="keys-grid">
-                        <button class="key fn" onclick="inputFn('Math.sin(')">sin</button>
-                        <button class="key fn" onclick="inputFn('Math.cos(')">cos</button>
-                        <button class="key fn" onclick="inputFn('Math.tan(')">tan</button>
-                        <button class="key fn" onclick="inputFn('Math.PI')">π</button>
-                        <button class="key ac" onclick="clearAll()">AC</button>
-                        
-                        <button class="key fn" onclick="inputFn('Math.sqrt(')">√</button>
-                        <button class="key fn" onclick="inputFn('(')">(</button>
-                        <button class="key fn" onclick="inputFn(')')">)</button>
-                        <button class="key fn" onclick="inputFn('**')">^</button>
-                        <button class="key op" onclick="inputFn('/')">÷</button>
-                        
-                        <button class="key" onclick="inputNum('7')">7</button>
-                        <button class="key" onclick="inputNum('8')">8</button>
-                        <button class="key" onclick="inputNum('9')">9</button>
-                        <button class="key" onclick="backspace()">BS</button>
-                        <button class="key op" onclick="inputFn('*')">×</button>
-
-                        <button class="key" onclick="inputNum('4')">4</button>
-                        <button class="key" onclick="inputNum('5')">5</button>
-                        <button class="key" onclick="inputNum('6')">6</button>
-                        <button class="key op" onclick="inputFn('-')">-</button>
-                        <button class="key" onclick="inputNum('1')">1</button> <button class="key" onclick="inputNum('1')">1</button> 
-                        <button class="key" onclick="inputNum('2')">2</button>
-                        <button class="key" onclick="inputNum('3')">3</button>
-                        <button class="key op" onclick="inputFn('+')">+</button>
-                        <button class="key" style="visibility:hidden"> </button> <button class="key" onclick="inputNum('0')">0</button>
-                        <button class="key" onclick="inputNum('.')">.</button>
-                        <button class="key eq" onclick="calcResult()">=</button>
-                    </div>
-                </div>
-                <div>
-                    <h3>履歴</h3>
-                    <div class="history-list" id="histList">
-                        <div style="padding:10px; color:#ccc; text-align:center">履歴なし</div>
-                    </div>
-                    <button class="btn-outline" style="width:100%; margin-top:10px;" onclick="clearHistory()">履歴削除</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="unit" class="tool-box">
-            <div class="card">
-                <h2>⚖️ 万能単位変換</h2>
-                <div class="input-group">
-                    <label>カテゴリー選択</label>
-                    <select id="unit-category" onchange="renderUnitInputs()">
-                        <option value="length">長さ (Length)</option>
-                        <option value="weight">重さ (Weight)</option>
-                        <option value="data">データ (Data)</option>
-                        <option value="temp">温度 (Temperature)</option>
-                        <option value="time">時間 (Time)</option>
-                    </select>
-                </div>
-                <div id="unit-inputs" class="unit-grid">
-                    </div>
-            </div>
-        </div>
-
-        <div id="kanji" class="tool-box">
-            <div class="card">
-                <h2>dictionary 漢字辞典</h2>
-                <div style="display:flex; gap:10px;">
-                    <input type="text" id="kInput" placeholder="漢字一文字 (例: 夢)" maxlength="1" style="font-size:20px;">
-                    <button class="btn" onclick="fetchKanji()">検索</button>
-                </div>
-                
-                <div id="kResult" style="display:none; margin-top:30px;">
-                    <div class="kanji-detail">
-                        <div class="kanji-big" id="kChar">?</div>
-                        <div class="kanji-info" style="flex:1;">
-                            <div class="tags" id="kTags"></div>
-                            <h3 id="kMeanings" style="margin:10px 0;">意味...</h3>
-                            <table>
-                                <tr><th>音読み</th><td id="kOn"></td></tr>
-                                <tr><th>訓読み</th><td id="kKun"></td></tr>
-                                <tr><th>画数</th><td id="kStroke"></td></tr>
-                                <tr><th>JLPT</th><td id="kJlpt"></td></tr>
-                            </table>
-                            <div style="margin-top:15px;">
-                                <a id="kLink" href="#" target="_blank" class="btn-outline" style="text-decoration:none; padding:5px 10px; font-size:12px;">Weblioで詳しく見る</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </main>
+    </div>
 
     <script>
-        // --- 画面切り替え ---
-        function switchTab(id) {
-            document.querySelectorAll('.tool-box').forEach(el => el.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-        }
+        // --- ツール定義 (ここを増やすだけで機能が増える) ---
+        const tools = [
+            // ■ 計算・お金
+            { id: 'discount', cat: 'calc', icon: 'fa-tags', title: '割引計算機', desc: '「3割引」「20%OFF」などを瞬時に計算します。', 
+              html: `<div style="display:flex; gap:10px;"><input type="number" id="dc_price" placeholder="元の価格 (円)"><input type="number" id="dc_percent" placeholder="割引率 (%)"></div><button class="action-btn" onclick="runDiscount()">計算する</button>` },
+            
+            { id: 'warikan', cat: 'calc', icon: 'fa-users', title: 'スマート割り勘', desc: '人数と金額から一人あたりの支払い額を計算。端数処理も対応。',
+              html: `<input type="number" id="wk_price" placeholder="合計金額 (円)"><input type="number" id="wk_ppl" placeholder="人数 (人)"><select id="wk_mode"><option value="1">1円単位</option><option value="100">100円単位(多めに集める)</option></select><button class="action-btn" onclick="runWarikan()">計算する</button>` },
+            
+            { id: 'tax', cat: 'calc', icon: 'fa-shopping-cart', title: '消費税計算', desc: '税抜・税込を相互に変換します。軽減税率(8%)対応。',
+              html: `<input type="number" id="tx_val" placeholder="金額を入力"><div style="display:flex; gap:10px; margin-bottom:15px;"><button class="action-btn" style="background:#64748b" onclick="runTax(1.1)">税込(10%)にする</button><button class="action-btn" style="background:#64748b" onclick="runTax(1.08)">税込(8%)にする</button></div><button class="action-btn" onclick="runTaxRev(1.1)">税込から税抜を出す(10%)</button>` },
 
-        // --- 1. テキスト解析機能 ---
-        function analyzeText() {
-            const txt = document.getElementById('txtInput').value;
-            // 基本
-            document.getElementById('c_total').innerText = txt.length;
-            document.getElementById('c_nospace').innerText = txt.replace(/\s+/g, '').length;
-            // 行数（空行も含む）
-            document.getElementById('c_lines').innerText = txt ? txt.split('\n').length : 0;
-            // 段落（空行で区切る）
-            const paragraphs = txt.split(/\n\s*\n/).filter(p => p.trim().length > 0);
-            document.getElementById('c_para').innerText = paragraphs.length;
-            // 原稿用紙 (簡易計算: 空白も1文字とみなす)
-            document.getElementById('c_paper').innerText = Math.ceil(txt.length / 400) + "枚";
-            // 読了時間 (500文字/分)
-            const sec = Math.ceil(txt.length / 500 * 60);
-            document.getElementById('c_time').innerText = sec < 60 ? `${sec}秒` : `${Math.floor(sec/60)}分${sec%60}秒`;
-            // バイト数 (UTF-8目安)
-            const blob = new Blob([txt]);
-            document.getElementById('c_byte').innerText = blob.size + " B";
-        }
+            { id: 'bmi', cat: 'calc', icon: 'fa-weight', title: 'BMI計算機', desc: '身長と体重から肥満度をチェックします。',
+              html: `<input type="number" id="bmi_h" placeholder="身長 (cm)"><input type="number" id="bmi_w" placeholder="体重 (kg)"><button class="action-btn" onclick="runBMI()">判定する</button>` },
 
-        // --- 2. 関数電卓機能 ---
-        let calcExp = '';
-        const historyData = [];
+            // ■ 日付・時間
+            { id: 'age', cat: 'date', icon: 'fa-birthday-cake', title: '年齢・日数計算', desc: '生年月日から現在の年齢、生まれてからの日数を計算。',
+              html: `<input type="date" id="age_birth"><button class="action-btn" onclick="runAge()">計算する</button>` },
+            
+            { id: 'era', cat: 'date', icon: 'fa-torii-gate', title: '西暦・和暦変換', desc: '1990年は平成何年？を一発変換。',
+              html: `<input type="number" id="era_year" placeholder="西暦 (例: 2024)"><button class="action-btn" onclick="runEra()">和暦に変換</button>` },
 
-        function inputNum(v) { calcExp += v; updateDisp(); }
-        function inputFn(v) { calcExp += v; updateDisp(); }
-        function backspace() { calcExp = calcExp.slice(0, -1); updateDisp(); }
-        function clearAll() { calcExp = ''; document.getElementById('calc-history').innerText = ''; updateDisp(); }
+            { id: 'stopwatch', cat: 'date', icon: 'fa-stopwatch', title: 'ストップウォッチ', desc: 'シンプルなストップウォッチ。ラップ機能なしの硬派仕様。',
+              html: `<div id="sw_disp" style="font-size:40px; text-align:center; margin:20px; font-family:monospace;">00:00:00</div><button class="action-btn" onclick="toggleSW()" id="sw_btn">スタート</button>` },
+
+            // ■ 文字・変換
+            { id: 'count', cat: 'text', icon: 'fa-file-alt', title: '文字数カウンター', desc: 'レポートやSNS投稿用に。空白無視カウントも。',
+              html: `<textarea id="cnt_txt" rows="5" placeholder="ここに入力" oninput="runCount()"></textarea>` },
+
+            { id: 'pass', cat: 'text', icon: 'fa-key', title: '強力パスワード生成', desc: 'ランダムで安全なパスワードを作ります。',
+              html: `<select id="ps_len"><option value="8">8文字</option><option value="12" selected>12文字</option><option value="16">16文字</option><option value="32">32文字 (最強)</option></select><button class="action-btn" onclick="runPass()">生成する</button>` },
+
+            { id: 'qr', cat: 'text', icon: 'fa-qrcode', title: 'QRコード作成', desc: 'URLやテキストをQRコード画像に変換します。',
+              html: `<input type="text" id="qr_txt" placeholder="URLなどを入力"><button class="action-btn" onclick="runQR()">QRコード作成</button><div id="qr_area" style="margin-top:20px; display:flex; justify-content:center;"></div>` },
+              
+            { id: 'case', cat: 'text', icon: 'fa-font', title: '大文字・小文字変換', desc: '英語の「HELLO」⇔「hello」を一括変換。',
+              html: `<textarea id="case_txt" rows="3" placeholder="英語を入力"></textarea><div style="display:flex; gap:10px;"><button class="action-btn" onclick="runCase('upper')">全て大文字</button><button class="action-btn" onclick="runCase('lower')">全て小文字</button></div>` },
+
+            // ■ 生活・便利
+            { id: 'loan', cat: 'life', icon: 'fa-home', title: '簡易ローン計算', desc: '借入額と金利から月々の支払額を概算します。',
+              html: `<input type="number" id="ln_amount" placeholder="借入額 (万円)"><input type="number" id="ln_rate" placeholder="年利 (%)"><input type="number" id="ln_year" placeholder="返済期間 (年)"><button class="action-btn" onclick="runLoan()">計算する</button>` },
+
+            { id: 'unit', cat: 'life', icon: 'fa-ruler-combined', title: '単位変換 (簡易版)', desc: 'メートル、インチ、尺などを変換。',
+              html: `<input type="number" id="un_val" placeholder="数値を入力 (メートル基準)"><button class="action-btn" onclick="runUnit()">変換結果を表示</button>` },
+
+            { id: 'search', cat: 'life', icon: 'fa-search-plus', title: 'Google/Twitter一括検索', desc: '入力した言葉を複数のサイトで同時に検索タブを開きます。',
+              html: `<input type="text" id="mul_key" placeholder="検索ワード"><button class="action-btn" onclick="runMultiSearch()">GoogleとXとYouTubeで検索</button>` },
+
+            // ■ 運・ランダム
+            { id: 'dice', cat: 'random', icon: 'fa-dice-five', title: 'サイコロ', desc: '1〜6のサイコロを振ります。TRPGやボードゲームに。',
+              html: `<button class="action-btn" onclick="runDice()" style="height:100px; font-size:24px;">サイコロを振る</button>` },
+
+            { id: 'roulette', cat: 'random', icon: 'fa-bullseye', title: '迷った時のルーレット', desc: '選択肢（カンマ区切り）から1つを選びます。ランチ決めに。',
+              html: `<textarea id="rl_list" placeholder="ラーメン, カレー, 寿司, ハンバーグ"></textarea><button class="action-btn" onclick="runRoulette()">決めてもらう！</button>` },
+              
+            { id: 'omikuji', cat: 'random', icon: 'fa-star', title: '簡易おみくじ', desc: '今日の運勢を占います。',
+              html: `<button class="action-btn" onclick="runOmikuji()">おみくじを引く</button>` },
+        ];
+
+        // --- 初期表示処理 ---
+        const grid = document.getElementById('grid-container');
+        const stage = document.getElementById('tool-stage');
         
-        function updateDisp() {
-            document.getElementById('calc-main').innerText = calcExp || '0';
-        }
-
-        function calcResult() {
-            try {
-                // セキュリティリスク軽減のため簡易チェック等は省略していますが、本来はFunction等を使うべき
-                // evalの代わりにnew Functionを使用
-                const res = new Function('return ' + calcExp)();
-                
-                // 履歴に追加
-                historyData.unshift({ exp: calcExp, res: res });
-                renderHistory();
-                
-                document.getElementById('calc-history').innerText = calcExp + ' =';
-                calcExp = String(res);
-                updateDisp();
-            } catch (e) {
-                alert('計算式エラー');
-            }
-        }
-
-        function renderHistory() {
-            const hList = document.getElementById('histList');
-            hList.innerHTML = '';
-            historyData.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'hist-item';
-                div.innerHTML = `<div>${item.exp}</div><div style="font-weight:bold; text-align:right;">= ${item.res}</div>`;
-                div.onclick = () => { calcExp = String(item.res); updateDisp(); };
-                hList.appendChild(div);
+        function renderGrid(filterCat = 'all', keyword = '') {
+            grid.innerHTML = '';
+            stage.innerHTML = ''; // クリア
+            grid.style.display = 'grid'; // グリッド表示に戻す
+            
+            tools.forEach(tool => {
+                if ((filterCat === 'all' || tool.cat === filterCat) && 
+                    (keyword === '' || tool.title.includes(keyword) || tool.desc.includes(keyword))) {
+                    
+                    const card = document.createElement('div');
+                    card.className = 'tool-card';
+                    card.innerHTML = `
+                        <div class="card-icon"><i class="fas ${tool.icon}"></i></div>
+                        <div class="card-title">${tool.title}</div>
+                        <div class="card-desc">${tool.desc}</div>
+                    `;
+                    card.onclick = () => openTool(tool);
+                    grid.appendChild(card);
+                }
             });
         }
-        function clearHistory() { historyData.length = 0; renderHistory(); }
-
-        // --- 3. 万能単位変換機能 ---
-        const unitRates = {
-            length: { m: 1, km: 1000, cm: 0.01, mm: 0.001, inch: 0.0254, ft: 0.3048, yard: 0.9144 },
-            weight: { kg: 1, g: 0.001, mg: 0.000001, t: 1000, lb: 0.453592, oz: 0.0283495 },
-            data:   { MB: 1, KB: 1/1024, GB: 1024, TB: 1024*1024, B: 1/1048576 },
-            temp:   { C: 'base', F: 'func', K: 'func' }, // 特殊処理
-            time:   { min: 1, sec: 1/60, hour: 60, day: 1440, week: 10080 }
-        };
-
-        // 初期表示
-        window.onload = function() { renderUnitInputs(); };
-
-        function renderUnitInputs() {
-            const cat = document.getElementById('unit-category').value;
-            const container = document.getElementById('unit-inputs');
-            container.innerHTML = '';
-            
-            const units = Object.keys(unitRates[cat]);
-            
-            units.forEach(u => {
-                const div = document.createElement('div');
-                div.className = 'unit-card';
-                div.innerHTML = `
-                    <strong>${u.toUpperCase()}</strong>
-                    <input type="number" data-unit="${u}" oninput="calcUnit(this)">
-                `;
-                container.appendChild(div);
-            });
+        
+        function openTool(tool) {
+            grid.style.display = 'none';
+            stage.innerHTML = `
+                <div class="tool-view active">
+                    <div class="back-btn" onclick="renderGrid()"><i class="fas fa-arrow-left"></i> 一覧に戻る</div>
+                    <h2><i class="fas ${tool.icon}" style="color:var(--primary)"></i> ${tool.title}</h2>
+                    <p>${tool.desc}</p>
+                    <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
+                    ${tool.html}
+                    <div id="result" class="result-area" style="display:none;"></div>
+                </div>
+            `;
+            document.getElementById('page-title').innerText = tool.title;
         }
 
-        function calcUnit(elm) {
-            const cat = document.getElementById('unit-category').value;
-            const val = parseFloat(elm.value);
-            const currentUnit = elm.getAttribute('data-unit');
-            const inputs = document.querySelectorAll('#unit-inputs input');
+        // --- カテゴリ・検索 ---
+        function filterCategory(cat) {
+            document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            renderGrid(cat);
+        }
+        function searchTools(val) { renderGrid('all', val); }
 
-            if (isNaN(val)) {
-                inputs.forEach(i => { if(i !== elm) i.value = ''; });
-                return;
-            }
-
-            // 温度は計算式が違うため特別対応
-            if (cat === 'temp') {
-                let celsius;
-                // まず摂氏に変換
-                if (currentUnit === 'C') celsius = val;
-                else if (currentUnit === 'F') celsius = (val - 32) * 5/9;
-                else if (currentUnit === 'K') celsius = val - 273.15;
-
-                inputs.forEach(i => {
-                    if (i === elm) return;
-                    const u = i.getAttribute('data-unit');
-                    if (u === 'C') i.value = Math.round(celsius * 100) / 100;
-                    if (u === 'F') i.value = Math.round((celsius * 9/5 + 32) * 100) / 100;
-                    if (u === 'K') i.value = Math.round((celsius + 273.15) * 100) / 100;
-                });
-                return;
-            }
-
-            // それ以外は係数計算
-            const baseVal = val * unitRates[cat][currentUnit]; // 基準単位(値1のもの)に変換
-
-            inputs.forEach(i => {
-                if (i === elm) return;
-                const u = i.getAttribute('data-unit');
-                const rate = unitRates[cat][u];
-                // 浮動小数点誤差を丸める
-                let res = baseVal / rate;
-                // 桁数調整（最大6桁）
-                i.value = parseFloat(res.toPrecision(7)) / 1; 
-            });
+        // --- 汎用: 結果表示ヘルパー ---
+        function showRes(text) {
+            const el = document.getElementById('result');
+            el.style.display = 'block';
+            el.innerHTML = text;
         }
 
-        // --- 4. 漢字検索機能 (kanjiapi.dev) ---
-        async function fetchKanji() {
-            const char = document.getElementById('kInput').value;
-            if (!char) return;
-            
-            const resArea = document.getElementById('kResult');
-            resArea.style.display = 'block';
-            document.getElementById('kChar').innerText = '...';
+        // ============================
+        // ■ 各ツールのロジック (ここが脳みそ)
+        // ============================
 
-            try {
-                const res = await fetch(`https://kanjiapi.dev/v1/kanji/${char}`);
-                if (!res.ok) throw new Error();
-                const data = await res.json();
-
-                document.getElementById('kChar').innerText = data.kanji;
-                document.getElementById('kMeanings').innerText = data.meanings.join(', ');
-                document.getElementById('kOn').innerText = data.on_readings.join(', ') || '-';
-                document.getElementById('kKun').innerText = data.kun_readings.join(', ') || '-';
-                document.getElementById('kStroke').innerText = data.stroke_count + '画';
-                document.getElementById('kJlpt').innerText = data.jlpt ? `N${data.jlpt}` : '-';
-                
-                // タグ生成
-                const tags = document.getElementById('kTags');
-                tags.innerHTML = `<span class="tag">Grade: ${data.grade || '-'}</span> <span class="tag">Unicode: ${data.unicode}</span>`;
-
-                // 外部辞書リンク
-                document.getElementById('kLink').href = `https://www.weblio.jp/content/${char}`;
-
-            } catch (e) {
-                alert('見つかりませんでした');
-                resArea.style.display = 'none';
+        // 割引計算
+        function runDiscount() {
+            const p = Number(document.getElementById('dc_price').value);
+            const r = Number(document.getElementById('dc_percent').value);
+            showRes(`${p}円 の ${r}% OFF は...<br><span style="font-size:32px; color:red;">${Math.floor(p * (1 - r/100))} 円</span> です`);
+        }
+        // 割り勘
+        function runWarikan() {
+            const p = Number(document.getElementById('wk_price').value);
+            const n = Number(document.getElementById('wk_ppl').value);
+            const unit = Number(document.getElementById('wk_mode').value);
+            if(!n) return;
+            const res = Math.ceil(p / n / unit) * unit;
+            const surplus = (res * n) - p;
+            showRes(`一人当たり: <span style="font-size:32px; color:blue;">${res} 円</span><br>(余り: ${surplus}円)`);
+        }
+        // 税計算
+        function runTax(rate) {
+            const v = Number(document.getElementById('tx_val').value);
+            showRes(`税込: ${Math.floor(v * rate)} 円`);
+        }
+        function runTaxRev(rate) {
+            const v = Number(document.getElementById('tx_val').value);
+            showRes(`税抜: ${Math.floor(v / rate)} 円`);
+        }
+        // BMI
+        function runBMI() {
+            const h = Number(document.getElementById('bmi_h').value) / 100;
+            const w = Number(document.getElementById('bmi_w').value);
+            const bmi = w / (h*h);
+            let msg = bmi < 18.5 ? "低体重" : bmi < 25 ? "普通体重" : "肥満";
+            showRes(`BMI: ${bmi.toFixed(1)} (${msg})`);
+        }
+        // 年齢
+        function runAge() {
+            const b = new Date(document.getElementById('age_birth').value);
+            const today = new Date();
+            const age = today.getFullYear() - b.getFullYear();
+            const diff = Math.floor((today - b) / 86400000);
+            showRes(`${age}歳 (生まれてから ${diff}日)`);
+        }
+        // 元号
+        function runEra() {
+            const y = Number(document.getElementById('era_year').value);
+            if(y >= 2019) showRes(`令和 ${y - 2018} 年`);
+            else if(y >= 1989) showRes(`平成 ${y - 1988} 年`);
+            else if(y >= 1926) showRes(`昭和 ${y - 1925} 年`);
+            else showRes("明治・大正、またはそれ以前");
+        }
+        // ストップウォッチ
+        let swT = null, swS = 0;
+        function toggleSW() {
+            const btn = document.getElementById('sw_btn');
+            if(swT) { clearInterval(swT); swT = null; btn.innerText = "再開"; }
+            else {
+                btn.innerText = "ストップ";
+                swT = setInterval(() => {
+                    swS++;
+                    const h = String(Math.floor(swS/3600)).padStart(2,'0');
+                    const m = String(Math.floor((swS%3600)/60)).padStart(2,'0');
+                    const s = String(swS%60).padStart(2,'0');
+                    document.getElementById('sw_disp').innerText = `${h}:${m}:${s}`;
+                }, 1000);
             }
         }
+        // 文字数
+        function runCount() {
+            const t = document.getElementById('cnt_txt').value;
+            showRes(`文字数: ${t.length} <br> 空白なし: ${t.replace(/\s/g,'').length}`);
+        }
+        // パスワード
+        function runPass() {
+            const len = Number(document.getElementById('ps_len').value);
+            const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+            let p = "";
+            for(let i=0; i<len; i++) p += chars.charAt(Math.floor(Math.random()*chars.length));
+            showRes(p);
+        }
+        // QRコード
+        function runQR() {
+            const area = document.getElementById('qr_area');
+            area.innerHTML = "";
+            new QRCode(area, document.getElementById('qr_txt').value);
+            showRes("生成しました");
+        }
+        // 大文字小文字
+        function runCase(mode) {
+            const t = document.getElementById('case_txt').value;
+            showRes(mode==='upper' ? t.toUpperCase() : t.toLowerCase());
+        }
+        // ローン
+        function runLoan() {
+            const p = Number(document.getElementById('ln_amount').value) * 10000;
+            const r = Number(document.getElementById('ln_rate').value) / 100 / 12;
+            const n = Number(document.getElementById('ln_year').value) * 12;
+            const pay = (p * r * Math.pow(1+r, n)) / (Math.pow(1+r, n) - 1);
+            showRes(`月々: ${Math.floor(pay).toLocaleString()} 円`);
+        }
+        // 単位
+        function runUnit() {
+            const v = Number(document.getElementById('un_val').value);
+            showRes(`${v}m = ${(v*100).toFixed(1)}cm = ${(v*3.28).toFixed(2)}ft = ${(v*39.37).toFixed(2)}inch`);
+        }
+        // 一括検索
+        function runMultiSearch() {
+            const k = document.getElementById('mul_key').value;
+            window.open(`https://www.google.com/search?q=${k}`);
+            window.open(`https://twitter.com/search?q=${k}`);
+            window.open(`https://www.youtube.com/results?search_query=${k}`);
+        }
+        // サイコロ
+        function runDice() {
+            const d = Math.floor(Math.random() * 6) + 1;
+            showRes(`<i class="fas fa-dice-${['one','two','three','four','five','six'][d-1]}" style="font-size:60px"></i><br>${d}`);
+        }
+        // ルーレット
+        function runRoulette() {
+            const l = document.getElementById('rl_list').value.split(',').map(s=>s.trim()).filter(s=>s);
+            if(!l.length) return;
+            const r = l[Math.floor(Math.random() * l.length)];
+            showRes(`運命の選択は...<br><span style="font-size:32px; color:#e11d48;">${r}</span> です！`);
+        }
+        // おみくじ
+        function runOmikuji() {
+            const r = ["大吉","中吉","小吉","吉","末吉","凶"];
+            showRes(r[Math.floor(Math.random()*r.length)]);
+        }
+
+        // 初期化
+        renderGrid();
     </script>
 </body>
 </html>

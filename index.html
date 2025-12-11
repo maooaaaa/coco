@@ -2,8 +2,8 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LifeStation V8 | Reborn Workspace</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LifeStation V9 | Ultimate Workspace</title>
     
     <!-- Libraries -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -17,19 +17,20 @@
     <style>
         /* --- Core Variables --- */
         :root {
-            --primary: #4f46e5;
-            --primary-glow: rgba(79, 70, 229, 0.4);
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.4);
             --accent: #06b6d4;
             --danger: #ef4444;
             --success: #10b981;
-            --bg-grad-1: #f8fafc;
-            --bg-grad-2: #e2e8f0;
-            --glass-bg: rgba(255, 255, 255, 0.95);
-            --glass-border: rgba(255, 255, 255, 0.8);
-            --text-main: #0f172a;
-            --text-sub: #64748b;
+            --bg-grad-1: #f3f4f6;
+            --bg-grad-2: #e5e7eb;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.9);
+            --text-main: #1f2937;
+            --text-sub: #6b7280;
             --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+            --sidebar-width: 260px;
         }
 
         body.dark {
@@ -37,11 +38,11 @@
             --primary-glow: rgba(129, 140, 248, 0.3);
             --accent: #22d3ee;
             --bg-grad-1: #0f172a;
-            --bg-grad-2: #1e1b4b;
-            --glass-bg: rgba(30, 41, 59, 0.95);
+            --bg-grad-2: #111827;
+            --glass-bg: rgba(30, 41, 59, 0.85);
             --glass-border: rgba(255, 255, 255, 0.08);
-            --text-main: #f1f5f9;
-            --text-sub: #94a3b8;
+            --text-main: #f3f4f6;
+            --text-sub: #9ca3af;
             --card-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
         }
 
@@ -60,30 +61,28 @@
 
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-thumb { background: var(--text-sub); border-radius: 4px; opacity: 0.3; }
         ::-webkit-scrollbar-track { background: transparent; }
 
-        /* Glassmorphism Class */
         .glass {
             background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--glass-border);
             box-shadow: var(--card-shadow);
         }
 
         /* --- Layout --- */
         .sidebar {
-            width: 260px;
+            width: var(--sidebar-width);
             display: flex;
             flex-direction: column;
             padding: 20px;
             gap: 15px;
-            z-index: 20;
+            z-index: 50;
             border-right: 1px solid var(--glass-border);
-            transition: transform 0.3s ease;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .logo {
@@ -94,6 +93,7 @@
             align-items: center;
             gap: 10px;
             letter-spacing: -0.5px;
+            padding-bottom: 10px;
         }
         .logo i { color: var(--primary); }
         .version-badge {
@@ -123,10 +123,10 @@
         }
         .menu-item:hover { background: rgba(128,128,128, 0.08); color: var(--primary); }
         .menu-item.active { background: var(--primary); color: white; box-shadow: 0 4px 12px var(--primary-glow); }
-        .menu-count { margin-left: auto; font-size: 10px; background: rgba(128,128,128,0.1); padding: 2px 6px; border-radius: 8px; }
+        .menu-count { margin-left: auto; font-size: 10px; background: rgba(128,128,128,0.2); padding: 2px 6px; border-radius: 8px; }
 
         /* Main Area */
-        .main { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+        .main { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; transition: 0.3s; }
 
         .header {
             padding: 15px 30px;
@@ -134,9 +134,10 @@
             align-items: center;
             justify-content: space-between;
             border-bottom: 1px solid var(--glass-border);
+            z-index: 40;
         }
 
-        .search-container { position: relative; width: 300px; }
+        .search-container { position: relative; width: 300px; max-width: 100%; }
         .search-input {
             width: 100%; padding: 10px 15px 10px 40px;
             border-radius: 20px; border: 1px solid var(--glass-border);
@@ -144,10 +145,10 @@
             color: var(--text-main);
             transition: 0.3s;
         }
-        .search-input:focus { background: var(--glass-bg); box-shadow: 0 0 0 2px var(--primary-glow); }
+        .search-input:focus { background: var(--glass-bg); box-shadow: 0 0 0 2px var(--primary-glow); border-color: var(--primary); }
         .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-sub); font-size: 14px; }
 
-        .content { flex: 1; padding: 30px; overflow-y: auto; }
+        .content { flex: 1; padding: 30px; overflow-y: auto; overflow-x: hidden; }
         
         /* Dashboard Widgets */
         .dashboard-grid {
@@ -162,6 +163,7 @@
             display: flex; flex-direction: column;
             position: relative; overflow: hidden;
             min-height: 150px;
+            border: 1px solid var(--glass-border);
         }
         .widget-title { font-size: 14px; color: var(--text-sub); margin-bottom: 10px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
         .widget-val { font-size: 28px; font-weight: 800; color: var(--text-main); }
@@ -170,7 +172,7 @@
         /* Tool Grid */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
             gap: 20px;
             padding-bottom: 80px;
             animation: fadeIn 0.5s ease;
@@ -200,22 +202,24 @@
         
         .fav-btn {
             position: absolute; top: 15px; right: 15px;
-            color: var(--text-sub); opacity: 0.3; transition: 0.2s;
+            color: var(--text-sub); opacity: 0.3; transition: 0.2s; font-size: 16px;
         }
-        .fav-btn:hover, .fav-btn.active { color: var(--accent); opacity: 1; transform: scale(1.1); }
+        .fav-btn:hover, .fav-btn.active { color: var(--accent); opacity: 1; transform: scale(1.2); }
 
         /* Modals */
         .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
             display: none; justify-content: center; align-items: center; z-index: 1000;
             opacity: 0; transition: opacity 0.2s;
         }
         .modal-overlay.show { opacity: 1; }
         .modal-box {
-            width: 95%; max-width: 800px; max-height: 90vh;
+            width: 90%; max-width: 900px; height: 85vh;
             border-radius: 20px; display: flex; flex-direction: column;
             transform: scale(0.95); transition: 0.3s cubic-bezier(0.19, 1, 0.22, 1);
             overflow: hidden; background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
         .modal-overlay.show .modal-box { transform: scale(1); }
         
@@ -225,111 +229,71 @@
             font-weight: bold; font-size: 18px;
             background: rgba(var(--primary), 0.05);
         }
-        .modal-body { padding: 25px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; }
+        .modal-body { padding: 25px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; position: relative; }
 
         /* UI Components */
         .btn {
             background: var(--primary); color: white; border: none; padding: 12px 20px;
             border-radius: 10px; cursor: pointer; font-weight: 600; width: 100%;
             transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
+            user-select: none;
         }
         .btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
         .btn:active { transform: scale(0.98); }
-        .btn-sm { padding: 8px 15px; font-size: 13px; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; width: auto; }
         .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
-        .btn-outline:hover { background: rgba(var(--primary), 0.1); }
-        .btn-group { display: flex; gap: 10px; }
+        .btn-outline:hover { background: rgba(99, 102, 241, 0.1); }
+        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
 
         input, select, textarea {
             width: 100%; padding: 12px; border: 1px solid var(--glass-border);
             border-radius: 10px; margin-bottom: 15px; font-size: 14px;
-            background: rgba(255,255,255,0.6); color: var(--text-main);
-            transition: 0.2s;
+            background: rgba(255,255,255,0.5); color: var(--text-main);
+            transition: 0.2s; font-family: inherit;
         }
         body.dark input, body.dark textarea, body.dark select { background: rgba(0,0,0,0.3); }
         input:focus, textarea:focus, select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px var(--primary-glow); background: var(--glass-bg); }
 
-        .result-area {
-            background: rgba(16, 185, 129, 0.08); border: 1px dashed var(--success);
-            padding: 15px; border-radius: 10px; margin-top: 15px;
-            text-align: center; font-weight: bold; color: var(--success);
-            word-break: break-all;
-        }
-
-        /* Tool Specific: Calculator */
-        .calc-wrapper { display: flex; flex-direction: column; height: 100%; max-height: 500px; }
-        .calc-grid { 
-            display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; 
-            flex: 1; /* Fill remaining space */
-        }
+        /* Specific Tools */
+        .calc-wrapper { display: flex; flex-direction: column; height: 100%; max-height: 600px; margin: 0 auto; width: 100%; max-width: 400px; }
+        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; flex: 1; }
         .calc-btn { 
-            width: 100%; height: 100%; min-height: 50px;
-            font-size: 18px; border-radius: 12px; border:none; cursor:pointer; 
-            transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-weight: 500;
-            background: rgba(255,255,255,0.6); color: var(--text-main);
-            display: flex; align-items: center; justify-content: center;
+            width: 100%; height: 100%; min-height: 50px; font-size: 20px; border-radius: 12px; border:none; 
+            cursor:pointer; background: rgba(255,255,255,0.5); color: var(--text-main);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: 0.1s;
         }
-        body.dark .calc-btn { background: rgba(255,255,255,0.1); }
-        .calc-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .calc-btn:active { transform: translateY(0); }
-        
-        .calc-btn.op { color: white; background: var(--primary); font-weight:bold; }
-        .calc-btn.fn { color: var(--accent); background: rgba(236,72,153,0.1); font-size: 14px; font-weight: bold; }
-        .calc-btn.eq { background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; grid-column: span 1; }
-        .calc-btn.num { font-weight: bold; font-size: 20px; }
-        
-        .calc-disp-container {
-            background: rgba(0,0,0,0.05); border-radius: 12px; padding: 10px; margin-bottom: 15px;
-            text-align: right;
-        }
-        .calc-history { font-size: 12px; color: var(--text-sub); height: 20px; overflow: hidden; white-space: nowrap; margin-bottom: 5px; }
-        .calc-current { font-size: 32px; font-family: monospace; font-weight: bold; overflow-x: auto; white-space: nowrap; }
+        body.dark .calc-btn { background: rgba(255,255,255,0.05); }
+        .calc-btn:active { transform: scale(0.95); }
+        .calc-btn.op { background: var(--primary); color: white; }
+        .calc-btn.eq { background: var(--accent); color: white; grid-column: span 2; }
 
-        /* Tool Specific: Image Editor */
-        .img-editor-container { width: 100%; height: 400px; background: #333; overflow: hidden; display: flex; justify-content: center; align-items: center; border-radius: 8px; margin-bottom: 15px; }
-        #cropper-img { max-width: 100%; max-height: 100%; display: block; }
-
-        /* Tool Specific: ToDo */
-        .todo-item { display: flex; align-items: center; gap: 10px; padding: 12px; border-bottom: 1px solid var(--glass-border); background: rgba(255,255,255,0.05); border-radius: 8px; margin-bottom: 8px; transition: 0.2s; }
-        .todo-item:hover { background: rgba(255,255,255,0.2); }
-        .todo-check { cursor: pointer; color: var(--text-sub); font-size: 20px; }
-        .todo-check.done { color: var(--success); }
+        .todo-item { display: flex; align-items: center; gap: 10px; padding: 10px; border-bottom: 1px solid var(--glass-border); background: rgba(255,255,255,0.05); border-radius: 8px; margin-bottom: 8px; }
         .todo-text { flex: 1; word-break: break-all; }
         .todo-text.done { text-decoration: line-through; opacity: 0.5; }
-        
-        /* Tool Specific: Markdown */
-        #md-preview { border: 1px solid var(--glass-border); padding: 15px; border-radius: 8px; background: rgba(255,255,255,0.2); min-height: 100%; margin-top: 0; overflow-y: auto; }
-        #md-preview h1, #md-preview h2 { border-bottom: 1px solid rgba(128,128,128,0.3); padding-bottom: 5px; }
-        #md-preview blockquote { border-left: 4px solid var(--primary); padding-left: 10px; color: var(--text-sub); }
-
-        /* Chat UI */
-        .chat-box { height: 300px; overflow-y: auto; border: 1px solid var(--glass-border); border-radius: 10px; padding: 15px; margin-bottom: 10px; background: rgba(0,0,0,0.02); }
-        .chat-msg { margin-bottom: 10px; padding: 10px 15px; border-radius: 12px; max-width: 85%; word-wrap: break-word; }
-        .chat-msg.user { background: var(--primary); color: white; margin-left: auto; border-bottom-right-radius: 2px; }
-        .chat-msg.ai { background: var(--glass-bg); color: var(--text-main); margin-right: auto; border-bottom-left-radius: 2px; border: 1px solid var(--glass-border); }
 
         /* Mobile Responsive */
-        @media (max-width: 768px) {
-            body { flex-direction: column; overflow: auto; }
-            .sidebar { width: 100%; height: auto; padding: 10px 20px; flex-direction: row; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--glass-border); border-right: none; position: sticky; top:0; background: var(--glass-bg); z-index: 100; transform: none; }
-            .nav-menu { display: none; position: absolute; top: 60px; left: 0; right: 0; background: var(--glass-bg); padding: 20px; border-bottom: 1px solid var(--glass-border); box-shadow: 0 10px 20px rgba(0,0,0,0.1); max-height: 80vh; }
-            .nav-menu.active { display: flex; }
-            .header { padding: 15px 20px; }
-            .search-container { width: 100%; }
-            .content { padding: 20px; }
-            #mobile-toggle { display: block; font-size: 20px; color: var(--text-main); }
-            
-            /* Mobile Modal Adjustment */
-            .modal-box { width: 100%; height: 100%; max-height: 100%; border-radius: 0; }
-            .modal-body { padding: 15px; }
-            
-            /* Mobile Calc */
-            .calc-grid { grid-template-columns: repeat(4, 1fr); gap: 8px; }
-            .calc-btn { min-height: 60px; font-size: 20px; }
-            .calc-btn.fn { display: none; } /* Hide complex functions on mobile default */
-            .calc-disp-container { margin-bottom: 10px; }
+        .mobile-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 45;
+            display: none; opacity: 0; transition: opacity 0.3s;
         }
-        @media (min-width: 769px) { #mobile-toggle { display: none; } }
+        .mobile-overlay.show { opacity: 1; display: block; }
+        
+        #mobile-toggle { display: none; font-size: 20px; cursor: pointer; padding: 10px; }
+
+        @media (max-width: 768px) {
+            .sidebar { 
+                position: fixed; top: 0; bottom: 0; left: 0; 
+                transform: translateX(-100%); background: var(--glass-bg);
+                box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            }
+            .sidebar.open { transform: translateX(0); }
+            .content { padding: 15px; }
+            .header { padding: 15px; }
+            .search-container { display: none; } /* Hide search on mobile header to save space */
+            #mobile-toggle { display: block; }
+            .modal-box { width: 100%; height: 100%; max-height: 100%; border-radius: 0; border: none; }
+            .calc-grid { gap: 8px; }
+        }
     </style>
 </head>
 <body>
@@ -338,902 +302,824 @@
     <div id="tool-modal" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-header">
-                <span id="tm-title"><i class="fas fa-tools"></i> Tool Name</span>
-                <span style="cursor:pointer; width:30px; height:30px; display:flex; align-items:center; justify-content:center; border-radius:50%; background:rgba(128,128,128,0.1); transition:0.2s;" onclick="closeModal()">×</span>
+                <span id="tm-title"><i class="fas fa-tools"></i> Tool</span>
+                <button class="btn btn-sm btn-outline" onclick="App.closeModal()" style="width:30px; height:30px; padding:0; border-radius:50%; border:none; font-size:20px;">×</button>
             </div>
             <div class="modal-body">
                 <p id="tm-desc" style="color:var(--text-sub); margin-bottom:15px; font-size:13px;"></p>
-                <div id="tm-ui" style="flex:1; display:flex; flex-direction:column; overflow-y:auto;"></div>
-                <div id="tm-result" class="result-area" style="display:none; margin-top:15px;"></div>
+                <div id="tm-ui" style="flex:1; display:flex; flex-direction:column; overflow-y:auto; overflow-x:hidden;"></div>
+                <div id="tm-result" style="margin-top:15px; display:none;"></div>
             </div>
         </div>
     </div>
 
+    <!-- Mobile Overlay for Sidebar -->
+    <div id="mobile-overlay" class="mobile-overlay" onclick="App.toggleMenu()"></div>
+
     <!-- Sidebar -->
-    <nav class="sidebar glass">
+    <nav class="sidebar glass" id="sidebar">
         <div class="logo">
-            <i class="fas fa-layer-group"></i> 
+            <i class="fas fa-cube"></i> 
             <span>LifeStation</span>
-            <span class="version-badge">V8</span>
-            <i id="mobile-toggle" class="fas fa-bars" onclick="toggleMenu()" style="margin-left:auto;"></i>
+            <span class="version-badge">V9</span>
         </div>
         
-        <div class="nav-menu" id="nav-menu">
-            <div class="menu-item active" onclick="filter('all')"><i class="fas fa-th-large"></i> ホーム <span class="menu-count" id="c-all">0</span></div>
-            <div class="menu-item" onclick="filter('fav')"><i class="fas fa-star" style="color:var(--accent)"></i> お気に入り <span class="menu-count" id="c-fav">0</span></div>
-            <div class="menu-item" onclick="filter('work')"><i class="fas fa-briefcase"></i> 仕事・効率化 <span class="menu-count" id="c-work">0</span></div>
-            <div class="menu-item" onclick="filter('calc')"><i class="fas fa-calculator"></i> 計算・分析 <span class="menu-count" id="c-calc">0</span></div>
-            <div class="menu-item" onclick="filter('image')"><i class="fas fa-image"></i> 画像・メディア <span class="menu-count" id="c-image">0</span></div>
-            <div class="menu-item" onclick="filter('text')"><i class="fas fa-font"></i> テキスト・AI <span class="menu-count" id="c-text">0</span></div>
-            
-            <div style="margin-top:auto; padding-top:10px; border-top:1px solid var(--glass-border); display:flex; justify-content:space-between; font-size:18px;">
-                <i class="fas fa-moon" onclick="toggleTheme()" style="cursor:pointer; color:var(--text-sub);" title="ダークモード切替"></i>
-                <i class="fas fa-file-export" onclick="exportData()" style="cursor:pointer; color:var(--text-sub);" title="データ保存"></i>
-                <i class="fas fa-trash-alt" onclick="clearData()" style="cursor:pointer; color:var(--danger);" title="データ初期化"></i>
-            </div>
+        <div class="nav-menu">
+            <div class="menu-item active" onclick="App.filter('all', this)"><i class="fas fa-th-large"></i> ホーム <span class="menu-count" id="c-all">0</span></div>
+            <div class="menu-item" onclick="App.filter('fav', this)"><i class="fas fa-star" style="color:var(--accent)"></i> お気に入り <span class="menu-count" id="c-fav">0</span></div>
+            <div class="menu-item" onclick="App.filter('work', this)"><i class="fas fa-briefcase"></i> 仕事・効率化 <span class="menu-count" id="c-work">0</span></div>
+            <div class="menu-item" onclick="App.filter('calc', this)"><i class="fas fa-calculator"></i> 計算・分析 <span class="menu-count" id="c-calc">0</span></div>
+            <div class="menu-item" onclick="App.filter('image', this)"><i class="fas fa-image"></i> 画像・メディア <span class="menu-count" id="c-image">0</span></div>
+            <div class="menu-item" onclick="App.filter('text', this)"><i class="fas fa-font"></i> テキスト・AI <span class="menu-count" id="c-text">0</span></div>
+        </div>
+
+        <div style="margin-top:auto; padding-top:15px; border-top:1px solid var(--glass-border); display:flex; justify-content:space-between; align-items:center;">
+            <i class="fas fa-moon" onclick="App.toggleTheme()" style="cursor:pointer; color:var(--text-sub); padding:10px;" title="ダークモード"></i>
+            <i class="fas fa-download" onclick="App.exportData()" style="cursor:pointer; color:var(--text-sub); padding:10px;" title="バックアップ"></i>
+            <i class="fas fa-trash-alt" onclick="App.clearData()" style="cursor:pointer; color:var(--danger); padding:10px;" title="初期化"></i>
         </div>
     </nav>
 
     <!-- Main Content -->
     <main class="main">
         <header class="header glass">
-            <div class="search-container">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" class="search-input" placeholder="ツールを検索 (Ctrl+K)..." id="search-box" oninput="searchTools(this.value)">
+            <div style="display:flex; align-items:center; gap:15px;">
+                <i id="mobile-toggle" class="fas fa-bars" onclick="App.toggleMenu()"></i>
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="ツールを検索 (Ctrl+K)..." id="search-box" oninput="App.searchTools(this.value)">
+                </div>
             </div>
-            <div style="font-size:12px; color:var(--text-sub); text-align:right;">
-                <div id="clock" style="font-weight:bold; font-size:16px; color:var(--text-main);">00:00</div>
-                <div id="date">Loading...</div>
+            <div style="text-align:right;">
+                <div id="clock" style="font-weight:800; font-size:18px; color:var(--text-main); font-variant-numeric: tabular-nums;">00:00</div>
+                <div id="date" style="font-size:11px; color:var(--text-sub);">Loading...</div>
             </div>
         </header>
 
         <div class="content">
-            <!-- Widgets Dashboard -->
+            <!-- Widgets -->
             <div class="dashboard-grid">
                 <div class="widget glass">
-                    <div class="widget-title"><i class="fas fa-sun"></i> Weather (Tokyo)<span id="w-loc" style="font-size:10px;"></span></div>
+                    <div class="widget-title"><i class="fas fa-cloud-sun"></i> Weather</div>
                     <div style="display:flex; align-items:center; gap:15px; margin-top:10px;">
-                        <i id="w-icon" class="fas fa-cloud" style="font-size:36px; color:var(--primary);"></i>
+                        <i id="w-icon" class="fas fa-spinner fa-spin" style="font-size:36px; color:var(--primary);"></i>
                         <div>
                             <div class="widget-val" id="w-temp">--°C</div>
-                            <div style="font-size:13px; color:var(--text-sub);" id="w-desc">Loading...</div>
+                            <div style="font-size:13px; color:var(--text-sub);" id="w-desc">Checking...</div>
                         </div>
                     </div>
                 </div>
                 
                 <div class="widget glass">
-                    <div class="widget-title"><i class="fas fa-tasks"></i> Today's Tasks <span id="w-todo-cnt">0/0</span></div>
-                    <div style="margin-top:10px; flex:1; overflow-y:auto; font-size:13px; max-height:80px;" id="w-todo-list">
-                        <!-- Tasks -->
-                    </div>
-                    <div style="height:6px; background:rgba(0,0,0,0.1); border-radius:3px; margin-top:10px; overflow:hidden;">
+                    <div class="widget-title"><i class="fas fa-check-circle"></i> Tasks <span id="w-todo-cnt">0/0</span></div>
+                    <div style="margin-top:10px; flex:1; overflow-y:auto; font-size:13px; max-height:80px;" id="w-todo-list"></div>
+                    <div style="height:4px; background:rgba(0,0,0,0.1); border-radius:2px; margin-top:10px; overflow:hidden;">
                         <div id="w-todo-bar" style="height:100%; width:0%; background:var(--success); transition:0.5s;"></div>
                     </div>
                 </div>
 
                 <div class="widget glass">
-                    <div class="widget-title"><i class="fas fa-chart-bar"></i> Weekly Focus <span style="font-size:10px;">(min)</span></div>
+                    <div class="widget-title"><i class="fas fa-chart-line"></i> Focus Log</div>
                     <div class="widget-chart-con">
                         <canvas id="w-chart"></canvas>
                     </div>
                 </div>
             </div>
 
-            <div id="grid" class="grid">
-                <!-- Cards will be injected here -->
-            </div>
+            <!-- Grid -->
+            <div id="grid" class="grid"></div>
             
-            <div style="text-align:center; margin-top:50px; color:var(--text-sub); font-size:12px;">
-                LifeStation V8 Reborn - The Ultimate Web Workspace
+            <div style="text-align:center; margin-top:50px; color:var(--text-sub); font-size:12px; opacity:0.6;">
+                LifeStation V9 Reborn - All local, Secure & Fast.
             </div>
         </div>
     </main>
 
     <script>
-        // ============================================
-        //  APP STATE & CONFIG
-        // ============================================
-        const STORE_KEY = 'lifestation_v8_data';
-        let appData = {
-            favs: [],
-            todos: [],
-            memo: '',
-            theme: 'light',
-            pomoLogs: [], 
-            clips: [], 
-            apiKey: ''
-        };
-        let activeTool = null;
-        let pInterval = null;
-        let cropper = null;
-        let audioCtx = null;
-        let noiseNode = null;
-        let gainNode = null;
-        let mediaRecorder = null;
-        let recInterval = null;
+        /**
+         * LifeStation V9 - Core Logic
+         * Namespaced to 'App' to prevent global pollution.
+         */
+        const App = {
+            STORE_KEY: 'ls_v9_data',
+            data: {
+                favs: [],
+                todos: [],
+                snippets: [],
+                theme: 'light',
+                pomoLogs: [],
+                apiKey: ''
+            },
+            state: {
+                activeTool: null,
+                intervals: {},
+                audioCtx: null,
+                mediaRecorder: null,
+                cropper: null,
+                chartInstance: null
+            },
+            
+            // --- Initialization ---
+            init() {
+                this.loadData();
+                this.renderGrid('all');
+                this.updateClock();
+                this.updateCounts();
+                this.initDashboard();
+                
+                // Event Listeners
+                setInterval(() => this.updateClock(), 1000);
+                document.addEventListener('keydown', (e) => {
+                    if((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); document.getElementById('search-box').focus(); }
+                    if(e.key === 'Escape') this.closeModal();
+                });
+                
+                // Theme Init
+                if(this.data.theme === 'dark') document.body.classList.add('dark');
+            },
 
-        // ============================================
-        //  TOOLS DEFINITION
-        // ============================================
-        const tools = [
-            // --- WORK ---
+            // --- Data Management ---
+            loadData() {
+                try {
+                    const raw = localStorage.getItem(this.STORE_KEY);
+                    if(raw) this.data = { ...this.data, ...JSON.parse(raw) };
+                } catch(e) { console.error('Data Load Error', e); }
+            },
+            saveData() {
+                try {
+                    localStorage.setItem(this.STORE_KEY, JSON.stringify(this.data));
+                } catch(e) { console.warn('Storage Quota Exceeded?'); }
+            },
+            clearData() {
+                if(confirm('すべてのデータを削除し、初期状態に戻しますか？')) {
+                    localStorage.removeItem(this.STORE_KEY);
+                    location.reload();
+                }
+            },
+            exportData() {
+                const b = new Blob([JSON.stringify(this.data, null, 2)], {type:'application/json'});
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(b);
+                a.download = `lifestation_backup_${new Date().toISOString().slice(0,10)}.json`;
+                a.click();
+            },
+
+            // --- UI Control ---
+            toggleTheme() {
+                document.body.classList.toggle('dark');
+                this.data.theme = document.body.classList.contains('dark') ? 'dark' : 'light';
+                this.saveData();
+            },
+            toggleMenu() {
+                const sb = document.getElementById('sidebar');
+                const ov = document.getElementById('mobile-overlay');
+                sb.classList.toggle('open');
+                if(sb.classList.contains('open')) {
+                    ov.style.display = 'block';
+                    setTimeout(()=>ov.classList.add('show'),10);
+                } else {
+                    ov.classList.remove('show');
+                    setTimeout(()=>ov.style.display='none',300);
+                }
+            },
+            updateClock() {
+                const now = new Date();
+                document.getElementById('clock').innerText = now.toLocaleTimeString('ja-JP', {hour:'2-digit', minute:'2-digit'});
+                document.getElementById('date').innerText = now.toLocaleDateString('ja-JP', {year:'numeric', month:'short', day:'numeric', weekday:'short'});
+            },
+            filter(cat, el) {
+                if(el) {
+                    document.querySelectorAll('.menu-item').forEach(e => e.classList.remove('active'));
+                    el.classList.add('active');
+                }
+                // Close mobile menu if open
+                if(document.getElementById('sidebar').classList.contains('open')) this.toggleMenu();
+                
+                const list = (cat === 'all') ? Tools : 
+                             (cat === 'fav') ? Tools.filter(t => this.data.favs.includes(t.id)) :
+                             Tools.filter(t => t.cat === cat);
+                this.renderGridInternal(list);
+            },
+            searchTools(q) {
+                q = q.toLowerCase();
+                const list = Tools.filter(t => t.title.toLowerCase().includes(q) || t.desc.toLowerCase().includes(q));
+                this.renderGridInternal(list);
+            },
+            renderGrid(type) {
+                // Wrapper to call internal render
+                this.filter(type, document.querySelector(`.menu-item[onclick*="'${type}'"]`));
+            },
+            renderGridInternal(list) {
+                const grid = document.getElementById('grid');
+                grid.innerHTML = '';
+                list.forEach(t => {
+                    const isFav = this.data.favs.includes(t.id);
+                    const div = document.createElement('div');
+                    div.className = 'card glass';
+                    div.innerHTML = `
+                        <i class="fas fa-star fav-btn ${isFav?'active':''}" onclick="App.toggleFav('${t.id}', event)"></i>
+                        <div class="card-icon-box"><i class="fas ${t.icon}"></i></div>
+                        <div>
+                            <div class="card-title">${t.title}</div>
+                            <div class="card-desc">${t.desc}</div>
+                        </div>
+                    `;
+                    div.onclick = () => this.openTool(t);
+                    grid.appendChild(div);
+                });
+            },
+            toggleFav(id, e) {
+                e.stopPropagation();
+                if(this.data.favs.includes(id)) this.data.favs = this.data.favs.filter(i => i !== id);
+                else this.data.favs.push(id);
+                this.saveData();
+                e.target.classList.toggle('active');
+                this.updateCounts();
+            },
+            updateCounts() {
+                ['work','calc','image','text'].forEach(c => { 
+                    const el = document.getElementById('c-'+c);
+                    if(el) el.innerText = Tools.filter(t => t.cat === c).length 
+                });
+                document.getElementById('c-all').innerText = Tools.length;
+                document.getElementById('c-fav').innerText = this.data.favs.length;
+            },
+            escapeHtml(str) {
+                if(!str) return '';
+                return str.replace(/[&<>"']/g, function(m) {
+                    return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'}[m];
+                });
+            },
+
+            // --- Dashboard Logic ---
+            async initDashboard() {
+                // Weather
+                const wIcon = document.getElementById('w-icon');
+                const wTemp = document.getElementById('w-temp');
+                const wDesc = document.getElementById('w-desc');
+                
+                if(navigator.onLine) {
+                    try {
+                        // Tokyo default, simple fetch
+                        const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=35.6895&longitude=139.6917&current_weather=true');
+                        const data = await res.json();
+                        const w = data.current_weather;
+                        wTemp.innerText = `${w.temperature}°C`;
+                        const code = w.weathercode;
+                        let icon='fa-cloud', desc='Cloudy';
+                        if(code===0) { icon='fa-sun'; desc='Sunny'; }
+                        else if(code<3) { icon='fa-cloud-sun'; desc='Partly'; }
+                        else if(code<60) { icon='fa-smog'; desc='Foggy'; }
+                        else if(code<80) { icon='fa-cloud-rain'; desc='Rainy'; }
+                        else { icon='fa-bolt'; desc='Storm'; }
+                        wIcon.className = `fas ${icon}`;
+                        wDesc.innerText = desc;
+                    } catch(e) { wDesc.innerText = 'Weather Error'; }
+                } else { wDesc.innerText = 'Offline'; }
+
+                // Tasks Widget
+                const todos = this.data.todos;
+                const done = todos.filter(t=>t.done).length;
+                document.getElementById('w-todo-cnt').innerText = `${done}/${todos.length}`;
+                document.getElementById('w-todo-bar').style.width = todos.length ? `${(done/todos.length)*100}%` : '0%';
+                const list = document.getElementById('w-todo-list');
+                list.innerHTML = todos.slice(0,5).map(t => 
+                    `<div style="margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; ${t.done?'opacity:0.5;text-decoration:line-through':''}">
+                     <i class="fas fa-circle" style="font-size:6px; vertical-align:middle; margin-right:5px; color:var(--primary)"></i>${this.escapeHtml(t.txt)}</div>`
+                ).join('') || '<div style="color:var(--text-sub)">No tasks</div>';
+
+                // Chart Widget
+                const ctx = document.getElementById('w-chart');
+                if(ctx) {
+                    const chartCtx = ctx.getContext('2d');
+                    if(this.state.chartInstance) this.state.chartInstance.destroy();
+                    
+                    const labels = [], data = [];
+                    for(let i=6; i>=0; i--) {
+                        const d = new Date(); d.setDate(d.getDate()-i);
+                        labels.push(d.toLocaleDateString('en', {weekday:'narrow'}));
+                        const k = d.toISOString().slice(0,10);
+                        const dayLog = this.data.pomoLogs.filter(l => l.date === k).reduce((a,b)=>a+b.min, 0);
+                        data.push(dayLog);
+                    }
+                    
+                    this.state.chartInstance = new Chart(chartCtx, {
+                        type: 'bar',
+                        data: { labels, datasets: [{ label: 'Focus (min)', data, backgroundColor: '#6366f1', borderRadius: 4, barThickness: 12 }] },
+                        options: { 
+                            responsive: true, maintainAspectRatio: false, 
+                            plugins:{ legend:{display:false} }, 
+                            scales:{ y:{display:false}, x:{grid:{display:false}, ticks:{color:'#9ca3af', font:{size:10}}} } 
+                        }
+                    });
+                }
+            },
+
+            // --- Tool Management ---
+            openTool(tool) {
+                this.state.activeTool = tool;
+                document.getElementById('tm-title').innerHTML = `<i class="fas ${tool.icon}"></i> ${tool.title}`;
+                document.getElementById('tm-desc').innerText = tool.desc;
+                const ui = document.getElementById('tm-ui');
+                const res = document.getElementById('tm-result');
+                ui.innerHTML = ''; res.style.display = 'none'; res.innerHTML = '';
+                
+                // Render Tool UI
+                if(tool.render) tool.render(ui);
+                
+                const modal = document.getElementById('tool-modal');
+                modal.style.display = 'flex';
+                setTimeout(()=>modal.classList.add('show'), 10);
+            },
+            closeModal() {
+                const modal = document.getElementById('tool-modal');
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                    this.cleanupTool();
+                }, 200);
+            },
+            cleanupTool() {
+                // Stop any running intervals or audio
+                if(this.state.intervals.pomo) clearInterval(this.state.intervals.pomo);
+                if(this.state.intervals.rec) clearInterval(this.state.intervals.rec);
+                if(this.state.audioCtx) { this.state.audioCtx.close(); this.state.audioCtx = null; }
+                if(this.state.cropper) { this.state.cropper.destroy(); this.state.cropper = null; }
+                if(this.state.mediaRecorder && this.state.mediaRecorder.state !== 'inactive') this.state.mediaRecorder.stop();
+                this.state.activeTool = null;
+                // Refresh Dashboard
+                this.initDashboard();
+            }
+        };
+
+        // --- TOOLS DEFINITION ---
+        const Tools = [
+            // === WORK ===
             {
-                id: 'todo', cat: 'work', icon: 'fa-check-double', title: 'ToDoリスト', desc: 'タスク管理・並べ替え・一括削除',
-                type: 'custom',
+                id: 'todo', cat: 'work', icon: 'fa-check-double', title: 'Smart ToDo', desc: 'Drag & Drop対応、タスク管理',
+                render: (el) => {
+                    el.innerHTML = `
+                        <div style="display:flex; gap:10px; margin-bottom:15px;">
+                            <input type="text" id="td-in" placeholder="新しいタスク..." style="margin:0;">
+                            <button class="btn" style="width:auto;" onclick="ToolLogic.addTodo()"><i class="fas fa-plus"></i></button>
+                        </div>
+                        <div id="td-list" style="flex:1; overflow-y:auto; min-height:200px;"></div>
+                        <div style="text-align:right; margin-top:10px;">
+                            <button class="btn btn-sm btn-outline" style="color:var(--danger); border-color:var(--danger); display:inline-flex;" onclick="ToolLogic.clearDoneTodos()">完了済みを削除</button>
+                        </div>
+                    `;
+                    ToolLogic.renderTodos();
+                    // Enter key support
+                    document.getElementById('td-in').addEventListener('keypress', (e)=>{ if(e.key==='Enter') ToolLogic.addTodo(); });
+                }
+            },
+            {
+                id: 'snippet', cat: 'work', icon: 'fa-code', title: 'Snippets', desc: '定型文・コード管理',
                 render: (el) => {
                     el.innerHTML = `
                         <div style="display:flex; gap:10px; margin-bottom:10px;">
-                            <input type="text" id="td-in" placeholder="新しいタスク..." onkeypress="if(event.key==='Enter')addTodo()" style="margin:0;">
-                            <button class="btn" style="width:auto;" onclick="addTodo()"><i class="fas fa-plus"></i></button>
+                            <input type="text" id="sn-title" placeholder="タイトル" style="margin:0; width:30%;">
+                            <input type="text" id="sn-body" placeholder="内容 (コードや定型文)..." style="margin:0; flex:1;">
+                            <button class="btn" style="width:auto;" onclick="ToolLogic.addSnippet()"><i class="fas fa-save"></i></button>
                         </div>
-                        <div style="display:flex; justify-content:flex-end; margin-bottom:5px;">
-                            <button class="btn btn-sm btn-outline" style="color:var(--danger); border-color:var(--danger);" onclick="clearDoneTodos()">完了済みを削除</button>
-                        </div>
-                        <div id="td-list" style="flex:1; overflow-y:auto; min-height:200px;"></div>
+                        <div id="sn-list" style="flex:1; overflow-y:auto;"></div>
                     `;
-                    renderTodos();
+                    ToolLogic.renderSnippets();
                 }
             },
             {
-                id: 'memo', cat: 'work', icon: 'fa-sticky-note', title: 'Markdownメモ', desc: 'プレビュー機能付き高機能メモ',
-                type: 'custom',
+                id: 'pomo', cat: 'work', icon: 'fa-hourglass-half', title: 'Focus Timer', desc: 'ポモドーロタイマー (通知音あり)',
                 render: (el) => {
                     el.innerHTML = `
-                        <div style="display:flex; gap:15px; height:400px; flex-direction:row;">
-                            <div style="flex:1; display:flex; flex-direction:column;">
-                                <textarea id="memo-pad" style="flex:1; resize:none; font-family:monospace; padding:15px; margin:0;" placeholder="# Markdownが使えます" oninput="updateMemo()">${appData.memo || ''}</textarea>
+                        <div style="text-align:center; padding:20px; display:flex; flex-direction:column; align-items:center;">
+                            <div id="pm-disp" style="font-size:80px; font-weight:800; font-family:monospace; color:var(--primary); line-height:1;">25:00</div>
+                            <div style="margin-top:20px; display:grid; grid-template-columns:1fr 1fr; gap:10px; width:100%; max-width:300px;">
+                                <button class="btn" onclick="ToolLogic.startPomo(25)">Focus (25m)</button>
+                                <button class="btn" style="background:var(--success)" onclick="ToolLogic.startPomo(5)">Break (5m)</button>
                             </div>
-                            <div style="flex:1; display:flex; flex-direction:column; border:1px solid var(--glass-border); border-radius:10px; background:rgba(255,255,255,0.4); overflow:hidden;">
-                                <div id="md-preview" style="padding:15px; overflow-y:auto; height:100%;"></div>
-                            </div>
-                        </div>
-                        <div style="display:flex; gap:10px; margin-top:15px;">
-                            <button class="btn btn-outline" onclick="downloadMemo()"><i class="fas fa-download"></i> .md保存</button>
-                            <button class="btn btn-outline" onclick="copyMemo()"><i class="fas fa-copy"></i> コピー</button>
-                        </div>
-                    `;
-                    // Mobile Layout Fix
-                    if(window.innerWidth <= 768) {
-                        el.querySelector('div').style.flexDirection = 'column';
-                    }
-                    updateMemo();
-                }
-            },
-            {
-                id: 'pomo', cat: 'work', icon: 'fa-clock', title: 'ポモドーロ', desc: '集中力維持＆ログ分析',
-                type: 'custom',
-                render: (el) => {
-                    el.innerHTML = `
-                        <div style="text-align:center; padding:20px;">
-                            <div id="pm-disp" style="font-size:72px; font-weight:800; font-family:monospace; color:var(--primary); margin:20px 0;">25:00</div>
-                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; max-width:300px; margin:0 auto;">
-                                <button class="btn" onclick="startPomo(25)">集中 (25分)</button>
-                                <button class="btn" style="background:var(--success)" onclick="startPomo(5)">休憩 (5分)</button>
-                            </div>
-                            <button class="btn" style="background:var(--danger); width:100%; max-width:300px; margin:10px auto;" onclick="stopPomo()"><i class="fas fa-stop"></i> 停止</button>
-                            <div style="margin-top:20px; font-size:12px; color:var(--text-sub);">完了するとダッシュボードに記録されます</div>
+                            <button class="btn btn-outline" style="margin-top:10px; border:none; color:var(--text-sub);" onclick="ToolLogic.stopPomo()">Stop</button>
                         </div>
                     `;
                 }
             },
             {
-                id: 'zen', cat: 'work', icon: 'fa-headphones', title: 'Zen Generator', desc: '集中用ノイズ生成 (音量調整可)',
-                type: 'custom',
+                id: 'zen', cat: 'work', icon: 'fa-headphones', title: 'Zen Noise', desc: '集中用環境音 (Web Audio API)',
                 render: (el) => {
                     el.innerHTML = `
                         <div style="text-align:center; padding:30px;">
-                            <div style="margin-bottom:30px; display:flex; justify-content:center; gap:20px;">
-                                <i class="fas fa-wave-square" style="font-size:40px; color:var(--primary);"></i>
-                                <i class="fas fa-wind" style="font-size:40px; color:var(--accent);"></i>
-                            </div>
-                            
                             <div style="margin-bottom:20px;">
-                                <label style="font-size:14px; font-weight:bold; margin-bottom:5px; display:block;">Noise Type</label>
-                                <select id="zen-type" style="width:200px; margin:0 auto; text-align:center;">
+                                <select id="zen-type" style="width:200px; text-align:center; margin:0 auto;">
                                     <option value="pink">Pink Noise (集中)</option>
                                     <option value="white">White Noise (遮音)</option>
                                     <option value="brown">Brown Noise (睡眠)</option>
                                 </select>
                             </div>
-
                             <div style="margin-bottom:30px;">
-                                <label style="font-size:12px; margin-bottom:5px; display:block;">Volume</label>
-                                <input type="range" id="zen-vol" min="0" max="1" step="0.01" value="0.1" style="width:200px; margin:0 auto; display:block;">
+                                <input type="range" id="zen-vol" min="0" max="0.5" step="0.01" value="0.1" style="width:200px;">
                             </div>
-
-                            <button class="btn" id="zen-btn" onclick="toggleZen()" style="max-width:200px; margin:0 auto;">再生開始</button>
+                            <button class="btn" id="zen-btn" onclick="ToolLogic.toggleZen()" style="max-width:200px; margin:0 auto;">Play</button>
+                            <p style="font-size:12px; color:var(--text-sub); margin-top:15px;">生成されたノイズをループ再生します</p>
                         </div>
                     `;
-                    document.getElementById('zen-vol').addEventListener('input', (e) => {
-                        if(gainNode) gainNode.gain.value = e.target.value;
-                    });
-                    document.getElementById('zen-type').addEventListener('change', () => {
-                        if(audioCtx) { toggleZen(); toggleZen(); } // Restart if playing
+                    document.getElementById('zen-vol').addEventListener('input', (e)=>{
+                        if(ToolLogic.zenGain) ToolLogic.zenGain.gain.value = e.target.value;
                     });
                 }
             },
-            {
-                id: 'clip', cat: 'work', icon: 'fa-clipboard-list', title: '定型文管理', desc: 'よく使うフレーズを保存・コピー',
-                type: 'custom',
-                render: (el) => {
-                    el.innerHTML = `
-                        <div style="display:flex; gap:10px; margin-bottom:15px;">
-                            <input type="text" id="cl-in" placeholder="定型文を入力..." style="margin:0;">
-                            <button class="btn" style="width:auto;" onclick="addClip()"><i class="fas fa-plus"></i></button>
-                        </div>
-                        <div id="cl-list" style="flex:1; overflow-y:auto; min-height:200px;"></div>
-                    `;
-                    renderClips();
-                }
-            },
 
-            // --- CALC ---
+            // === CALC ===
             {
-                id: 'calc', cat: 'calc', icon: 'fa-calculator', title: '関数電卓Pro', desc: '履歴機能付き・レスポンシブ電卓',
-                type: 'custom',
+                id: 'calc', cat: 'calc', icon: 'fa-calculator', title: 'Pro Calculator', desc: '安全設計・履歴付き電卓',
                 render: (el) => {
                     el.innerHTML = `
                         <div class="calc-wrapper">
-                            <div class="calc-disp-container">
-                                <div id="c-hist" class="calc-history"></div>
-                                <div id="c-disp" class="calc-current">0</div>
+                            <div style="background:rgba(0,0,0,0.05); padding:10px; border-radius:10px; margin-bottom:10px; text-align:right;">
+                                <div id="c-hist" style="height:20px; font-size:12px; color:var(--text-sub);"></div>
+                                <div id="c-disp" style="font-size:32px; font-family:monospace; font-weight:bold; overflow:hidden;">0</div>
                             </div>
-                            <div class="calc-grid">
-                                <button class="calc-btn fn" onclick="cIn('Math.sin(')">sin</button>
-                                <button class="calc-btn fn" onclick="cIn('Math.cos(')">cos</button>
-                                <button class="calc-btn fn" onclick="cIn('Math.tan(')">tan</button>
-                                <button class="calc-btn fn" onclick="cIn('Math.PI')">π</button>
-                                <button class="calc-btn op" style="background:var(--danger)" onclick="cIn('C')">AC</button>
-                                
-                                <button class="calc-btn fn" onclick="cIn('Math.sqrt(')">√</button>
-                                <button class="calc-btn fn" onclick="cIn('(')">(</button>
-                                <button class="calc-btn fn" onclick="cIn(')')">)</button>
-                                <button class="calc-btn fn" onclick="cIn('**')">^</button>
-                                <button class="calc-btn op" onclick="cIn('/')">÷</button>
-                                
-                                <button class="calc-btn num" onclick="cIn('7')">7</button>
-                                <button class="calc-btn num" onclick="cIn('8')">8</button>
-                                <button class="calc-btn num" onclick="cIn('9')">9</button>
-                                <button class="calc-btn op" style="background:var(--text-sub); color:white;" onclick="cIn('Del')">⌫</button>
-                                <button class="calc-btn op" onclick="cIn('*')">×</button>
-                                
-                                <button class="calc-btn num" onclick="cIn('4')">4</button>
-                                <button class="calc-btn num" onclick="cIn('5')">5</button>
-                                <button class="calc-btn num" onclick="cIn('6')">6</button>
-                                <button class="calc-btn op" onclick="cIn('-')">-</button>
-                                <button class="calc-btn op" onclick="cIn('%')">%</button>
-                                
-                                <button class="calc-btn num" onclick="cIn('1')">1</button>
-                                <button class="calc-btn num" onclick="cIn('2')">2</button>
-                                <button class="calc-btn num" onclick="cIn('3')">3</button>
-                                <button class="calc-btn op" onclick="cIn('+')">+</button>
-                                <button class="calc-btn eq" onclick="cIn('=')">=</button>
-                                
-                                <button class="calc-btn num" onclick="cIn('0')" style="grid-column:span 2;">0</button>
-                                <button class="calc-btn num" onclick="cIn('.')">.</button>
+                            <div class="calc-grid" id="calc-keys">
+                                <!-- Keys generated by JS -->
                             </div>
                         </div>
                     `;
-                    setupCalcKeys();
+                    ToolLogic.initCalc();
                 }
             },
             {
-                id: 'warikan', cat: 'calc', icon: 'fa-users', title: '割り勘奉行', desc: '詳細設定可能なスマート割り勘',
-                type: 'custom',
+                id: 'warikan', cat: 'calc', icon: 'fa-users', title: 'Smart Warikan', desc: '上司傾斜・端数処理',
                 render: (el) => {
                     el.innerHTML = `
-                        <div style="display:flex; flex-direction:column; gap:15px; height:100%;">
+                        <div style="display:flex; flex-direction:column; gap:15px;">
                             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                                <div><label style="font-size:12px; color:var(--text-sub);">合計金額</label><input type="number" id="w-total" placeholder="12300" style="margin:0;"></div>
-                                <div><label style="font-size:12px; color:var(--text-sub);">人数</label><input type="number" id="w-num" placeholder="3" style="margin:0;"></div>
+                                <div><label>会計</label><input type="number" id="w-total" placeholder="0"></div>
+                                <div><label>人数</label><input type="number" id="w-num" placeholder="0"></div>
                             </div>
-                            
                             <div style="background:rgba(0,0,0,0.03); padding:15px; border-radius:10px;">
                                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                                    <label style="font-size:14px; cursor:pointer;"><input type="checkbox" id="w-boss-check" onchange="document.getElementById('w-boss-pay').disabled=!this.checked"> 上司・先輩が多めに払う</label>
+                                    <label style="cursor:pointer; display:flex; align-items:center; gap:5px;"><input type="checkbox" id="w-boss-check" onchange="document.getElementById('w-boss-pay').disabled=!this.checked"> 上司設定</label>
                                     <input type="number" id="w-boss-pay" placeholder="支払額" disabled style="width:100px; margin:0;">
                                 </div>
-                                <div style="display:flex; align-items:center; gap:10px;">
-                                    <span style="font-size:13px;">単位:</span>
-                                    <select id="w-unit" style="margin:0; width:auto; padding:5px;">
-                                        <option value="1">1円</option>
-                                        <option value="10">10円</option>
-                                        <option value="100" selected>100円</option>
-                                        <option value="500">500円</option>
-                                        <option value="1000">1000円</option>
-                                    </select>
-                                    <span style="font-size:12px; color:var(--text-sub);">で切り上げ</span>
+                                <div style="display:flex; align-items:center; gap:5px; font-size:13px;">
+                                    <span>単位:</span>
+                                    <select id="w-unit" style="width:auto; padding:5px; margin:0;"><option value="100">100円</option><option value="1000">1000円</option><option value="1">1円</option></select>
+                                    <span>切り上げ</span>
                                 </div>
                             </div>
-
-                            <button class="btn" onclick="calcWarikan()">計算する</button>
-                            <div id="w-result" class="result-area" style="display:none; text-align:left; overflow-y:auto; max-height:200px;"></div>
+                            <button class="btn" onclick="ToolLogic.calcWarikan()">計算</button>
+                            <div id="w-result"></div>
                         </div>
                     `;
                 }
             },
-            { id: 'discount', cat: 'calc', icon: 'fa-tags', title: '割引計算', desc: 'セール価格計算', inputs: ['price:元の価格(円)', 'per:割引率(%)'], func: (p,r) => { const end=Math.floor(p*(1-r/100)); return `支払額: ${end.toLocaleString()}円<br><span style="font-size:12px;color:gray">(${p*r/100}円 お得)</span>`; } },
-            { id: 'unit', cat: 'calc', icon: 'fa-balance-scale', title: '単位変換', desc: '様々な単位を相互変換', type:'custom', render:(el)=>{
-                el.innerHTML=`
-                    <div style="display:flex; flex-direction:column; gap:15px;">
-                        <select id="u-cat" onchange="updateUnitType()" style="margin:0;"><option value="len">長さ</option><option value="wgt">重さ</option><option value="tmp">温度</option><option value="area">面積</option><option value="spd">速度</option></select>
-                        <div style="display:flex; gap:10px; align-items:center;">
-                            <input type="number" id="u-val" placeholder="値" style="margin:0; flex:1;">
-                            <select id="u-from" style="margin:0; width:80px;"></select>
-                            <i class="fas fa-arrow-right"></i>
-                            <select id="u-to" style="margin:0; width:80px;"></select>
-                        </div>
-                        <button class="btn" onclick="convertUnitPro()">変換</button>
-                    </div>
-                `;
-                updateUnitType();
-            }},
 
-            // --- IMAGE / MEDIA ---
+            // === IMAGE ===
             {
-                id: 'recorder', cat: 'image', icon: 'fa-microphone', title: 'レコーダー', desc: '音声/画面録画 & 保存',
-                type: 'custom',
+                id: 'recorder', cat: 'image', icon: 'fa-microphone', title: 'Recorder', desc: '音声/画面収録 (ローカルのみ)',
                 render: (el) => {
                     el.innerHTML = `
-                        <div style="text-align:center;">
-                            <div id="rec-timer" style="font-size:40px; font-family:monospace; margin-bottom:20px; color:var(--text-sub);">00:00</div>
-                            <div style="display:flex; gap:15px; justify-content:center; margin-bottom:20px;">
-                                <button class="btn" onclick="startRecord('audio')"><i class="fas fa-microphone"></i> 録音</button>
-                                <button class="btn" style="background:var(--accent);" onclick="startRecord('screen')"><i class="fas fa-desktop"></i> 画面録画</button>
+                        <div style="text-align:center; padding:20px;">
+                            <div id="rec-timer" style="font-size:40px; font-family:monospace; margin-bottom:20px;">00:00</div>
+                            <div id="rec-controls">
+                                <button class="btn" onclick="ToolLogic.startRecord('audio')"><i class="fas fa-microphone"></i> 録音開始</button>
+                                <button class="btn" style="background:var(--accent); margin-top:10px;" onclick="ToolLogic.startRecord('screen')"><i class="fas fa-video"></i> 画面録画開始</button>
                             </div>
-                            <div id="rec-status" style="display:none;">
-                                <div style="color:var(--danger); animation:pulse 1s infinite; margin-bottom:10px;">● Recording...</div>
-                                <button class="btn" style="background:var(--danger);" onclick="stopRecord()">停止 & 保存</button>
+                            <div id="rec-active" style="display:none;">
+                                <div style="color:var(--danger); animation:pulse 1s infinite; margin-bottom:15px;">● Recording...</div>
+                                <button class="btn" style="background:var(--danger);" onclick="ToolLogic.stopRecord()">停止して保存</button>
                             </div>
                         </div>
+                        <style>@keyframes pulse{0%{opacity:1}50%{opacity:0.5}100%{opacity:1}}</style>
                     `;
                 }
             },
             {
-                id: 'img-editor', cat: 'image', icon: 'fa-crop-alt', title: '画像エディタ', desc: 'トリミング・回転・保存',
-                type: 'custom',
+                id: 'qrcode', cat: 'image', icon: 'fa-qrcode', title: 'QR Gen', desc: 'テキストをQRコード化',
+                render: (el) => {
+                    el.innerHTML = `
+                        <input type="text" id="qr-text" placeholder="URL or Text..." oninput="ToolLogic.genQR()">
+                        <div id="qr-out" style="display:flex; justify-content:center; padding:20px; background:white; border-radius:10px; margin-top:10px;"></div>
+                    `;
+                }
+            },
+
+            // === TEXT ===
+            {
+                id: 'ai', cat: 'text', icon: 'fa-robot', title: 'AI Chat', desc: 'OpenAI API (Your Key)',
                 render: (el) => {
                     el.innerHTML = `
                         <div style="display:flex; flex-direction:column; height:100%;">
-                            <input type="file" id="img-in" accept="image/*" onchange="initCropper(this)" style="margin-bottom:10px;">
-                            <div class="img-editor-container" id="crop-container" style="display:none; flex:1;">
-                                <img id="cropper-img" src="">
-                            </div>
-                            <div id="editor-controls" style="display:none; margin-top:10px;">
-                                <div class="btn-group" style="margin-bottom:10px; justify-content:center;">
-                                    <button class="btn btn-sm btn-outline" onclick="cropper.rotate(-90)"><i class="fas fa-undo"></i></button>
-                                    <button class="btn btn-sm btn-outline" onclick="cropper.rotate(90)"><i class="fas fa-redo"></i></button>
-                                    <button class="btn btn-sm btn-outline" onclick="cropper.scaleX(cropper.getData().scaleX*-1)"><i class="fas fa-arrows-alt-h"></i></button>
-                                    <button class="btn btn-sm btn-outline" onclick="cropper.reset()">Reset</button>
-                                </div>
-                                <button class="btn" onclick="exportCroppedImage()"><i class="fas fa-file-export"></i> 編集を保存</button>
+                            <input type="password" id="ai-key" placeholder="API Key (sk-...)" value="${App.data.apiKey||''}" onchange="App.data.apiKey=this.value;App.saveData();" style="font-size:12px; margin-bottom:5px;">
+                            <div id="ai-log" style="flex:1; border:1px solid var(--glass-border); background:rgba(255,255,255,0.3); border-radius:10px; padding:15px; overflow-y:auto; margin-bottom:10px; display:flex; flex-direction:column; gap:10px;"></div>
+                            <div style="display:flex; gap:10px;">
+                                <input type="text" id="ai-in" placeholder="Message..." style="margin:0;" onkeypress="if(event.key==='Enter')ToolLogic.sendAi()">
+                                <button class="btn" style="width:auto;" onclick="ToolLogic.sendAi()"><i class="fas fa-paper-plane"></i></button>
                             </div>
                         </div>
                     `;
                 }
-            },
-            { id: 'qrcode', cat: 'image', icon: 'fa-qrcode', title: 'QR作成', desc: 'テキストからQRコード生成', inputs:['text:内容'], type:'qr' },
-
-            // --- TEXT / AI ---
-            {
-                id: 'ai-chat', cat: 'text', icon: 'fa-robot', title: 'AI Assistant', desc: 'APIを使用したチャット',
-                type: 'custom',
-                render: (el) => {
-                    el.innerHTML = `
-                        <div style="display:flex; flex-direction:column; height:100%;">
-                            <input type="password" id="ai-key" placeholder="OpenAI API Key (sk-...)" value="${appData.apiKey||''}" onchange="saveApiKey(this.value)" style="font-size:12px; margin-bottom:5px;">
-                            <div id="ai-log" class="chat-box" style="flex:1;"></div>
-                            <div style="display:flex; gap:10px; margin-top:5px;">
-                                <input type="text" id="ai-in" placeholder="メッセージ..." onkeypress="if(event.key==='Enter')sendAi()" style="margin:0; flex:1;">
-                                <button class="btn" style="width:auto;" onclick="sendAi()"><i class="fas fa-paper-plane"></i></button>
-                            </div>
-                        </div>
-                    `;
-                }
-            },
-            { id: 'regex', cat: 'text', icon: 'fa-search', title: '正規表現', desc: 'リアルタイムテスト', type:'custom', render:(el)=>{
-                el.innerHTML = `<input type="text" id="reg-pat" placeholder="/Pattern/flags" oninput="testRegex()">
-                <textarea id="reg-txt" rows="4" placeholder="対象テキスト" oninput="testRegex()"></textarea>
-                <div id="reg-res" class="result-area" style="text-align:left; white-space:pre-wrap;"></div>`;
-            }},
-            { id: 'char', cat: 'text', icon: 'fa-text-width', title: '文字数', desc: '文字数・行数カウント', type:'custom', render:(el)=>{
-                el.innerHTML=`<textarea id="txt-c" rows="5" placeholder="テキストを入力..." oninput="countChar()"></textarea><div id="txt-res" style="text-align:right; font-weight:bold;">0 文字</div>`;
-            }},
+            }
         ];
 
-        // ============================================
-        //  INIT & CORE
-        // ============================================
-        window.onload = () => {
-            loadData();
-            updateTime();
-            renderGrid(tools);
-            updateCounts();
-            initDashboard();
-            
-            document.addEventListener('keydown', (e) => {
-                if(e.ctrlKey && e.key === 'k') { e.preventDefault(); document.getElementById('search-box').focus(); }
-                if(e.key === 'Escape') closeModal();
-            });
-
-            setInterval(updateTime, 1000);
-        };
-
-        function loadData() {
-            try {
-                const d = localStorage.getItem(STORE_KEY);
-                if(d) {
-                    appData = { ...appData, ...JSON.parse(d) };
-                    if(appData.theme === 'dark') document.body.classList.add('dark');
-                }
-            } catch(e) { console.error('Load Error', e); }
-        }
-        function saveData() { localStorage.setItem(STORE_KEY, JSON.stringify(appData)); }
-        function updateTime() {
-            const now = new Date();
-            document.getElementById('clock').innerText = now.toLocaleTimeString('ja-JP', {hour:'2-digit', minute:'2-digit'});
-            document.getElementById('date').innerText = now.toLocaleDateString('ja-JP', {month:'short', day:'numeric', weekday:'short'});
-        }
-        function exportData() {
-            const b = new Blob([JSON.stringify(appData)], {type:'application/json'});
-            const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download='lifestation_backup.json'; a.click();
-        }
-
-        // ============================================
-        //  DASHBOARD & UI
-        // ============================================
-        async function initDashboard() {
-            // Weather
-            try {
-                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=35.6895&longitude=139.6917&current_weather=true');
-                const data = await res.json();
-                const w = data.current_weather;
-                document.getElementById('w-temp').innerText = `${w.temperature}°C`;
-                const code = w.weathercode;
-                let icon = 'fa-cloud', desc = 'Cloudy';
-                if(code===0) { icon='fa-sun'; desc='Sunny'; }
-                else if(code<3) { icon='fa-cloud-sun'; desc='Partly Cloudy'; }
-                else if(code<60) { icon='fa-smog'; desc='Foggy'; }
-                else if(code<80) { icon='fa-cloud-rain'; desc='Rainy'; }
-                else { icon='fa-bolt'; desc='Storm'; }
-                document.getElementById('w-icon').className = `fas ${icon}`;
-                document.getElementById('w-desc').innerText = desc;
-            } catch(e) { document.getElementById('w-desc').innerText = 'Offline'; }
-
-            // Tasks
-            const todos = appData.todos;
-            const done = todos.filter(t=>t.done).length;
-            document.getElementById('w-todo-cnt').innerText = `${done}/${todos.length}`;
-            document.getElementById('w-todo-bar').style.width = todos.length ? `${(done/todos.length)*100}%` : '0%';
-            const list = document.getElementById('w-todo-list');
-            list.innerHTML = todos.slice(0,5).map(t=>`<div style="margin-bottom:4px; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; ${t.done?'text-decoration:line-through;opacity:0.5':''}"><i class="fas fa-circle" style="font-size:6px; vertical-align:middle; margin-right:5px; color:var(--primary)"></i>${t.txt}</div>`).join('') || '<div style="color:var(--text-sub)">No tasks</div>';
-
-            // Chart
-            const ctx = document.getElementById('w-chart');
-            if(ctx) {
-                const chartCtx = ctx.getContext('2d');
-                if(window.wChart) window.wChart.destroy();
-                const labels = [], data = [];
-                for(let i=6; i>=0; i--) {
-                    const d = new Date(); d.setDate(d.getDate()-i);
-                    labels.push(d.toLocaleDateString('en', {weekday:'narrow'}));
-                    const k = d.toISOString().slice(0,10);
-                    const dayLog = appData.pomoLogs.filter(l => l.date === k).reduce((a,b)=>a+b.min, 0);
-                    data.push(dayLog);
-                }
-                window.wChart = new Chart(chartCtx, {
-                    type: 'bar',
-                    data: { labels, datasets: [{ label: 'Focus', data, backgroundColor: '#6366f1', borderRadius: 4 }] },
-                    options: { responsive: true, maintainAspectRatio: false, plugins:{legend:{display:false}}, scales:{y:{display:false, grid:{display:false}}, x:{grid:{display:false}}} }
+        // --- TOOL LOGIC IMPLEMENTATION ---
+        const ToolLogic = {
+            // ToDo
+            renderTodos() {
+                const list = document.getElementById('td-list');
+                list.innerHTML = '';
+                App.data.todos.forEach((t, i) => {
+                    const div = document.createElement('div');
+                    div.className = 'todo-item';
+                    div.innerHTML = `
+                        <i class="fas fa-check-circle" style="color:${t.done?'var(--success)':'var(--text-sub)'}; cursor:pointer;" onclick="ToolLogic.toggleTodo(${i})"></i>
+                        <span class="todo-text ${t.done?'done':''}" contenteditable="true" onblur="ToolLogic.updTodo(${i}, this.innerText)">${App.escapeHtml(t.txt)}</span>
+                        <i class="fas fa-times" style="color:var(--danger); cursor:pointer; opacity:0.5;" onclick="ToolLogic.delTodo(${i})"></i>
+                    `;
+                    list.appendChild(div);
                 });
-            }
-        }
+                new Sortable(list, { 
+                    animation: 150, 
+                    onEnd: (e) => {
+                        const item = App.data.todos.splice(e.oldIndex, 1)[0];
+                        App.data.todos.splice(e.newIndex, 0, item);
+                        App.saveData();
+                    }
+                });
+            },
+            addTodo() {
+                const inp = document.getElementById('td-in');
+                if(inp.value.trim()) {
+                    App.data.todos.unshift({ txt: inp.value, done: false });
+                    App.saveData();
+                    inp.value = '';
+                    this.renderTodos();
+                }
+            },
+            toggleTodo(i) { App.data.todos[i].done = !App.data.todos[i].done; App.saveData(); this.renderTodos(); },
+            delTodo(i) { App.data.todos.splice(i, 1); App.saveData(); this.renderTodos(); },
+            updTodo(i, txt) { App.data.todos[i].txt = txt; App.saveData(); },
+            clearDoneTodos() {
+                App.data.todos = App.data.todos.filter(t => !t.done);
+                App.saveData();
+                this.renderTodos();
+            },
 
-        function renderGrid(list) {
-            const grid = document.getElementById('grid');
-            grid.innerHTML = '';
-            list.forEach(t => {
-                const isFav = appData.favs.includes(t.id);
-                const div = document.createElement('div');
-                div.className = 'card glass';
-                div.innerHTML = `
-                    <i class="fas fa-star fav-btn ${isFav?'active':''}" onclick="toggleFav('${t.id}', event)"></i>
-                    <div class="card-icon-box"><i class="fas ${t.icon}"></i></div>
-                    <div>
-                        <div class="card-title">${t.title}</div>
-                        <div class="card-desc">${t.desc}</div>
+            // Snippets
+            renderSnippets() {
+                const list = document.getElementById('sn-list');
+                list.innerHTML = App.data.snippets.map((s, i) => `
+                    <div class="todo-item" onclick="ToolLogic.copySnip(${i})">
+                        <div style="flex:1; cursor:pointer;">
+                            <div style="font-weight:bold; font-size:13px;">${App.escapeHtml(s.title)}</div>
+                            <div style="font-size:11px; color:var(--text-sub); overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">${App.escapeHtml(s.body)}</div>
+                        </div>
+                        <i class="fas fa-trash" style="color:var(--danger); opacity:0.5; cursor:pointer;" onclick="event.stopPropagation();ToolLogic.delSnip(${i})"></i>
+                    </div>
+                `).join('');
+            },
+            addSnippet() {
+                const t = document.getElementById('sn-title').value;
+                const b = document.getElementById('sn-body').value;
+                if(b) {
+                    App.data.snippets.unshift({title:t||'No Title', body:b});
+                    App.saveData();
+                    document.getElementById('sn-title').value='';
+                    document.getElementById('sn-body').value='';
+                    this.renderSnippets();
+                }
+            },
+            delSnip(i) { App.data.snippets.splice(i, 1); App.saveData(); this.renderSnippets(); },
+            copySnip(i) { navigator.clipboard.writeText(App.data.snippets[i].body); alert('Copied!'); },
+
+            // Pomodoro
+            startPomo(min) {
+                this.stopPomo();
+                let sec = min * 60;
+                const disp = document.getElementById('pm-disp');
+                App.state.intervals.pomo = setInterval(() => {
+                    sec--;
+                    const m = Math.floor(sec/60).toString().padStart(2,'0');
+                    const s = (sec%60).toString().padStart(2,'0');
+                    disp.innerText = `${m}:${s}`;
+                    if(sec <= 0) {
+                        this.stopPomo();
+                        this.playNotificationSound();
+                        alert('Time is up!');
+                        App.data.pomoLogs.push({date: new Date().toISOString().slice(0,10), min: min});
+                        App.saveData();
+                    }
+                }, 1000);
+            },
+            stopPomo() { if(App.state.intervals.pomo) clearInterval(App.state.intervals.pomo); },
+            playNotificationSound() {
+                // Simple sine wave beep
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.value = 880; 
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 1);
+                osc.start();
+                osc.stop(ctx.currentTime + 1);
+            },
+
+            // Zen (Improved Audio)
+            zenGain: null,
+            toggleZen() {
+                const btn = document.getElementById('zen-btn');
+                if(App.state.audioCtx) {
+                    App.state.audioCtx.close();
+                    App.state.audioCtx = null;
+                    btn.innerText = 'Play';
+                    btn.style.background = 'var(--primary)';
+                    return;
+                }
+                // Start Audio
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                const ctx = new AudioContext();
+                App.state.audioCtx = ctx;
+                
+                const type = document.getElementById('zen-type').value;
+                const bufferSize = ctx.sampleRate * 5; // 5 seconds buffer
+                const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                
+                // Generate Noise
+                for(let i=0; i<bufferSize; i++) {
+                    const white = Math.random() * 2 - 1;
+                    if(type === 'white') data[i] = white;
+                    else if(type === 'pink') {
+                        // Simple Pink approximation
+                        data[i] = (this.lastOut||0 + (0.02 * white)) / 1.02; // Roughly brown/pinkish
+                        this.lastOut = data[i];
+                        data[i] *= 3.5; 
+                    } else { // Brown
+                         data[i] = (this.lastOut||0 + (0.05 * white)) / 1.05; 
+                         this.lastOut = data[i];
+                         data[i] *= 5; 
+                    }
+                }
+                this.lastOut = 0;
+
+                const noiseSrc = ctx.createBufferSource();
+                noiseSrc.buffer = buffer;
+                noiseSrc.loop = true;
+                this.zenGain = ctx.createGain();
+                this.zenGain.gain.value = document.getElementById('zen-vol').value;
+                noiseSrc.connect(this.zenGain);
+                this.zenGain.connect(ctx.destination);
+                noiseSrc.start();
+                
+                btn.innerText = 'Stop';
+                btn.style.background = 'var(--danger)';
+            },
+
+            // Calculator (Safer)
+            initCalc() {
+                const keys = ['C','(',')','/','7','8','9','*','4','5','6','-','1','2','3','+','0','.','='];
+                const con = document.getElementById('calc-keys');
+                keys.forEach(k => {
+                    const b = document.createElement('button');
+                    b.className = `calc-btn ${['C','(',')','/','*','-','+'].includes(k)?'op':(k==='='?'eq':'')}`;
+                    b.innerText = k;
+                    b.onclick = () => this.calcInput(k);
+                    con.appendChild(b);
+                });
+                this.calcExp = '';
+            },
+            calcInput(k) {
+                const d = document.getElementById('c-disp');
+                const h = document.getElementById('c-hist');
+                if(k==='C') { this.calcExp = ''; h.innerText=''; d.innerText='0'; }
+                else if(k==='=') {
+                    try {
+                        // Basic validation to prevent arbitrary code execution
+                        if(/[^0-9+\-*/(). ]/.test(this.calcExp)) throw new Error("Invalid Input");
+                        const res = new Function(`return ${this.calcExp}`)();
+                        h.innerText = this.calcExp + ' =';
+                        this.calcExp = String(res);
+                        d.innerText = this.calcExp;
+                    } catch(e) { d.innerText = 'Error'; this.calcExp=''; }
+                } else {
+                    this.calcExp += k;
+                    d.innerText = this.calcExp;
+                }
+            },
+
+            // Warikan
+            calcWarikan() {
+                const total = parseInt(document.getElementById('w-total').value);
+                const num = parseInt(document.getElementById('w-num').value);
+                if(!total || !num) return;
+                
+                const unit = parseInt(document.getElementById('w-unit').value);
+                const isBoss = document.getElementById('w-boss-check').checked;
+                const bossPay = isBoss ? (parseInt(document.getElementById('w-boss-pay').value)||0) : 0;
+                
+                let regularNum = num - (isBoss ? 1 : 0);
+                let rest = total - bossPay;
+                
+                if(regularNum <= 0) { document.getElementById('w-result').innerHTML='人数エラー'; return; }
+                if(rest < 0) { document.getElementById('w-result').innerHTML='支払い超過'; return; }
+                
+                const perPersonRaw = rest / regularNum;
+                const perPerson = Math.ceil(perPersonRaw / unit) * unit;
+                const payTotal = bossPay + (perPerson * regularNum);
+                const pool = payTotal - total;
+                
+                document.getElementById('w-result').style.display='block';
+                document.getElementById('w-result').innerHTML = `
+                    <div style="background:var(--bg-grad-1); padding:15px; border-radius:10px; margin-top:15px; font-size:14px;">
+                        ${isBoss ? `<div>👑 上司: <b>${bossPay.toLocaleString()}</b> 円</div><hr style="opacity:0.2">` : ''}
+                        <div>👤 1人あたり: <b style="font-size:18px; color:var(--primary)">${perPerson.toLocaleString()}</b> 円</div>
+                        <div style="font-size:11px; color:var(--text-sub); margin-top:5px;">
+                            総回収: ${payTotal.toLocaleString()}円<br>
+                            余り (プール金): <b style="color:var(--success)">${pool.toLocaleString()}</b> 円
+                        </div>
                     </div>
                 `;
-                div.onclick = () => openTool(t);
-                grid.appendChild(div);
-            });
-        }
+            },
 
-        function filter(cat) {
-            document.querySelectorAll('.menu-item').forEach(e => e.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-            if(window.innerWidth <= 768) toggleMenu();
-            if(cat === 'all') renderGrid(tools);
-            else if(cat === 'fav') renderGrid(tools.filter(t => appData.favs.includes(t.id)));
-            else renderGrid(tools.filter(t => t.cat === cat));
-        }
-
-        function searchTools(q) {
-            q = q.toLowerCase();
-            renderGrid(tools.filter(t => t.title.toLowerCase().includes(q) || t.desc.toLowerCase().includes(q)));
-        }
-
-        function toggleFav(id, e) {
-            e.stopPropagation();
-            if(appData.favs.includes(id)) appData.favs = appData.favs.filter(i => i !== id);
-            else appData.favs.push(id);
-            saveData();
-            e.target.classList.toggle('active');
-            updateCounts();
-        }
-
-        function updateCounts() {
-            ['work','calc','image','text'].forEach(c => { 
-                const el = document.getElementById('c-'+c);
-                if(el) el.innerText = tools.filter(t => t.cat === c).length 
-            });
-            document.getElementById('c-all').innerText = tools.length;
-            document.getElementById('c-fav').innerText = appData.favs.length;
-        }
-
-        function toggleTheme() {
-            document.body.classList.toggle('dark');
-            appData.theme = document.body.classList.contains('dark') ? 'dark' : 'light';
-            saveData();
-        }
-
-        function clearData() { if(confirm('初期化しますか？')) { localStorage.removeItem(STORE_KEY); location.reload(); } }
-        function toggleMenu() { document.getElementById('nav-menu').classList.toggle('active'); }
-
-        // Tool Control
-        function openTool(tool) {
-            activeTool = tool;
-            document.getElementById('tm-title').innerHTML = `<i class="fas ${tool.icon}"></i> ${tool.title}`;
-            document.getElementById('tm-desc').innerText = tool.desc;
-            const ui = document.getElementById('tm-ui');
-            const res = document.getElementById('tm-result');
-            ui.innerHTML = ''; res.style.display = 'none'; res.innerHTML = '';
-            
-            if(tool.type === 'custom') {
-                tool.render(ui);
-            } else {
-                if(tool.inputs) {
-                    tool.inputs.forEach((inp, i) => {
-                        const [key, ph] = inp.includes(':') ? inp.split(':') : ['v', inp];
-                        ui.innerHTML += `<input type="text" id="in-${i}" placeholder="${ph}">`;
-                    });
-                }
-                ui.innerHTML += `<button class="btn" onclick="execTool()">実行</button>`;
-            }
-            const modal = document.getElementById('tool-modal');
-            modal.style.display = 'flex';
-            setTimeout(()=>modal.classList.add('show'), 10);
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('tool-modal');
-            modal.classList.remove('show');
-            setTimeout(() => {
-                modal.style.display = 'none';
-                if(cropper) { cropper.destroy(); cropper=null; }
-                stopPomo();
-                if(audioCtx) { audioCtx.close(); audioCtx=null; } // Stop Zen
-                stopRecord();
-            }, 200);
-        }
-
-        async function execTool() {
-            const resBox = document.getElementById('tm-result');
-            resBox.style.display = 'block';
-            try {
-                const args = [];
-                if(activeTool.inputs) for(let i=0; i<activeTool.inputs.length; i++) args.push(document.getElementById(`in-${i}`).value);
-                if(activeTool.type === 'qr') { resBox.innerHTML = ''; new QRCode(resBox, args[0]); }
-                else if(activeTool.type === 'async') { resBox.innerHTML = 'Processing...'; resBox.innerHTML = await activeTool.func(...args); }
-                else { resBox.innerHTML = activeTool.func(...args); }
-            } catch(e) { resBox.innerText = 'Error: ' + e.message; }
-        }
-
-        // --- TOOL LOGIC ---
-
-        // ToDo
-        function addTodo() {
-            const v = document.getElementById('td-in').value;
-            if(!v) return;
-            appData.todos.push({txt:v, done:false});
-            saveData();
-            document.getElementById('td-in').value = '';
-            renderTodos();
-            initDashboard();
-        }
-        function renderTodos() {
-            const list = document.getElementById('td-list');
-            list.innerHTML = '';
-            appData.todos.forEach((t, i) => {
-                const d = document.createElement('div');
-                d.className = 'todo-item';
-                d.innerHTML = `<i class="fas fa-check-circle todo-check ${t.done?'done':''}" onclick="togTodo(${i})"></i><span class="todo-text ${t.done?'done':''}" contenteditable="true" onblur="updTodo(${i}, this.innerText)">${t.txt}</span><i class="fas fa-times" style="color:var(--danger);cursor:pointer;" onclick="delTodo(${i})"></i>`;
-                list.appendChild(d);
-            });
-            new Sortable(list, { onEnd: (e)=>{ const item = appData.todos.splice(e.oldIndex, 1)[0]; appData.todos.splice(e.newIndex, 0, item); saveData(); }});
-        }
-        function togTodo(i) { appData.todos[i].done = !appData.todos[i].done; saveData(); renderTodos(); initDashboard(); }
-        function delTodo(i) { appData.todos.splice(i, 1); saveData(); renderTodos(); initDashboard(); }
-        function updTodo(i, t) { appData.todos[i].txt = t; saveData(); }
-        function clearDoneTodos() {
-            if(confirm('完了済みのタスクをすべて削除しますか？')) {
-                appData.todos = appData.todos.filter(t => !t.done);
-                saveData();
-                renderTodos();
-                initDashboard();
-            }
-        }
-
-        // Memo
-        function updateMemo() { const txt = document.getElementById('memo-pad').value; document.getElementById('md-preview').innerHTML = marked.parse(txt); appData.memo = txt; saveData(); }
-        function copyMemo() { navigator.clipboard.writeText(appData.memo); alert('Copied!'); }
-        function downloadMemo() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([appData.memo], {type:'text/markdown'})); a.download = 'memo.md'; a.click(); }
-
-        // Pomodoro
-        function startPomo(min) {
-            stopPomo();
-            let s = min * 60;
-            const d = document.getElementById('pm-disp');
-            pInterval = setInterval(() => {
-                s--;
-                d.innerText = `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`;
-                if(s<=0) {
-                    stopPomo();
-                    new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg').play();
-                    alert('Time Up!');
-                    appData.pomoLogs.push({date: new Date().toISOString().slice(0,10), min: min});
-                    saveData();
-                    initDashboard();
-                }
-            }, 1000);
-        }
-        function stopPomo() { if(pInterval) clearInterval(pInterval); }
-
-        // Zen Generator (Improved)
-        function toggleZen() {
-            const btn = document.getElementById('zen-btn');
-            if(audioCtx) {
-                audioCtx.close(); audioCtx = null;
-                btn.innerText = '再生開始';
-                btn.style.background = 'var(--primary)';
-                return;
-            }
-            try {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const type = document.getElementById('zen-type').value;
-                const bufferSize = 4096;
-                
-                noiseNode = audioCtx.createScriptProcessor(bufferSize, 1, 1);
-                
-                // Noise Generation Logic
-                noiseNode.onaudioprocess = function(e) {
-                    const output = e.outputBuffer.getChannelData(0);
-                    for (let i = 0; i < bufferSize; i++) {
-                        const white = Math.random() * 2 - 1;
-                        if(type === 'white') {
-                            output[i] = white;
-                        } else if(type === 'pink') {
-                            // Pink noise approximation
-                            let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0; 
-                            // (Resetting variables inside loop is wrong for stateful filter, simplify for this demo)
-                            // Using simple 1/f filter logic usually requires state outside loop.
-                            // Falling back to simple brown-like for demo stability or white.
-                            // Re-implementing simplified stateful:
-                            if(!this.b0) { this.b0=0;this.b1=0;this.b2=0; }
-                            this.b0 = 0.99886 * this.b0 + white * 0.0555179;
-                            this.b1 = 0.99332 * this.b1 + white * 0.0750759;
-                            this.b2 = 0.96900 * this.b2 + white * 0.1538520;
-                            output[i] = (this.b0 + this.b1 + this.b2) * 0.1; 
-                        } else { // Brown
-                            if(!this.lastOut) this.lastOut = 0;
-                            this.lastOut = (this.lastOut + (0.02 * white)) / 1.02;
-                            output[i] = this.lastOut * 3.5; 
-                        }
-                    }
-                };
-
-                gainNode = audioCtx.createGain();
-                gainNode.gain.value = document.getElementById('zen-vol').value;
-                
-                noiseNode.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-                
-                btn.innerText = '停止';
-                btn.style.background = 'var(--danger)';
-            } catch(e) { alert('Audio Error'); }
-        }
-
-        // Calculator
-        let cExp = '';
-        function setupCalcKeys() {
-            document.onkeydown = (e) => {
-                if(!activeTool || activeTool.id !== 'calc') return; // Only if calc is open
-                const k = e.key;
-                if((k>='0'&&k<='9')||['+','-','*','/','.','(',')','%'].includes(k)) { e.preventDefault(); cIn(k); }
-                else if(k==='Enter') { e.preventDefault(); cIn('='); }
-                else if(k==='Backspace') { e.preventDefault(); cIn('Del'); }
-                else if(k==='Escape') { e.preventDefault(); cIn('C'); }
-            }
-        }
-        function cIn(v) {
-            const d = document.getElementById('c-disp');
-            const h = document.getElementById('c-hist');
-            if(v==='C') { cExp = ''; h.innerText = ''; }
-            else if(v==='Del') cExp = cExp.slice(0,-1);
-            else if(v==='=') { 
-                try { 
-                    const res = new Function('return ' + cExp.replace(/Math\./g, 'Math.').replace(/\^/g, '**'))(); 
-                    h.innerText = cExp + ' =';
-                    cExp = String(res); 
-                } catch { cExp = 'Error'; } 
-            }
-            else cExp += v;
-            d.innerText = cExp || '0';
-        }
-
-        // Warikan
-        function calcWarikan() {
-            const total = parseInt(document.getElementById('w-total').value);
-            const num = parseInt(document.getElementById('w-num').value);
-            const unit = parseInt(document.getElementById('w-unit').value);
-            const isBoss = document.getElementById('w-boss-check').checked;
-            const bossPay = isBoss ? parseInt(document.getElementById('w-boss-pay').value) : 0;
-            
-            if(!total || !num) { alert('金額と人数を入力してください'); return; }
-            
-            const resDiv = document.getElementById('w-result');
-            resDiv.style.display = 'block';
-            let restTotal = total;
-            let regularNum = num;
-            let msg = '';
-            
-            if(isBoss) {
-                if(!bossPay) { alert('多めに払う金額を入力してください'); return; }
-                restTotal -= bossPay;
-                regularNum -= 1;
-                msg += `<div>👑 <strong>多めに払う人 (1名):</strong> ${bossPay.toLocaleString()}円</div>`;
-            }
-            
-            if(regularNum > 0) {
-                if(restTotal < 0) {
-                    msg += `<div style="color:var(--danger)">⚠️ 支払い額が合計を超えています</div>`;
-                } else {
-                    const perPersonRaw = restTotal / regularNum;
-                    const perPerson = Math.ceil(perPersonRaw / unit) * unit;
-                    const payTotal = (isBoss ? bossPay : 0) + (perPerson * regularNum);
-                    const pool = payTotal - total;
+            // Recorder
+            async startRecord(type) {
+                try {
+                    const stream = type === 'screen' 
+                        ? await navigator.mediaDevices.getDisplayMedia({video:true, audio:true})
+                        : await navigator.mediaDevices.getUserMedia({audio:true});
                     
-                    msg += `<div>👤 <strong>一人あたり (${regularNum}名):</strong> ${perPerson.toLocaleString()}円</div>`;
-                    msg += `<hr style="margin:10px 0; border:0; border-top:1px dashed #ccc;">`;
-                    msg += `<div>💰 <strong>集金総額:</strong> ${payTotal.toLocaleString()}円</div>`;
-                    msg += `<div>🎁 <strong>余り (プール金):</strong> ${pool.toLocaleString()}円</div>`;
-                }
-            }
-            resDiv.innerHTML = msg;
-        }
-
-        // Recorder
-        async function startRecord(type) {
-            try {
-                const stream = type === 'screen' 
-                    ? await navigator.mediaDevices.getDisplayMedia({video:true, audio:true})
-                    : await navigator.mediaDevices.getUserMedia({audio:true});
-                
-                mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
-                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-                mediaRecorder.onstop = () => {
-                    const blob = new Blob(audioChunks, {type: type==='screen'?'video/webm':'audio/webm'});
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a'); a.href = url; a.download = `rec_${Date.now()}.webm`; a.click();
+                    App.state.mediaRecorder = new MediaRecorder(stream);
+                    let chunks = [];
+                    App.state.mediaRecorder.ondataavailable = e => chunks.push(e.data);
+                    App.state.mediaRecorder.onstop = () => {
+                        const blob = new Blob(chunks, {type: type==='screen'?'video/webm':'audio/webm'});
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `rec_${Date.now()}.webm`;
+                        a.click();
+                        this.stopRecUI();
+                        stream.getTracks().forEach(t=>t.stop());
+                    };
+                    App.state.mediaRecorder.start();
                     
-                    document.getElementById('rec-status').style.display = 'none';
-                    clearInterval(recInterval);
-                    document.getElementById('rec-timer').innerText = "00:00";
-                    stream.getTracks().forEach(t => t.stop());
-                };
-                mediaRecorder.start();
-                document.getElementById('rec-status').style.display = 'block';
+                    document.getElementById('rec-controls').style.display = 'none';
+                    document.getElementById('rec-active').style.display = 'block';
+                    
+                    let start = Date.now();
+                    App.state.intervals.rec = setInterval(() => {
+                        let d = Math.floor((Date.now()-start)/1000);
+                        document.getElementById('rec-timer').innerText = 
+                            `${Math.floor(d/60).toString().padStart(2,'0')}:${(d%60).toString().padStart(2,'0')}`;
+                    }, 1000);
+                    
+                } catch(e) { alert('Permission Denied or Not Supported'); }
+            },
+            stopRecord() { if(App.state.mediaRecorder) App.state.mediaRecorder.stop(); },
+            stopRecUI() {
+                document.getElementById('rec-controls').style.display = 'block';
+                document.getElementById('rec-active').style.display = 'none';
+                clearInterval(App.state.intervals.rec);
+                document.getElementById('rec-timer').innerText = '00:00';
+            },
+
+            // QR
+            genQR() {
+                const t = document.getElementById('qr-text').value;
+                const o = document.getElementById('qr-out');
+                o.innerHTML = '';
+                if(t) new QRCode(o, {text:t, width:128, height:128});
+            },
+
+            // AI
+            async sendAi() {
+                if(!App.data.apiKey) { alert('API Keyを設定してください'); return; }
+                const inp = document.getElementById('ai-in');
+                const msg = inp.value; if(!msg) return;
+                const log = document.getElementById('ai-log');
                 
-                // Timer
-                let start = Date.now();
-                recInterval = setInterval(() => {
-                    let diff = Math.floor((Date.now() - start) / 1000);
-                    let m = Math.floor(diff/60).toString().padStart(2,'0');
-                    let s = (diff%60).toString().padStart(2,'0');
-                    document.getElementById('rec-timer').innerText = `${m}:${s}`;
-                }, 1000);
-
-            } catch(e) { alert('権限が必要です: ' + e.message); }
-        }
-        function stopRecord() { 
-            if(mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop(); 
-        }
-
-        // AI Chat
-        function saveApiKey(k) { appData.apiKey = k; saveData(); }
-        async function sendAi() {
-            const inp = document.getElementById('ai-in');
-            const msg = inp.value;
-            if(!msg) return;
-            const log = document.getElementById('ai-log');
-            log.innerHTML += `<div class="chat-msg user">${msg}</div>`;
-            inp.value = '';
-            log.scrollTop = log.scrollHeight;
-
-            if(!appData.apiKey) {
-                log.innerHTML += `<div class="chat-msg ai">API Keyを設定してください。</div>`;
-                return;
-            }
-
-            try {
-                log.innerHTML += `<div class="chat-msg ai" id="ai-loading">...</div>`;
-                const res = await fetch('https://api.openai.com/v1/chat/completions', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${appData.apiKey}` },
-                    body: JSON.stringify({ model: "gpt-3.5-turbo", messages: [{role: "user", content: msg}] })
-                });
-                const data = await res.json();
-                document.getElementById('ai-loading').remove();
-                if(data.error) throw new Error(data.error.message);
-                const reply = data.choices?.[0]?.message?.content || 'Error';
-                log.innerHTML += `<div class="chat-msg ai">${marked.parse(reply)}</div>`;
+                log.innerHTML += `<div style="align-self:flex-end; background:var(--primary); color:white; padding:8px 12px; border-radius:12px 12px 0 12px; max-width:80%; font-size:13px;">${App.escapeHtml(msg)}</div>`;
+                inp.value = '';
                 log.scrollTop = log.scrollHeight;
-            } catch(e) {
-                const l = document.getElementById('ai-loading');
-                if(l) l.remove();
-                log.innerHTML += `<div class="chat-msg ai" style="color:var(--danger)">Error: ${e.message}</div>`;
+
+                try {
+                    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+                        method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${App.data.apiKey}`},
+                        body: JSON.stringify({model:"gpt-3.5-turbo", messages:[{role:"user", content:msg}]})
+                    });
+                    const d = await res.json();
+                    if(d.error) throw new Error(d.error.message);
+                    const reply = d.choices[0].message.content;
+                    log.innerHTML += `<div style="align-self:flex-start; background:rgba(128,128,128,0.1); color:var(--text-main); padding:8px 12px; border-radius:12px 12px 12px 0; max-width:80%; font-size:13px;">${marked.parse(reply)}</div>`;
+                } catch(e) {
+                    log.innerHTML += `<div style="color:var(--danger); font-size:11px;">Error: ${e.message}</div>`;
+                }
+                log.scrollTop = log.scrollHeight;
             }
-        }
+        };
 
-        // Utils (Clip, Units, Image, etc)
-        function addClip() { const v=document.getElementById('cl-in').value; if(!v)return; appData.clips.push(v); saveData(); document.getElementById('cl-in').value=''; renderClips(); }
-        function renderClips() { 
-            document.getElementById('cl-list').innerHTML = appData.clips.map((c,i)=>`<div class="todo-item" onclick="navigator.clipboard.writeText('${c.replace(/'/g,"\\'")}');alert('Copied!')" style="cursor:pointer;"><div style="flex:1;">${c}</div><i class="fas fa-trash" style="color:var(--danger);" onclick="event.stopPropagation();appData.clips.splice(${i},1);saveData();renderClips();"></i></div>`).join('');
-        }
-        
-        const units = { len: { m:1, cm:100, mm:1000, km:0.001, inch:39.37, ft:3.28 }, wgt: { kg:1, g:1000, lb:2.204 }, tmp: { C:'C', F:'F' }, area: { m2:1, tsubo:0.3025 }, spd: { kmh:1, ms:0.277 } };
-        function updateUnitType() {
-            const t = document.getElementById('u-cat').value; const ks = Object.keys(units[t]);
-            const mkOpt = (k) => `<option value="${k}">${k}</option>`;
-            document.getElementById('u-from').innerHTML = ks.map(mkOpt).join(''); document.getElementById('u-to').innerHTML = ks.map(mkOpt).join('');
-        }
-        function convertUnitPro() {
-            const t = document.getElementById('u-cat').value; const v = parseFloat(document.getElementById('u-val').value);
-            const f = document.getElementById('u-from').value; const to = document.getElementById('u-to').value;
-            if(isNaN(v)) return;
-            let res = 0;
-            if(t === 'tmp') { if(f==='C' && to==='F') res = v*1.8+32; else if(f==='F' && to==='C') res = (v-32)/1.8; else res = v; }
-            else { res = (v / units[t][f]) * units[t][to]; }
-            alert(`${v}${f} = ${res.toFixed(4)}${to}`);
-        }
-
-        function initCropper(input) {
-            if(cropper) { cropper.destroy(); cropper=null; }
-            if(!input.files[0]) return;
-            const img = document.getElementById('cropper-img');
-            const reader = new FileReader();
-            reader.onload = (e) => { img.src = e.target.result; document.getElementById('crop-container').style.display='flex'; document.getElementById('editor-controls').style.display='block'; cropper = new Cropper(img, { viewMode: 1 }); };
-            reader.readAsDataURL(input.files[0]);
-        }
-        function exportCroppedImage() { if(!cropper) return; cropper.getCroppedCanvas().toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'edited.png'; a.click(); }); }
-        
-        function countChar() { const t = document.getElementById('txt-c').value; document.getElementById('txt-res').innerText = `${t.length}字`; }
-        function testRegex() {
-            const p = document.getElementById('reg-pat').value; const t = document.getElementById('reg-txt').value; const r = document.getElementById('reg-res');
-            if(!p || !t) { r.innerText=''; return; }
-            try { const parts = p.match(/^\/(.*?)\/([gimsuy]*)$/); const re = parts ? new RegExp(parts[1], parts[2]) : new RegExp(p); const m = t.match(re); r.innerText = m ? `Match:\n${JSON.stringify(m,null,2)}` : 'No Match'; } catch(e) { r.innerText = 'Invalid'; }
-        }
+        // Boot
+        window.onload = () => App.init();
     </script>
 </body>
 </html>

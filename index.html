@@ -3,278 +3,412 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>便利ツールBOX</title>
+    <title>Ultimate Tools | 高機能ツール集</title>
     <style>
         :root {
-            --primary-color: #2563eb;
-            --bg-color: #f3f4f6;
-            --sidebar-width: 250px;
+            --primary: #3b82f6;
+            --secondary: #1e40af;
+            --bg: #f8fafc;
+            --text: #1e293b;
+            --sidebar-w: 260px;
         }
+        * { box-sizing: border-box; }
         body {
-            font-family: "Helvetica Neue", Arial, sans-serif;
-            margin: 0;
-            display: flex;
-            height: 100vh;
-            background-color: var(--bg-color);
-            color: #333;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0; display: flex; height: 100vh; background: var(--bg); color: var(--text);
         }
-
-        /* サイドバー（メニュー） */
+        
+        /* サイドバー */
         .sidebar {
-            width: var(--sidebar-width);
-            background-color: #1f2937;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            padding: 20px 0;
-            flex-shrink: 0;
+            width: var(--sidebar-w); background: #0f172a; color: #fff; display: flex; flex-direction: column;
+            padding: 20px 0; flex-shrink: 0; box-shadow: 2px 0 10px rgba(0,0,0,0.2);
         }
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 30px;
-            color: #60a5fa;
+        .logo { font-size: 20px; font-weight: bold; text-align: center; margin-bottom: 30px; letter-spacing: 1px; color: #60a5fa; }
+        .nav-item {
+            padding: 15px 25px; cursor: pointer; transition: 0.2s; color: #94a3b8; font-size: 15px; display: flex; align-items: center; gap: 10px;
         }
-        .menu-btn {
-            background: none;
-            border: none;
-            color: #d1d5db;
-            padding: 15px 25px;
-            text-align: left;
-            cursor: pointer;
-            font-size: 16px;
-            transition: 0.2s;
-        }
-        .menu-btn:hover, .menu-btn.active {
-            background-color: #374151;
-            color: white;
-            border-left: 4px solid var(--primary-color);
-        }
-
-        /* メインコンテンツ */
-        .main-content {
-            flex-grow: 1;
-            padding: 40px;
-            overflow-y: auto;
-        }
-        .tool-section {
-            display: none; /* デフォルトは非表示 */
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .tool-section.active {
-            display: block; /* 選択されたら表示 */
-            animation: fadeIn 0.3s ease;
-        }
-        h2 { border-bottom: 2px solid #f3f4f6; padding-bottom: 10px; margin-top: 0; }
+        .nav-item:hover, .nav-item.active { background: #1e293b; color: #fff; border-left: 4px solid var(--primary); }
         
-        /* 各ツールの汎用スタイル */
-        textarea, input, select {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-sizing: border-box;
-            font-size: 16px;
-        }
-        .result-box {
-            background-color: #eef2ff;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 15px;
-            font-weight: bold;
-            color: #1e3a8a;
-        }
-        button.action-btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button.action-btn:hover { opacity: 0.9; }
-
-        /* 電卓専用スタイル */
-        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .calc-btn {
-            padding: 15px; background: #f3f4f6; border: none; border-radius: 5px; font-size: 18px; cursor: pointer;
-        }
-        .calc-btn.operator { background: #dbeafe; color: var(--primary-color); }
-        .calc-btn.equal { background: var(--primary-color); color: white; grid-column: span 2; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* メインエリア */
+        .main { flex: 1; padding: 40px; overflow-y: auto; }
+        .tool-box { display: none; animation: fadeUp 0.4s ease; max-width: 900px; margin: 0 auto; }
+        .tool-box.active { display: block; }
         
-        /* スマホ対応 */
-        @media (max-width: 600px) {
+        /* コンポーネント共通 */
+        h2 { border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0; color: var(--secondary); }
+        .card { background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 20px; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; color: #64748b; }
+        input, textarea, select {
+            width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 16px; transition: 0.2s;
+        }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        button.btn {
+            background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;
+        }
+        button.btn:hover { background: var(--secondary); }
+        button.btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
+        button.btn-outline:hover { background: #eff6ff; }
+
+        /* --- 1. 文字数カウンター拡張 --- */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
+        .stat-card { background: #f1f5f9; padding: 15px; border-radius: 8px; text-align: center; }
+        .stat-val { font-size: 24px; font-weight: bold; color: var(--primary); display: block; }
+        .stat-label { font-size: 12px; color: #64748b; }
+
+        /* --- 2. 関数電卓 --- */
+        .calc-wrapper { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        .display-area { text-align: right; background: #1e293b; color: #fff; padding: 20px; border-radius: 8px; margin-bottom: 15px; font-family: monospace; }
+        #calc-history { font-size: 14px; color: #94a3b8; min-height: 20px; }
+        #calc-main { font-size: 32px; font-weight: bold; }
+        .keys-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+        .key {
+            padding: 15px; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; background: #f1f5f9; transition: 0.1s;
+        }
+        .key:active { transform: scale(0.95); }
+        .key.fn { background: #e2e8f0; color: #334155; font-size: 14px; }
+        .key.op { background: #dbeafe; color: #2563eb; }
+        .key.eq { background: var(--primary); color: white; grid-column: span 2; }
+        .key.ac { background: #ef4444; color: white; }
+        .history-list { background: #f8fafc; padding: 15px; border-radius: 8px; height: 400px; overflow-y: auto; border: 1px solid #e2e8f0; }
+        .hist-item { padding: 8px; border-bottom: 1px solid #e2e8f0; font-size: 14px; cursor: pointer; }
+        .hist-item:hover { background: #e2e8f0; }
+
+        /* --- 3. 単位変換（マルチ） --- */
+        .unit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
+        .unit-card { background: #eff6ff; padding: 15px; border-radius: 8px; display: flex; flex-direction: column; }
+        .unit-card strong { font-size: 12px; color: #64748b; margin-bottom: 5px; }
+        .unit-card input { background: transparent; border: none; border-bottom: 1px solid #bfdbfe; border-radius: 0; font-weight: bold; color: #1e40af; }
+
+        /* --- 4. 漢字詳細 --- */
+        .kanji-detail { display: flex; gap: 30px; flex-wrap: wrap; }
+        .kanji-big { 
+            font-size: 120px; line-height: 1; border: 2px solid #e2e8f0; width: 150px; height: 150px; 
+            display: flex; align-items: center; justify-content: center; border-radius: 12px;
+        }
+        .kanji-info table { width: 100%; border-collapse: collapse; }
+        .kanji-info th { text-align: left; color: #64748b; padding: 5px 15px 5px 0; width: 80px; }
+        .kanji-info td { padding: 5px 0; }
+        .tags { display: flex; gap: 5px; margin-top: 10px; }
+        .tag { font-size: 11px; padding: 3px 8px; border-radius: 10px; background: #e2e8f0; color: #475569; }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        @media (max-width: 768px) {
             body { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; padding: 10px 0; flex-direction: row; overflow-x: auto; }
-            .menu-btn { padding: 10px; white-space: nowrap; border-left: none; border-bottom: 4px solid transparent; }
-            .menu-btn:hover, .menu-btn.active { border-bottom: 4px solid var(--primary-color); border-left: none; }
-            .main-content { padding: 20px; }
+            .sidebar { width: 100%; height: auto; flex-direction: row; overflow-x: auto; padding: 10px; }
+            .nav-item { white-space: nowrap; border-left: none; border-bottom: 3px solid transparent; padding: 10px 15px; }
+            .nav-item.active { border-left: none; border-bottom-color: var(--primary); }
+            .calc-wrapper { grid-template-columns: 1fr; }
+            .history-list { height: 150px; margin-top: 10px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
-        <div class="logo">便利ツールBOX</div>
-        <button class="menu-btn active" onclick="showTool('char-count')">文字数カウント</button>
-        <button class="menu-btn" onclick="showTool('calculator')">電卓</button>
-        <button class="menu-btn" onclick="showTool('unit-conv')">単位変換</button>
-        <button class="menu-btn" onclick="showTool('kanji-search')">漢字検索</button>
-    </div>
+    <nav class="sidebar">
+        <div class="logo">TOOL HUB PRO</div>
+        <div class="nav-item active" onclick="switchTab('text')">📝 高機能テキスト解析</div>
+        <div class="nav-item" onclick="switchTab('calc')">🧮 関数電卓</div>
+        <div class="nav-item" onclick="switchTab('unit')">⚖️ 万能単位変換</div>
+        <div class="nav-item" onclick="switchTab('kanji')">dictionary 漢字辞典</div>
+    </nav>
 
-    <div class="main-content">
+    <main class="main">
         
-        <div id="char-count" class="tool-section active">
-            <h2>📝 文字数カウント</h2>
-            <p>テキストを入力するとリアルタイムでカウントします。</p>
-            <textarea id="textInput" rows="10" placeholder="ここに文章を入力してください..."></textarea>
-            <div class="result-box">
-                文字数: <span id="countResult">0</span> 文字 (空白除く: <span id="countResultNoSpace">0</span>)
-                <br>行数: <span id="lineCount">0</span> 行
-            </div>
-        </div>
-
-        <div id="calculator" class="tool-section">
-            <h2>🧮 電卓</h2>
-            <input type="text" id="calcDisplay" readonly style="text-align: right; font-size: 24px;">
-            <div class="calc-grid">
-                <button class="calc-btn" onclick="appendCalc('7')">7</button>
-                <button class="calc-btn" onclick="appendCalc('8')">8</button>
-                <button class="calc-btn" onclick="appendCalc('9')">9</button>
-                <button class="calc-btn operator" onclick="appendCalc('/')">÷</button>
-                <button class="calc-btn" onclick="appendCalc('4')">4</button>
-                <button class="calc-btn" onclick="appendCalc('5')">5</button>
-                <button class="calc-btn" onclick="appendCalc('6')">6</button>
-                <button class="calc-btn operator" onclick="appendCalc('*')">×</button>
-                <button class="calc-btn" onclick="appendCalc('1')">1</button>
-                <button class="calc-btn" onclick="appendCalc('2')">2</button>
-                <button class="calc-btn" onclick="appendCalc('3')">3</button>
-                <button class="calc-btn operator" onclick="appendCalc('-')">-</button>
-                <button class="calc-btn" onclick="appendCalc('0')">0</button>
-                <button class="calc-btn" onclick="appendCalc('.')">.</button>
-                <button class="calc-btn" onclick="clearCalc()">C</button>
-                <button class="calc-btn operator" onclick="appendCalc('+')">+</button>
-                <button class="calc-btn equal" onclick="calculate()">=</button>
-            </div>
-        </div>
-
-        <div id="unit-conv" class="tool-section">
-            <h2>📏 単位変換 (長さ)</h2>
-            <div style="display: flex; gap: 10px; align-items: center;">
-                <input type="number" id="unitInput" placeholder="数値を入力" oninput="convertUnit()">
-                <select id="unitFrom" onchange="convertUnit()">
-                    <option value="1000">km</option>
-                    <option value="1" selected>m</option>
-                    <option value="0.01">cm</option>
-                    <option value="0.001">mm</option>
-                </select>
-                <span>→</span>
-                <select id="unitTo" onchange="convertUnit()">
-                    <option value="1000">km</option>
-                    <option value="1">m</option>
-                    <option value="0.01" selected>cm</option>
-                    <option value="0.001">mm</option>
-                </select>
-            </div>
-            <div class="result-box" id="unitResult">結果: ---</div>
-        </div>
-
-        <div id="kanji-search" class="tool-section">
-            <h2>dictionary 漢字検索</h2>
-            <p>漢字一文字を入力してください (例: 旅)</p>
-            <input type="text" id="kanjiInput" maxlength="1" placeholder="漢字を入力">
-            <button class="action-btn" onclick="searchKanji()">検索</button>
-            <div class="result-box" id="kanjiResult" style="display: none;">
+        <div id="text" class="tool-box active">
+            <div class="card">
+                <h2>📝 テキスト解析</h2>
+                <textarea id="txtInput" rows="8" placeholder="ここに文章を入力してください..." oninput="analyzeText()"></textarea>
+                <div class="stats-grid">
+                    <div class="stat-card"><span class="stat-label">全文字数</span><span id="c_total" class="stat-val">0</span></div>
+                    <div class="stat-card"><span class="stat-label">空白除外</span><span id="c_nospace" class="stat-val">0</span></div>
+                    <div class="stat-card"><span class="stat-label">行数</span><span id="c_lines" class="stat-val">0</span></div>
+                    <div class="stat-card"><span class="stat-label">段落数</span><span id="c_para" class="stat-val">0</span></div>
+                    <div class="stat-card"><span class="stat-label">原稿用紙 (400字)</span><span id="c_paper" class="stat-val">0枚</span></div>
+                    <div class="stat-card"><span class="stat-label">読了時間 (目安)</span><span id="c_time" class="stat-val">0秒</span></div>
+                    <div class="stat-card"><span class="stat-label">サイズ (UTF-8)</span><span id="c_byte" class="stat-val">0 B</span></div>
                 </div>
+            </div>
         </div>
 
-    </div>
+        <div id="calc" class="tool-box">
+            <div class="card calc-wrapper">
+                <div>
+                    <h2>🧮 関数電卓</h2>
+                    <div class="display-area">
+                        <div id="calc-history"></div>
+                        <div id="calc-main">0</div>
+                    </div>
+                    <div class="keys-grid">
+                        <button class="key fn" onclick="inputFn('Math.sin(')">sin</button>
+                        <button class="key fn" onclick="inputFn('Math.cos(')">cos</button>
+                        <button class="key fn" onclick="inputFn('Math.tan(')">tan</button>
+                        <button class="key fn" onclick="inputFn('Math.PI')">π</button>
+                        <button class="key ac" onclick="clearAll()">AC</button>
+                        
+                        <button class="key fn" onclick="inputFn('Math.sqrt(')">√</button>
+                        <button class="key fn" onclick="inputFn('(')">(</button>
+                        <button class="key fn" onclick="inputFn(')')">)</button>
+                        <button class="key fn" onclick="inputFn('**')">^</button>
+                        <button class="key op" onclick="inputFn('/')">÷</button>
+                        
+                        <button class="key" onclick="inputNum('7')">7</button>
+                        <button class="key" onclick="inputNum('8')">8</button>
+                        <button class="key" onclick="inputNum('9')">9</button>
+                        <button class="key" onclick="backspace()">BS</button>
+                        <button class="key op" onclick="inputFn('*')">×</button>
+
+                        <button class="key" onclick="inputNum('4')">4</button>
+                        <button class="key" onclick="inputNum('5')">5</button>
+                        <button class="key" onclick="inputNum('6')">6</button>
+                        <button class="key op" onclick="inputFn('-')">-</button>
+                        <button class="key" onclick="inputNum('1')">1</button> <button class="key" onclick="inputNum('1')">1</button> 
+                        <button class="key" onclick="inputNum('2')">2</button>
+                        <button class="key" onclick="inputNum('3')">3</button>
+                        <button class="key op" onclick="inputFn('+')">+</button>
+                        <button class="key" style="visibility:hidden"> </button> <button class="key" onclick="inputNum('0')">0</button>
+                        <button class="key" onclick="inputNum('.')">.</button>
+                        <button class="key eq" onclick="calcResult()">=</button>
+                    </div>
+                </div>
+                <div>
+                    <h3>履歴</h3>
+                    <div class="history-list" id="histList">
+                        <div style="padding:10px; color:#ccc; text-align:center">履歴なし</div>
+                    </div>
+                    <button class="btn-outline" style="width:100%; margin-top:10px;" onclick="clearHistory()">履歴削除</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="unit" class="tool-box">
+            <div class="card">
+                <h2>⚖️ 万能単位変換</h2>
+                <div class="input-group">
+                    <label>カテゴリー選択</label>
+                    <select id="unit-category" onchange="renderUnitInputs()">
+                        <option value="length">長さ (Length)</option>
+                        <option value="weight">重さ (Weight)</option>
+                        <option value="data">データ (Data)</option>
+                        <option value="temp">温度 (Temperature)</option>
+                        <option value="time">時間 (Time)</option>
+                    </select>
+                </div>
+                <div id="unit-inputs" class="unit-grid">
+                    </div>
+            </div>
+        </div>
+
+        <div id="kanji" class="tool-box">
+            <div class="card">
+                <h2>dictionary 漢字辞典</h2>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="kInput" placeholder="漢字一文字 (例: 夢)" maxlength="1" style="font-size:20px;">
+                    <button class="btn" onclick="fetchKanji()">検索</button>
+                </div>
+                
+                <div id="kResult" style="display:none; margin-top:30px;">
+                    <div class="kanji-detail">
+                        <div class="kanji-big" id="kChar">?</div>
+                        <div class="kanji-info" style="flex:1;">
+                            <div class="tags" id="kTags"></div>
+                            <h3 id="kMeanings" style="margin:10px 0;">意味...</h3>
+                            <table>
+                                <tr><th>音読み</th><td id="kOn"></td></tr>
+                                <tr><th>訓読み</th><td id="kKun"></td></tr>
+                                <tr><th>画数</th><td id="kStroke"></td></tr>
+                                <tr><th>JLPT</th><td id="kJlpt"></td></tr>
+                            </table>
+                            <div style="margin-top:15px;">
+                                <a id="kLink" href="#" target="_blank" class="btn-outline" style="text-decoration:none; padding:5px 10px; font-size:12px;">Weblioで詳しく見る</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
 
     <script>
-        // --- タブ切り替え機能 ---
-        function showTool(toolId) {
-            // すべてのツールを非表示
-            document.querySelectorAll('.tool-section').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.menu-btn').forEach(el => el.classList.remove('active'));
-            
-            // 指定されたツールを表示
-            document.getElementById(toolId).classList.add('active');
-            // ボタンのアクティブ化（簡易的な実装）
-            event.target.classList.add('active');
+        // --- 画面切り替え ---
+        function switchTab(id) {
+            document.querySelectorAll('.tool-box').forEach(el => el.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
         }
 
-        // --- 1. 文字数カウント機能 ---
-        document.getElementById('textInput').addEventListener('input', function(e) {
-            const text = e.target.value;
-            document.getElementById('countResult').textContent = text.length;
-            document.getElementById('countResultNoSpace').textContent = text.replace(/\s+/g, '').length;
-            document.getElementById('lineCount').textContent = text.split('\n').length;
-        });
+        // --- 1. テキスト解析機能 ---
+        function analyzeText() {
+            const txt = document.getElementById('txtInput').value;
+            // 基本
+            document.getElementById('c_total').innerText = txt.length;
+            document.getElementById('c_nospace').innerText = txt.replace(/\s+/g, '').length;
+            // 行数（空行も含む）
+            document.getElementById('c_lines').innerText = txt ? txt.split('\n').length : 0;
+            // 段落（空行で区切る）
+            const paragraphs = txt.split(/\n\s*\n/).filter(p => p.trim().length > 0);
+            document.getElementById('c_para').innerText = paragraphs.length;
+            // 原稿用紙 (簡易計算: 空白も1文字とみなす)
+            document.getElementById('c_paper').innerText = Math.ceil(txt.length / 400) + "枚";
+            // 読了時間 (500文字/分)
+            const sec = Math.ceil(txt.length / 500 * 60);
+            document.getElementById('c_time').innerText = sec < 60 ? `${sec}秒` : `${Math.floor(sec/60)}分${sec%60}秒`;
+            // バイト数 (UTF-8目安)
+            const blob = new Blob([txt]);
+            document.getElementById('c_byte').innerText = blob.size + " B";
+        }
 
-        // --- 2. 電卓機能 ---
-        function appendCalc(val) { document.getElementById('calcDisplay').value += val; }
-        function clearCalc() { document.getElementById('calcDisplay').value = ''; }
-        function calculate() {
+        // --- 2. 関数電卓機能 ---
+        let calcExp = '';
+        const historyData = [];
+
+        function inputNum(v) { calcExp += v; updateDisp(); }
+        function inputFn(v) { calcExp += v; updateDisp(); }
+        function backspace() { calcExp = calcExp.slice(0, -1); updateDisp(); }
+        function clearAll() { calcExp = ''; document.getElementById('calc-history').innerText = ''; updateDisp(); }
+        
+        function updateDisp() {
+            document.getElementById('calc-main').innerText = calcExp || '0';
+        }
+
+        function calcResult() {
             try {
-                const result = eval(document.getElementById('calcDisplay').value);
-                document.getElementById('calcDisplay').value = result;
+                // セキュリティリスク軽減のため簡易チェック等は省略していますが、本来はFunction等を使うべき
+                // evalの代わりにnew Functionを使用
+                const res = new Function('return ' + calcExp)();
+                
+                // 履歴に追加
+                historyData.unshift({ exp: calcExp, res: res });
+                renderHistory();
+                
+                document.getElementById('calc-history').innerText = calcExp + ' =';
+                calcExp = String(res);
+                updateDisp();
             } catch (e) {
-                alert('計算式が正しくありません');
+                alert('計算式エラー');
             }
         }
 
-        // --- 3. 単位変換機能 ---
-        function convertUnit() {
-            const val = parseFloat(document.getElementById('unitInput').value);
-            const from = parseFloat(document.getElementById('unitFrom').value);
-            const to = parseFloat(document.getElementById('unitTo').value);
+        function renderHistory() {
+            const hList = document.getElementById('histList');
+            hList.innerHTML = '';
+            historyData.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'hist-item';
+                div.innerHTML = `<div>${item.exp}</div><div style="font-weight:bold; text-align:right;">= ${item.res}</div>`;
+                div.onclick = () => { calcExp = String(item.res); updateDisp(); };
+                hList.appendChild(div);
+            });
+        }
+        function clearHistory() { historyData.length = 0; renderHistory(); }
+
+        // --- 3. 万能単位変換機能 ---
+        const unitRates = {
+            length: { m: 1, km: 1000, cm: 0.01, mm: 0.001, inch: 0.0254, ft: 0.3048, yard: 0.9144 },
+            weight: { kg: 1, g: 0.001, mg: 0.000001, t: 1000, lb: 0.453592, oz: 0.0283495 },
+            data:   { MB: 1, KB: 1/1024, GB: 1024, TB: 1024*1024, B: 1/1048576 },
+            temp:   { C: 'base', F: 'func', K: 'func' }, // 特殊処理
+            time:   { min: 1, sec: 1/60, hour: 60, day: 1440, week: 10080 }
+        };
+
+        // 初期表示
+        window.onload = function() { renderUnitInputs(); };
+
+        function renderUnitInputs() {
+            const cat = document.getElementById('unit-category').value;
+            const container = document.getElementById('unit-inputs');
+            container.innerHTML = '';
             
+            const units = Object.keys(unitRates[cat]);
+            
+            units.forEach(u => {
+                const div = document.createElement('div');
+                div.className = 'unit-card';
+                div.innerHTML = `
+                    <strong>${u.toUpperCase()}</strong>
+                    <input type="number" data-unit="${u}" oninput="calcUnit(this)">
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function calcUnit(elm) {
+            const cat = document.getElementById('unit-category').value;
+            const val = parseFloat(elm.value);
+            const currentUnit = elm.getAttribute('data-unit');
+            const inputs = document.querySelectorAll('#unit-inputs input');
+
             if (isNaN(val)) {
-                document.getElementById('unitResult').textContent = "結果: ---";
+                inputs.forEach(i => { if(i !== elm) i.value = ''; });
                 return;
             }
-            
-            // メートルを基準に変換
-            const meterVal = val * from;
-            const result = meterVal / to;
-            document.getElementById('unitResult').textContent = `結果: ${result}`;
+
+            // 温度は計算式が違うため特別対応
+            if (cat === 'temp') {
+                let celsius;
+                // まず摂氏に変換
+                if (currentUnit === 'C') celsius = val;
+                else if (currentUnit === 'F') celsius = (val - 32) * 5/9;
+                else if (currentUnit === 'K') celsius = val - 273.15;
+
+                inputs.forEach(i => {
+                    if (i === elm) return;
+                    const u = i.getAttribute('data-unit');
+                    if (u === 'C') i.value = Math.round(celsius * 100) / 100;
+                    if (u === 'F') i.value = Math.round((celsius * 9/5 + 32) * 100) / 100;
+                    if (u === 'K') i.value = Math.round((celsius + 273.15) * 100) / 100;
+                });
+                return;
+            }
+
+            // それ以外は係数計算
+            const baseVal = val * unitRates[cat][currentUnit]; // 基準単位(値1のもの)に変換
+
+            inputs.forEach(i => {
+                if (i === elm) return;
+                const u = i.getAttribute('data-unit');
+                const rate = unitRates[cat][u];
+                // 浮動小数点誤差を丸める
+                let res = baseVal / rate;
+                // 桁数調整（最大6桁）
+                i.value = parseFloat(res.toPrecision(7)) / 1; 
+            });
         }
 
-        // --- 4. 漢字検索機能 (kanjiapi.dev APIを使用) ---
-        async function searchKanji() {
-            const char = document.getElementById('kanjiInput').value;
-            const resultBox = document.getElementById('kanjiResult');
-            
+        // --- 4. 漢字検索機能 (kanjiapi.dev) ---
+        async function fetchKanji() {
+            const char = document.getElementById('kInput').value;
             if (!char) return;
-
-            resultBox.style.display = 'block';
-            resultBox.textContent = "検索中...";
+            
+            const resArea = document.getElementById('kResult');
+            resArea.style.display = 'block';
+            document.getElementById('kChar').innerText = '...';
 
             try {
-                // 公開APIを使用
-                const response = await fetch(`https://kanjiapi.dev/v1/kanji/${char}`);
-                if (!response.ok) throw new Error("見つかりませんでした");
+                const res = await fetch(`https://kanjiapi.dev/v1/kanji/${char}`);
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+
+                document.getElementById('kChar').innerText = data.kanji;
+                document.getElementById('kMeanings').innerText = data.meanings.join(', ');
+                document.getElementById('kOn').innerText = data.on_readings.join(', ') || '-';
+                document.getElementById('kKun').innerText = data.kun_readings.join(', ') || '-';
+                document.getElementById('kStroke').innerText = data.stroke_count + '画';
+                document.getElementById('kJlpt').innerText = data.jlpt ? `N${data.jlpt}` : '-';
                 
-                const data = await response.json();
-                
-                resultBox.innerHTML = `
-                    <h3>${data.kanji} (画数: ${data.stroke_count})</h3>
-                    <p><strong>読み(音):</strong> ${data.on_readings.join(', ')}</p>
-                    <p><strong>読み(訓):</strong> ${data.kun_readings.join(', ')}</p>
-                    <p><strong>意味:</strong> ${data.meanings.join(', ')}</p>
-                `;
-            } catch (error) {
-                resultBox.textContent = "エラー: 漢字が見つからないか、通信エラーです。";
+                // タグ生成
+                const tags = document.getElementById('kTags');
+                tags.innerHTML = `<span class="tag">Grade: ${data.grade || '-'}</span> <span class="tag">Unicode: ${data.unicode}</span>`;
+
+                // 外部辞書リンク
+                document.getElementById('kLink').href = `https://www.weblio.jp/content/${char}`;
+
+            } catch (e) {
+                alert('見つかりませんでした');
+                resArea.style.display = 'none';
             }
         }
     </script>

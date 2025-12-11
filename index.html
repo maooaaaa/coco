@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LifeStation V7 | Zenith Workspace</title>
+    <title>LifeStation V8 | Reborn Workspace</title>
     
     <!-- Libraries -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -17,28 +17,28 @@
     <style>
         /* --- Core Variables --- */
         :root {
-            --primary: #6366f1;
-            --primary-glow: rgba(99, 102, 241, 0.4);
-            --accent: #ec4899;
+            --primary: #4f46e5;
+            --primary-glow: rgba(79, 70, 229, 0.4);
+            --accent: #06b6d4;
             --danger: #ef4444;
             --success: #10b981;
-            --bg-grad-1: #f3f4f6;
-            --bg-grad-2: #e0e7ff;
-            --glass-bg: rgba(255, 255, 255, 0.92);
+            --bg-grad-1: #f8fafc;
+            --bg-grad-2: #e2e8f0;
+            --glass-bg: rgba(255, 255, 255, 0.95);
             --glass-border: rgba(255, 255, 255, 0.8);
-            --text-main: #1e293b;
+            --text-main: #0f172a;
             --text-sub: #64748b;
-            --card-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
         }
 
         body.dark {
             --primary: #818cf8;
             --primary-glow: rgba(129, 140, 248, 0.3);
-            --accent: #f472b6;
+            --accent: #22d3ee;
             --bg-grad-1: #0f172a;
             --bg-grad-2: #1e1b4b;
-            --glass-bg: rgba(30, 41, 59, 0.92);
+            --glass-bg: rgba(30, 41, 59, 0.95);
             --glass-border: rgba(255, 255, 255, 0.08);
             --text-main: #f1f5f9;
             --text-sub: #94a3b8;
@@ -83,10 +83,11 @@
             gap: 15px;
             z-index: 20;
             border-right: 1px solid var(--glass-border);
+            transition: transform 0.3s ease;
         }
 
         .logo {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 800;
             color: var(--text-main);
             display: flex;
@@ -117,7 +118,7 @@
             gap: 12px;
             transition: 0.2s;
             font-weight: 600;
-            border-radius: 12px;
+            border-radius: 10px;
             font-size: 14px;
         }
         .menu-item:hover { background: rgba(128,128,128, 0.08); color: var(--primary); }
@@ -224,7 +225,7 @@
             font-weight: bold; font-size: 18px;
             background: rgba(var(--primary), 0.05);
         }
-        .modal-body { padding: 25px; overflow-y: auto; flex: 1; }
+        .modal-body { padding: 25px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; }
 
         /* UI Components */
         .btn {
@@ -236,7 +237,7 @@
         .btn:active { transform: scale(0.98); }
         .btn-sm { padding: 8px 15px; font-size: 13px; }
         .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
-        .btn-outline:hover { background: rgba(59, 130, 246, 0.1); }
+        .btn-outline:hover { background: rgba(var(--primary), 0.1); }
         .btn-group { display: flex; gap: 10px; }
 
         input, select, textarea {
@@ -255,14 +256,18 @@
             word-break: break-all;
         }
 
-        /* Tool Specific Styles */
+        /* Tool Specific: Calculator */
+        .calc-wrapper { display: flex; flex-direction: column; height: 100%; max-height: 500px; }
         .calc-grid { 
             display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; 
+            flex: 1; /* Fill remaining space */
         }
         .calc-btn { 
-            aspect-ratio: 1.3; font-size: 18px; border-radius: 12px; border:none; cursor:pointer; 
+            width: 100%; height: 100%; min-height: 50px;
+            font-size: 18px; border-radius: 12px; border:none; cursor:pointer; 
             transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-weight: 500;
             background: rgba(255,255,255,0.6); color: var(--text-main);
+            display: flex; align-items: center; justify-content: center;
         }
         body.dark .calc-btn { background: rgba(255,255,255,0.1); }
         .calc-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
@@ -273,44 +278,56 @@
         .calc-btn.eq { background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; grid-column: span 1; }
         .calc-btn.num { font-weight: bold; font-size: 20px; }
         
-        .calc-disp { 
-            grid-column: span 5; background: rgba(0,0,0,0.05); text-align: right; 
-            padding: 20px; font-size: 32px; border-radius: 12px; margin-bottom: 15px; 
-            font-family: monospace; overflow-x: auto; white-space: nowrap;
+        .calc-disp-container {
+            background: rgba(0,0,0,0.05); border-radius: 12px; padding: 10px; margin-bottom: 15px;
+            text-align: right;
         }
+        .calc-history { font-size: 12px; color: var(--text-sub); height: 20px; overflow: hidden; white-space: nowrap; margin-bottom: 5px; }
+        .calc-current { font-size: 32px; font-family: monospace; font-weight: bold; overflow-x: auto; white-space: nowrap; }
 
-        .img-editor-container { max-height: 500px; background: #333; overflow: hidden; display: flex; justify-content: center; align-items: center; border-radius: 8px; }
-        #cropper-img { max-width: 100%; max-height: 450px; }
+        /* Tool Specific: Image Editor */
+        .img-editor-container { width: 100%; height: 400px; background: #333; overflow: hidden; display: flex; justify-content: center; align-items: center; border-radius: 8px; margin-bottom: 15px; }
+        #cropper-img { max-width: 100%; max-height: 100%; display: block; }
 
-        .todo-item { display: flex; align-items: center; gap: 10px; padding: 10px; border-bottom: 1px solid var(--glass-border); background: rgba(255,255,255,0.05); border-radius: 8px; margin-bottom: 5px; }
-        .todo-check { cursor: pointer; color: var(--text-sub); font-size: 18px; }
+        /* Tool Specific: ToDo */
+        .todo-item { display: flex; align-items: center; gap: 10px; padding: 12px; border-bottom: 1px solid var(--glass-border); background: rgba(255,255,255,0.05); border-radius: 8px; margin-bottom: 8px; transition: 0.2s; }
+        .todo-item:hover { background: rgba(255,255,255,0.2); }
+        .todo-check { cursor: pointer; color: var(--text-sub); font-size: 20px; }
         .todo-check.done { color: var(--success); }
-        .todo-text { flex: 1; }
+        .todo-text { flex: 1; word-break: break-all; }
         .todo-text.done { text-decoration: line-through; opacity: 0.5; }
         
-        #md-preview { border: 1px solid var(--glass-border); padding: 15px; border-radius: 8px; background: rgba(255,255,255,0.2); min-height: 100px; margin-top: 10px; }
+        /* Tool Specific: Markdown */
+        #md-preview { border: 1px solid var(--glass-border); padding: 15px; border-radius: 8px; background: rgba(255,255,255,0.2); min-height: 100%; margin-top: 0; overflow-y: auto; }
+        #md-preview h1, #md-preview h2 { border-bottom: 1px solid rgba(128,128,128,0.3); padding-bottom: 5px; }
+        #md-preview blockquote { border-left: 4px solid var(--primary); padding-left: 10px; color: var(--text-sub); }
 
         /* Chat UI */
-        .chat-box { height: 300px; overflow-y: auto; border: 1px solid var(--glass-border); border-radius: 10px; padding: 15px; margin-bottom: 10px; background: rgba(0,0,0,0.05); }
-        .chat-msg { margin-bottom: 10px; padding: 10px; border-radius: 10px; max-width: 80%; }
-        .chat-msg.user { background: var(--primary); color: white; margin-left: auto; }
-        .chat-msg.ai { background: var(--glass-bg); color: var(--text-main); margin-right: auto; }
+        .chat-box { height: 300px; overflow-y: auto; border: 1px solid var(--glass-border); border-radius: 10px; padding: 15px; margin-bottom: 10px; background: rgba(0,0,0,0.02); }
+        .chat-msg { margin-bottom: 10px; padding: 10px 15px; border-radius: 12px; max-width: 85%; word-wrap: break-word; }
+        .chat-msg.user { background: var(--primary); color: white; margin-left: auto; border-bottom-right-radius: 2px; }
+        .chat-msg.ai { background: var(--glass-bg); color: var(--text-main); margin-right: auto; border-bottom-left-radius: 2px; border: 1px solid var(--glass-border); }
 
         /* Mobile Responsive */
         @media (max-width: 768px) {
             body { flex-direction: column; overflow: auto; }
-            .sidebar { width: 100%; height: auto; padding: 10px 20px; flex-direction: row; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--glass-border); border-right: none; position: sticky; top:0; background: var(--glass-bg); z-index: 100; }
-            .nav-menu { display: none; position: absolute; top: 60px; left: 0; right: 0; background: var(--glass-bg); padding: 20px; border-bottom: 1px solid var(--glass-border); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+            .sidebar { width: 100%; height: auto; padding: 10px 20px; flex-direction: row; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--glass-border); border-right: none; position: sticky; top:0; background: var(--glass-bg); z-index: 100; transform: none; }
+            .nav-menu { display: none; position: absolute; top: 60px; left: 0; right: 0; background: var(--glass-bg); padding: 20px; border-bottom: 1px solid var(--glass-border); box-shadow: 0 10px 20px rgba(0,0,0,0.1); max-height: 80vh; }
             .nav-menu.active { display: flex; }
             .header { padding: 15px 20px; }
             .search-container { width: 100%; }
             .content { padding: 20px; }
             #mobile-toggle { display: block; font-size: 20px; color: var(--text-main); }
+            
+            /* Mobile Modal Adjustment */
+            .modal-box { width: 100%; height: 100%; max-height: 100%; border-radius: 0; }
+            .modal-body { padding: 15px; }
+            
+            /* Mobile Calc */
             .calc-grid { grid-template-columns: repeat(4, 1fr); gap: 8px; }
-            .calc-btn { aspect-ratio: 1.1; font-size: 16px; }
-            .calc-btn.fn { font-size: 12px; }
-            .calc-disp { grid-column: span 4; font-size: 28px; padding: 15px; }
-            /* スマホで一部の高度な関数を隠すなどの調整も可だが今回は全表示 */
+            .calc-btn { min-height: 60px; font-size: 20px; }
+            .calc-btn.fn { display: none; } /* Hide complex functions on mobile default */
+            .calc-disp-container { margin-bottom: 10px; }
         }
         @media (min-width: 769px) { #mobile-toggle { display: none; } }
     </style>
@@ -322,12 +339,12 @@
         <div class="modal-box">
             <div class="modal-header">
                 <span id="tm-title"><i class="fas fa-tools"></i> Tool Name</span>
-                <span style="cursor:pointer; width:30px; height:30px; display:flex; align-items:center; justify-content:center; border-radius:50%; background:rgba(128,128,128,0.1);" onclick="closeModal()">×</span>
+                <span style="cursor:pointer; width:30px; height:30px; display:flex; align-items:center; justify-content:center; border-radius:50%; background:rgba(128,128,128,0.1); transition:0.2s;" onclick="closeModal()">×</span>
             </div>
             <div class="modal-body">
-                <p id="tm-desc" style="color:var(--text-sub); margin-bottom:20px; font-size:14px;"></p>
-                <div id="tm-ui"></div>
-                <div id="tm-result" class="result-area" style="display:none;"></div>
+                <p id="tm-desc" style="color:var(--text-sub); margin-bottom:15px; font-size:13px;"></p>
+                <div id="tm-ui" style="flex:1; display:flex; flex-direction:column; overflow-y:auto;"></div>
+                <div id="tm-result" class="result-area" style="display:none; margin-top:15px;"></div>
             </div>
         </div>
     </div>
@@ -337,7 +354,7 @@
         <div class="logo">
             <i class="fas fa-layer-group"></i> 
             <span>LifeStation</span>
-            <span class="version-badge">V7</span>
+            <span class="version-badge">V8</span>
             <i id="mobile-toggle" class="fas fa-bars" onclick="toggleMenu()" style="margin-left:auto;"></i>
         </div>
         
@@ -346,7 +363,7 @@
             <div class="menu-item" onclick="filter('fav')"><i class="fas fa-star" style="color:var(--accent)"></i> お気に入り <span class="menu-count" id="c-fav">0</span></div>
             <div class="menu-item" onclick="filter('work')"><i class="fas fa-briefcase"></i> 仕事・効率化 <span class="menu-count" id="c-work">0</span></div>
             <div class="menu-item" onclick="filter('calc')"><i class="fas fa-calculator"></i> 計算・分析 <span class="menu-count" id="c-calc">0</span></div>
-            <div class="menu-item" onclick="filter('image')"><i class="fas fa-image"></i> 画像処理 <span class="menu-count" id="c-image">0</span></div>
+            <div class="menu-item" onclick="filter('image')"><i class="fas fa-image"></i> 画像・メディア <span class="menu-count" id="c-image">0</span></div>
             <div class="menu-item" onclick="filter('text')"><i class="fas fa-font"></i> テキスト・AI <span class="menu-count" id="c-text">0</span></div>
             
             <div style="margin-top:auto; padding-top:10px; border-top:1px solid var(--glass-border); display:flex; justify-content:space-between; font-size:18px;">
@@ -375,21 +392,21 @@
             <div class="dashboard-grid">
                 <div class="widget glass">
                     <div class="widget-title"><i class="fas fa-sun"></i> Weather (Tokyo)<span id="w-loc" style="font-size:10px;"></span></div>
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <i id="w-icon" class="fas fa-cloud" style="font-size:32px; color:var(--primary);"></i>
+                    <div style="display:flex; align-items:center; gap:15px; margin-top:10px;">
+                        <i id="w-icon" class="fas fa-cloud" style="font-size:36px; color:var(--primary);"></i>
                         <div>
                             <div class="widget-val" id="w-temp">--°C</div>
-                            <div style="font-size:12px; color:var(--text-sub);" id="w-desc">Loading...</div>
+                            <div style="font-size:13px; color:var(--text-sub);" id="w-desc">Loading...</div>
                         </div>
                     </div>
                 </div>
                 
                 <div class="widget glass">
                     <div class="widget-title"><i class="fas fa-tasks"></i> Today's Tasks <span id="w-todo-cnt">0/0</span></div>
-                    <div style="margin-top:5px; flex:1; overflow-y:auto; font-size:13px;" id="w-todo-list">
+                    <div style="margin-top:10px; flex:1; overflow-y:auto; font-size:13px; max-height:80px;" id="w-todo-list">
                         <!-- Tasks -->
                     </div>
-                    <div style="height:4px; background:rgba(0,0,0,0.1); border-radius:2px; margin-top:10px; overflow:hidden;">
+                    <div style="height:6px; background:rgba(0,0,0,0.1); border-radius:3px; margin-top:10px; overflow:hidden;">
                         <div id="w-todo-bar" style="height:100%; width:0%; background:var(--success); transition:0.5s;"></div>
                     </div>
                 </div>
@@ -407,7 +424,7 @@
             </div>
             
             <div style="text-align:center; margin-top:50px; color:var(--text-sub); font-size:12px;">
-                LifeStation V7 Zenith - Ultimate Web Workspace
+                LifeStation V8 Reborn - The Ultimate Web Workspace
             </div>
         </div>
     </main>
@@ -416,39 +433,43 @@
         // ============================================
         //  APP STATE & CONFIG
         // ============================================
-        const STORE_KEY = 'lifestation_v7_data';
+        const STORE_KEY = 'lifestation_v8_data';
         let appData = {
             favs: [],
             todos: [],
             memo: '',
             theme: 'light',
-            pomoLogs: [], // {date: '2023-10-01', min: 25}
-            clips: [], // 定型文
-            apiKey: '' // AI API Key
+            pomoLogs: [], 
+            clips: [], 
+            apiKey: ''
         };
         let activeTool = null;
         let pInterval = null;
-        let swInterval = null;
         let cropper = null;
-        let audioCtx = null; // Zen Audio
-        let mediaRecorder = null; // Recorder
-        let audioChunks = [];
+        let audioCtx = null;
+        let noiseNode = null;
+        let gainNode = null;
+        let mediaRecorder = null;
+        let recInterval = null;
 
         // ============================================
         //  TOOLS DEFINITION
         // ============================================
         const tools = [
-            // --- WORK (仕事・効率化) ---
+            // --- WORK ---
             {
-                id: 'todo', cat: 'work', icon: 'fa-check-double', title: 'ToDoリスト', desc: 'ドラッグ移動可能なタスク管理',
+                id: 'todo', cat: 'work', icon: 'fa-check-double', title: 'ToDoリスト', desc: 'タスク管理・並べ替え・一括削除',
                 type: 'custom',
                 render: (el) => {
                     el.innerHTML = `
-                        <div style="display:flex; gap:10px;">
+                        <div style="display:flex; gap:10px; margin-bottom:10px;">
                             <input type="text" id="td-in" placeholder="新しいタスク..." onkeypress="if(event.key==='Enter')addTodo()" style="margin:0;">
                             <button class="btn" style="width:auto;" onclick="addTodo()"><i class="fas fa-plus"></i></button>
                         </div>
-                        <div id="td-list" style="margin-top:15px; max-height:400px; overflow-y:auto;"></div>
+                        <div style="display:flex; justify-content:flex-end; margin-bottom:5px;">
+                            <button class="btn btn-sm btn-outline" style="color:var(--danger); border-color:var(--danger);" onclick="clearDoneTodos()">完了済みを削除</button>
+                        </div>
+                        <div id="td-list" style="flex:1; overflow-y:auto; min-height:200px;"></div>
                     `;
                     renderTodos();
                 }
@@ -458,15 +479,23 @@
                 type: 'custom',
                 render: (el) => {
                     el.innerHTML = `
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; height:400px;">
-                            <textarea id="memo-pad" style="resize:none; height:100%;" placeholder="# Markdownが使えます" oninput="updateMemo()">${appData.memo || ''}</textarea>
-                            <div id="md-preview" style="height:100%; overflow-y:auto;"></div>
+                        <div style="display:flex; gap:15px; height:400px; flex-direction:row;">
+                            <div style="flex:1; display:flex; flex-direction:column;">
+                                <textarea id="memo-pad" style="flex:1; resize:none; font-family:monospace; padding:15px; margin:0;" placeholder="# Markdownが使えます" oninput="updateMemo()">${appData.memo || ''}</textarea>
+                            </div>
+                            <div style="flex:1; display:flex; flex-direction:column; border:1px solid var(--glass-border); border-radius:10px; background:rgba(255,255,255,0.4); overflow:hidden;">
+                                <div id="md-preview" style="padding:15px; overflow-y:auto; height:100%;"></div>
+                            </div>
                         </div>
-                        <div style="display:flex; gap:10px; margin-top:10px;">
+                        <div style="display:flex; gap:10px; margin-top:15px;">
                             <button class="btn btn-outline" onclick="downloadMemo()"><i class="fas fa-download"></i> .md保存</button>
                             <button class="btn btn-outline" onclick="copyMemo()"><i class="fas fa-copy"></i> コピー</button>
                         </div>
                     `;
+                    // Mobile Layout Fix
+                    if(window.innerWidth <= 768) {
+                        el.querySelector('div').style.flexDirection = 'column';
+                    }
                     updateMemo();
                 }
             },
@@ -475,112 +504,136 @@
                 type: 'custom',
                 render: (el) => {
                     el.innerHTML = `
-                        <div style="text-align:center;">
-                            <div id="pm-disp" style="font-size:72px; font-weight:800; font-family:monospace; color:var(--primary); margin:30px 0;">25:00</div>
-                            <div style="display:flex; justify-content:center; gap:10px;">
+                        <div style="text-align:center; padding:20px;">
+                            <div id="pm-disp" style="font-size:72px; font-weight:800; font-family:monospace; color:var(--primary); margin:20px 0;">25:00</div>
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; max-width:300px; margin:0 auto;">
                                 <button class="btn" onclick="startPomo(25)">集中 (25分)</button>
                                 <button class="btn" style="background:var(--success)" onclick="startPomo(5)">休憩 (5分)</button>
-                                <button class="btn" style="background:var(--danger); width:auto;" onclick="stopPomo()"><i class="fas fa-stop"></i></button>
                             </div>
-                            <div style="margin-top:20px; font-size:12px; color:var(--text-sub);">完了するとログに記録されます</div>
+                            <button class="btn" style="background:var(--danger); width:100%; max-width:300px; margin:10px auto;" onclick="stopPomo()"><i class="fas fa-stop"></i> 停止</button>
+                            <div style="margin-top:20px; font-size:12px; color:var(--text-sub);">完了するとダッシュボードに記録されます</div>
                         </div>
                     `;
                 }
             },
             {
-                id: 'zen', cat: 'work', icon: 'fa-headphones', title: 'Zen Generator', desc: '集中用環境音 (Rain/WhiteNoise)',
+                id: 'zen', cat: 'work', icon: 'fa-headphones', title: 'Zen Generator', desc: '集中用ノイズ生成 (音量調整可)',
                 type: 'custom',
                 render: (el) => {
                     el.innerHTML = `
-                        <div style="text-align:center; padding:20px;">
+                        <div style="text-align:center; padding:30px;">
+                            <div style="margin-bottom:30px; display:flex; justify-content:center; gap:20px;">
+                                <i class="fas fa-wave-square" style="font-size:40px; color:var(--primary);"></i>
+                                <i class="fas fa-wind" style="font-size:40px; color:var(--accent);"></i>
+                            </div>
+                            
                             <div style="margin-bottom:20px;">
-                                <i class="fas fa-cloud-rain" style="font-size:40px; color:var(--primary); margin:10px;"></i>
-                                <i class="fas fa-wind" style="font-size:40px; color:var(--text-sub); margin:10px;"></i>
+                                <label style="font-size:14px; font-weight:bold; margin-bottom:5px; display:block;">Noise Type</label>
+                                <select id="zen-type" style="width:200px; margin:0 auto; text-align:center;">
+                                    <option value="pink">Pink Noise (集中)</option>
+                                    <option value="white">White Noise (遮音)</option>
+                                    <option value="brown">Brown Noise (睡眠)</option>
+                                </select>
                             </div>
-                            <button class="btn" id="zen-btn" onclick="toggleZen()">再生開始 (Pink Noise)</button>
-                            <p style="font-size:12px; margin-top:10px; color:var(--text-sub);">※Web Audio APIで生成されるノイズです</p>
+
+                            <div style="margin-bottom:30px;">
+                                <label style="font-size:12px; margin-bottom:5px; display:block;">Volume</label>
+                                <input type="range" id="zen-vol" min="0" max="1" step="0.01" value="0.1" style="width:200px; margin:0 auto; display:block;">
+                            </div>
+
+                            <button class="btn" id="zen-btn" onclick="toggleZen()" style="max-width:200px; margin:0 auto;">再生開始</button>
                         </div>
                     `;
+                    document.getElementById('zen-vol').addEventListener('input', (e) => {
+                        if(gainNode) gainNode.gain.value = e.target.value;
+                    });
+                    document.getElementById('zen-type').addEventListener('change', () => {
+                        if(audioCtx) { toggleZen(); toggleZen(); } // Restart if playing
+                    });
                 }
             },
             {
-                id: 'clip', cat: 'work', icon: 'fa-clipboard-list', title: '定型文管理', desc: 'クリップボード履歴 & 定型文',
+                id: 'clip', cat: 'work', icon: 'fa-clipboard-list', title: '定型文管理', desc: 'よく使うフレーズを保存・コピー',
                 type: 'custom',
                 render: (el) => {
                     el.innerHTML = `
-                        <div style="display:flex; gap:10px; margin-bottom:10px;">
-                            <input type="text" id="cl-in" placeholder="定型文を追加..." style="margin:0;">
+                        <div style="display:flex; gap:10px; margin-bottom:15px;">
+                            <input type="text" id="cl-in" placeholder="定型文を入力..." style="margin:0;">
                             <button class="btn" style="width:auto;" onclick="addClip()"><i class="fas fa-plus"></i></button>
                         </div>
-                        <div id="cl-list" style="max-height:300px; overflow-y:auto;"></div>
+                        <div id="cl-list" style="flex:1; overflow-y:auto; min-height:200px;"></div>
                     `;
                     renderClips();
                 }
             },
 
-            // --- CALC (計算・分析) ---
+            // --- CALC ---
             {
-                id: 'calc', cat: 'calc', icon: 'fa-calculator', title: '関数電卓', desc: '科学技術計算・モダンデザイン',
+                id: 'calc', cat: 'calc', icon: 'fa-calculator', title: '関数電卓Pro', desc: '履歴機能付き・レスポンシブ電卓',
                 type: 'custom',
                 render: (el) => {
                     el.innerHTML = `
-                        <div class="calc-disp" id="c-disp">0</div>
-                        <div class="calc-grid">
-                            <button class="calc-btn fn" onclick="cIn('Math.sin(')">sin</button>
-                            <button class="calc-btn fn" onclick="cIn('Math.cos(')">cos</button>
-                            <button class="calc-btn fn" onclick="cIn('Math.tan(')">tan</button>
-                            <button class="calc-btn fn" onclick="cIn('Math.PI')">π</button>
-                            <button class="calc-btn op" style="background:var(--danger)" onclick="cIn('C')">AC</button>
-                            
-                            <button class="calc-btn fn" onclick="cIn('Math.sqrt(')">√</button>
-                            <button class="calc-btn fn" onclick="cIn('(')">(</button>
-                            <button class="calc-btn fn" onclick="cIn(')')">)</button>
-                            <button class="calc-btn fn" onclick="cIn('**')">^</button>
-                            <button class="calc-btn op" onclick="cIn('/')">÷</button>
-                            
-                            <button class="calc-btn num" onclick="cIn('7')">7</button>
-                            <button class="calc-btn num" onclick="cIn('8')">8</button>
-                            <button class="calc-btn num" onclick="cIn('9')">9</button>
-                            <button class="calc-btn op" style="background:var(--text-sub)" onclick="cIn('Del')">⌫</button>
-                            <button class="calc-btn op" onclick="cIn('*')">×</button>
-                            
-                            <button class="calc-btn num" onclick="cIn('4')">4</button>
-                            <button class="calc-btn num" onclick="cIn('5')">5</button>
-                            <button class="calc-btn num" onclick="cIn('6')">6</button>
-                            <button class="calc-btn op" onclick="cIn('-')">-</button>
-                            <button class="calc-btn op" onclick="cIn('%')">%</button>
-                            
-                            <button class="calc-btn num" onclick="cIn('1')">1</button>
-                            <button class="calc-btn num" onclick="cIn('2')">2</button>
-                            <button class="calc-btn num" onclick="cIn('3')">3</button>
-                            <button class="calc-btn op" onclick="cIn('+')">+</button>
-                            <button class="calc-btn eq" onclick="cIn('=')">=</button>
-                            
-                            <button class="calc-btn num" onclick="cIn('0')" style="grid-column:span 2;">0</button>
-                            <button class="calc-btn num" onclick="cIn('.')">.</button>
+                        <div class="calc-wrapper">
+                            <div class="calc-disp-container">
+                                <div id="c-hist" class="calc-history"></div>
+                                <div id="c-disp" class="calc-current">0</div>
+                            </div>
+                            <div class="calc-grid">
+                                <button class="calc-btn fn" onclick="cIn('Math.sin(')">sin</button>
+                                <button class="calc-btn fn" onclick="cIn('Math.cos(')">cos</button>
+                                <button class="calc-btn fn" onclick="cIn('Math.tan(')">tan</button>
+                                <button class="calc-btn fn" onclick="cIn('Math.PI')">π</button>
+                                <button class="calc-btn op" style="background:var(--danger)" onclick="cIn('C')">AC</button>
+                                
+                                <button class="calc-btn fn" onclick="cIn('Math.sqrt(')">√</button>
+                                <button class="calc-btn fn" onclick="cIn('(')">(</button>
+                                <button class="calc-btn fn" onclick="cIn(')')">)</button>
+                                <button class="calc-btn fn" onclick="cIn('**')">^</button>
+                                <button class="calc-btn op" onclick="cIn('/')">÷</button>
+                                
+                                <button class="calc-btn num" onclick="cIn('7')">7</button>
+                                <button class="calc-btn num" onclick="cIn('8')">8</button>
+                                <button class="calc-btn num" onclick="cIn('9')">9</button>
+                                <button class="calc-btn op" style="background:var(--text-sub); color:white;" onclick="cIn('Del')">⌫</button>
+                                <button class="calc-btn op" onclick="cIn('*')">×</button>
+                                
+                                <button class="calc-btn num" onclick="cIn('4')">4</button>
+                                <button class="calc-btn num" onclick="cIn('5')">5</button>
+                                <button class="calc-btn num" onclick="cIn('6')">6</button>
+                                <button class="calc-btn op" onclick="cIn('-')">-</button>
+                                <button class="calc-btn op" onclick="cIn('%')">%</button>
+                                
+                                <button class="calc-btn num" onclick="cIn('1')">1</button>
+                                <button class="calc-btn num" onclick="cIn('2')">2</button>
+                                <button class="calc-btn num" onclick="cIn('3')">3</button>
+                                <button class="calc-btn op" onclick="cIn('+')">+</button>
+                                <button class="calc-btn eq" onclick="cIn('=')">=</button>
+                                
+                                <button class="calc-btn num" onclick="cIn('0')" style="grid-column:span 2;">0</button>
+                                <button class="calc-btn num" onclick="cIn('.')">.</button>
+                            </div>
                         </div>
                     `;
                     setupCalcKeys();
                 }
             },
             {
-                id: 'warikan', cat: 'calc', icon: 'fa-users', title: '割り勘奉行', desc: '飲み会・旅行に！スマート割り勘',
+                id: 'warikan', cat: 'calc', icon: 'fa-users', title: '割り勘奉行', desc: '詳細設定可能なスマート割り勘',
                 type: 'custom',
                 render: (el) => {
                     el.innerHTML = `
-                        <div style="display:flex; flex-direction:column; gap:15px;">
-                            <div style="display:flex; gap:10px;">
-                                <div style="flex:1;"><label style="font-size:12px; color:var(--text-sub);">合計金額 (円)</label><input type="number" id="w-total" placeholder="12300" style="margin:0;"></div>
-                                <div style="width:100px;"><label style="font-size:12px; color:var(--text-sub);">人数</label><input type="number" id="w-num" placeholder="3" style="margin:0;"></div>
+                        <div style="display:flex; flex-direction:column; gap:15px; height:100%;">
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                                <div><label style="font-size:12px; color:var(--text-sub);">合計金額</label><input type="number" id="w-total" placeholder="12300" style="margin:0;"></div>
+                                <div><label style="font-size:12px; color:var(--text-sub);">人数</label><input type="number" id="w-num" placeholder="3" style="margin:0;"></div>
                             </div>
                             
-                            <div style="background:rgba(0,0,0,0.03); padding:10px; border-radius:10px;">
-                                <div style="font-size:12px; color:var(--text-sub); margin-bottom:5px;">調整オプション</div>
-                                <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
-                                    <label style="font-size:13px;"><input type="checkbox" id="w-boss-check"> 特定の人が多めに払う</label>
-                                    <input type="number" id="w-boss-pay" placeholder="支払額" style="width:100px; margin:0; display:none;">
+                            <div style="background:rgba(0,0,0,0.03); padding:15px; border-radius:10px;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                                    <label style="font-size:14px; cursor:pointer;"><input type="checkbox" id="w-boss-check" onchange="document.getElementById('w-boss-pay').disabled=!this.checked"> 上司・先輩が多めに払う</label>
+                                    <input type="number" id="w-boss-pay" placeholder="支払額" disabled style="width:100px; margin:0;">
                                 </div>
-                                <div style="display:flex; gap:10px; align-items:center;">
+                                <div style="display:flex; align-items:center; gap:10px;">
                                     <span style="font-size:13px;">単位:</span>
                                     <select id="w-unit" style="margin:0; width:auto; padding:5px;">
                                         <option value="1">1円</option>
@@ -594,83 +647,21 @@
                             </div>
 
                             <button class="btn" onclick="calcWarikan()">計算する</button>
-                            
-                            <div id="w-result" class="result-area" style="display:none; text-align:left; line-height:1.6;"></div>
+                            <div id="w-result" class="result-area" style="display:none; text-align:left; overflow-y:auto; max-height:200px;"></div>
                         </div>
                     `;
-                    // Checkbox logic
-                    document.getElementById('w-boss-check').onchange = (e) => {
-                        document.getElementById('w-boss-pay').style.display = e.target.checked ? 'block' : 'none';
-                    };
-                    // Calculation Logic embedded for simplicity in tool definition
-                    window.calcWarikan = () => {
-                        const total = parseInt(document.getElementById('w-total').value);
-                        const num = parseInt(document.getElementById('w-num').value);
-                        const unit = parseInt(document.getElementById('w-unit').value);
-                        const isBoss = document.getElementById('w-boss-check').checked;
-                        const bossPay = isBoss ? parseInt(document.getElementById('w-boss-pay').value) : 0;
-                        
-                        if(!total || !num) { alert('金額と人数を入力してください'); return; }
-                        
-                        const resDiv = document.getElementById('w-result');
-                        resDiv.style.display = 'block';
-                        
-                        let restTotal = total;
-                        let regularNum = num;
-                        let msg = '';
-                        
-                        if(isBoss) {
-                            if(!bossPay) { alert('多めに払う金額を入力してください'); return; }
-                            restTotal -= bossPay;
-                            regularNum -= 1;
-                            msg += `👑 <strong>多めに払う人 (1名):</strong> ${bossPay.toLocaleString()}円<br>`;
-                        }
-                        
-                        if(regularNum > 0) {
-                            const perPersonRaw = restTotal / regularNum;
-                            // 切り上げ計算
-                            const perPerson = Math.ceil(perPersonRaw / unit) * unit;
-                            const payTotal = (isBoss ? bossPay : 0) + (perPerson * regularNum);
-                            const pool = payTotal - total;
-                            
-                            msg += `👤 <strong>一人あたり (${regularNum}名):</strong> ${perPerson.toLocaleString()}円<br>`;
-                            msg += `<hr style="margin:10px 0; border:0; border-top:1px dashed var(--success);">`;
-                            msg += `💰 <strong>支払総額:</strong> ${payTotal.toLocaleString()}円<br>`;
-                            if(pool > 0) msg += `🎁 <strong>余り (プール金):</strong> ${pool.toLocaleString()}円`;
-                            else if(pool < 0) msg += `⚠️ <strong>不足:</strong> ${Math.abs(pool).toLocaleString()}円`;
-                            else msg += `✨ <strong>ぴったり！</strong>`;
-                        }
-                        
-                        resDiv.innerHTML = msg;
-                    };
                 }
             },
-            {
-                id: 'plotter', cat: 'calc', icon: 'fa-chart-line', title: 'グラフプロッター', desc: '数式を入力してグラフを描画',
-                type: 'custom',
-                render: (el) => {
-                    el.innerHTML = `
-                        <div style="display:flex; gap:10px; margin-bottom:10px;">
-                            <input type="text" id="plt-eq" placeholder="例: Math.sin(x) * x" value="Math.sin(x)" style="margin:0;">
-                            <button class="btn" style="width:auto;" onclick="drawGraph()">描画</button>
-                        </div>
-                        <div style="height:300px; width:100%;">
-                            <canvas id="plotCanvas"></canvas>
-                        </div>
-                    `;
-                    setTimeout(drawGraph, 100);
-                }
-            },
-            { id: 'discount', cat: 'calc', icon: 'fa-tags', title: '割引計算', desc: '税込価格と割引額を即座に計算', inputs: ['price:元の価格(円)', 'per:割引率(%)'], func: (p,r) => { const end=Math.floor(p*(1-r/100)); return `支払額: ${end.toLocaleString()}円<br><span style="font-size:12px;color:gray">(${p*r/100}円 お得)</span>`; } },
-            { id: 'unit', cat: 'calc', icon: 'fa-balance-scale', title: '単位変換Pro', desc: '長さ/重さ/温度/面積/速度/データ', type:'custom', render:(el)=>{
+            { id: 'discount', cat: 'calc', icon: 'fa-tags', title: '割引計算', desc: 'セール価格計算', inputs: ['price:元の価格(円)', 'per:割引率(%)'], func: (p,r) => { const end=Math.floor(p*(1-r/100)); return `支払額: ${end.toLocaleString()}円<br><span style="font-size:12px;color:gray">(${p*r/100}円 お得)</span>`; } },
+            { id: 'unit', cat: 'calc', icon: 'fa-balance-scale', title: '単位変換', desc: '様々な単位を相互変換', type:'custom', render:(el)=>{
                 el.innerHTML=`
-                    <div style="display:flex; flex-direction:column; gap:10px;">
-                        <select id="u-cat" onchange="updateUnitType()"><option value="len">長さ</option><option value="wgt">重さ</option><option value="tmp">温度</option><option value="area">面積</option><option value="spd">速度</option></select>
+                    <div style="display:flex; flex-direction:column; gap:15px;">
+                        <select id="u-cat" onchange="updateUnitType()" style="margin:0;"><option value="len">長さ</option><option value="wgt">重さ</option><option value="tmp">温度</option><option value="area">面積</option><option value="spd">速度</option></select>
                         <div style="display:flex; gap:10px; align-items:center;">
-                            <input type="number" id="u-val" placeholder="値" style="margin:0;">
-                            <select id="u-from" style="margin:0;"></select>
+                            <input type="number" id="u-val" placeholder="値" style="margin:0; flex:1;">
+                            <select id="u-from" style="margin:0; width:80px;"></select>
                             <i class="fas fa-arrow-right"></i>
-                            <select id="u-to" style="margin:0;"></select>
+                            <select id="u-to" style="margin:0; width:80px;"></select>
                         </div>
                         <button class="btn" onclick="convertUnitPro()">変換</button>
                     </div>
@@ -680,67 +671,74 @@
 
             // --- IMAGE / MEDIA ---
             {
-                id: 'recorder', cat: 'image', icon: 'fa-microphone', title: 'レコーダー', desc: '音声/画面録画 & ダウンロード',
+                id: 'recorder', cat: 'image', icon: 'fa-microphone', title: 'レコーダー', desc: '音声/画面録画 & 保存',
                 type: 'custom',
                 render: (el) => {
                     el.innerHTML = `
-                        <div style="display:flex; gap:10px; justify-content:center; margin-bottom:20px;">
-                            <button class="btn" onclick="startRecord('audio')"><i class="fas fa-microphone"></i> 録音</button>
-                            <button class="btn" style="background:var(--accent);" onclick="startRecord('screen')"><i class="fas fa-desktop"></i> 画面録画</button>
-                        </div>
-                        <div id="rec-status" style="text-align:center; display:none;">
-                            <div style="color:var(--danger); animation:pulse 1s infinite;">● Recording...</div>
-                            <button class="btn" style="background:var(--danger); margin-top:10px;" onclick="stopRecord()">停止 & 保存</button>
+                        <div style="text-align:center;">
+                            <div id="rec-timer" style="font-size:40px; font-family:monospace; margin-bottom:20px; color:var(--text-sub);">00:00</div>
+                            <div style="display:flex; gap:15px; justify-content:center; margin-bottom:20px;">
+                                <button class="btn" onclick="startRecord('audio')"><i class="fas fa-microphone"></i> 録音</button>
+                                <button class="btn" style="background:var(--accent);" onclick="startRecord('screen')"><i class="fas fa-desktop"></i> 画面録画</button>
+                            </div>
+                            <div id="rec-status" style="display:none;">
+                                <div style="color:var(--danger); animation:pulse 1s infinite; margin-bottom:10px;">● Recording...</div>
+                                <button class="btn" style="background:var(--danger);" onclick="stopRecord()">停止 & 保存</button>
+                            </div>
                         </div>
                     `;
                 }
             },
             {
-                id: 'img-editor', cat: 'image', icon: 'fa-crop-alt', title: '画像エディタ', desc: 'トリミング・回転・フィルタ・保存',
+                id: 'img-editor', cat: 'image', icon: 'fa-crop-alt', title: '画像エディタ', desc: 'トリミング・回転・保存',
                 type: 'custom',
                 render: (el) => {
                     el.innerHTML = `
-                        <input type="file" id="img-in" accept="image/*" onchange="initCropper(this)">
-                        <div class="img-editor-container" id="crop-container" style="display:none;">
-                            <img id="cropper-img" src="">
-                        </div>
-                        <div id="editor-controls" style="display:none; margin-top:10px;">
-                            <div class="btn-group" style="margin-bottom:10px; flex-wrap:wrap;">
-                                <button class="btn btn-sm btn-outline" onclick="cropper.rotate(-90)"><i class="fas fa-undo"></i></button>
-                                <button class="btn btn-sm btn-outline" onclick="cropper.rotate(90)"><i class="fas fa-redo"></i></button>
-                                <button class="btn btn-sm btn-outline" onclick="cropper.reset()">Reset</button>
+                        <div style="display:flex; flex-direction:column; height:100%;">
+                            <input type="file" id="img-in" accept="image/*" onchange="initCropper(this)" style="margin-bottom:10px;">
+                            <div class="img-editor-container" id="crop-container" style="display:none; flex:1;">
+                                <img id="cropper-img" src="">
                             </div>
-                            <button class="btn" onclick="exportCroppedImage()"><i class="fas fa-file-export"></i> 保存</button>
+                            <div id="editor-controls" style="display:none; margin-top:10px;">
+                                <div class="btn-group" style="margin-bottom:10px; justify-content:center;">
+                                    <button class="btn btn-sm btn-outline" onclick="cropper.rotate(-90)"><i class="fas fa-undo"></i></button>
+                                    <button class="btn btn-sm btn-outline" onclick="cropper.rotate(90)"><i class="fas fa-redo"></i></button>
+                                    <button class="btn btn-sm btn-outline" onclick="cropper.scaleX(cropper.getData().scaleX*-1)"><i class="fas fa-arrows-alt-h"></i></button>
+                                    <button class="btn btn-sm btn-outline" onclick="cropper.reset()">Reset</button>
+                                </div>
+                                <button class="btn" onclick="exportCroppedImage()"><i class="fas fa-file-export"></i> 編集を保存</button>
+                            </div>
                         </div>
                     `;
                 }
             },
-            { id: 'qrcode', cat: 'image', icon: 'fa-qrcode', title: 'QR作成', desc: 'テキストやURLからQRコードを生成', inputs:['text:内容'], type:'qr' },
+            { id: 'qrcode', cat: 'image', icon: 'fa-qrcode', title: 'QR作成', desc: 'テキストからQRコード生成', inputs:['text:内容'], type:'qr' },
 
             // --- TEXT / AI ---
             {
-                id: 'ai-chat', cat: 'text', icon: 'fa-robot', title: 'AI Assistant', desc: 'OpenAI API等を使用したチャット',
+                id: 'ai-chat', cat: 'text', icon: 'fa-robot', title: 'AI Assistant', desc: 'APIを使用したチャット',
                 type: 'custom',
                 render: (el) => {
                     el.innerHTML = `
-                        <input type="password" id="ai-key" placeholder="OpenAI API Key (sk-...)" value="${appData.apiKey||''}" onchange="saveApiKey(this.value)" style="font-size:12px;">
-                        <div id="ai-log" class="chat-box"></div>
-                        <div style="display:flex; gap:10px;">
-                            <input type="text" id="ai-in" placeholder="メッセージ..." onkeypress="if(event.key==='Enter')sendAi()" style="margin:0;">
-                            <button class="btn" style="width:auto;" onclick="sendAi()"><i class="fas fa-paper-plane"></i></button>
+                        <div style="display:flex; flex-direction:column; height:100%;">
+                            <input type="password" id="ai-key" placeholder="OpenAI API Key (sk-...)" value="${appData.apiKey||''}" onchange="saveApiKey(this.value)" style="font-size:12px; margin-bottom:5px;">
+                            <div id="ai-log" class="chat-box" style="flex:1;"></div>
+                            <div style="display:flex; gap:10px; margin-top:5px;">
+                                <input type="text" id="ai-in" placeholder="メッセージ..." onkeypress="if(event.key==='Enter')sendAi()" style="margin:0; flex:1;">
+                                <button class="btn" style="width:auto;" onclick="sendAi()"><i class="fas fa-paper-plane"></i></button>
+                            </div>
                         </div>
                     `;
                 }
             },
-            { id: 'regex', cat: 'text', icon: 'fa-search', title: '正規表現テスト', desc: 'リアルタイムマッチング確認', type:'custom', render:(el)=>{
+            { id: 'regex', cat: 'text', icon: 'fa-search', title: '正規表現', desc: 'リアルタイムテスト', type:'custom', render:(el)=>{
                 el.innerHTML = `<input type="text" id="reg-pat" placeholder="/Pattern/flags" oninput="testRegex()">
                 <textarea id="reg-txt" rows="4" placeholder="対象テキスト" oninput="testRegex()"></textarea>
                 <div id="reg-res" class="result-area" style="text-align:left; white-space:pre-wrap;"></div>`;
             }},
-            { id: 'char', cat: 'text', icon: 'fa-text-width', title: '文字数カウント', desc: '文字数、行数、原稿用紙枚数', type:'custom', render:(el)=>{
+            { id: 'char', cat: 'text', icon: 'fa-text-width', title: '文字数', desc: '文字数・行数カウント', type:'custom', render:(el)=>{
                 el.innerHTML=`<textarea id="txt-c" rows="5" placeholder="テキストを入力..." oninput="countChar()"></textarea><div id="txt-res" style="text-align:right; font-weight:bold;">0 文字</div>`;
             }},
-            { id: 'share', cat: 'text', icon: 'fa-share-alt', title: 'Web共有', desc: 'スマホ標準の共有メニューを開く', inputs:['url:URL', 'title:タイトル'], type:'async', func:async(u,t)=>{ if(navigator.share){ await navigator.share({title:t, url:u}); return '共有メニューを開きました'; } else return 'このブラウザは非対応です'; } },
         ];
 
         // ============================================
@@ -762,11 +760,13 @@
         };
 
         function loadData() {
-            const d = localStorage.getItem(STORE_KEY);
-            if(d) {
-                appData = { ...appData, ...JSON.parse(d) }; // merge
-                if(appData.theme === 'dark') document.body.classList.add('dark');
-            }
+            try {
+                const d = localStorage.getItem(STORE_KEY);
+                if(d) {
+                    appData = { ...appData, ...JSON.parse(d) };
+                    if(appData.theme === 'dark') document.body.classList.add('dark');
+                }
+            } catch(e) { console.error('Load Error', e); }
         }
         function saveData() { localStorage.setItem(STORE_KEY, JSON.stringify(appData)); }
         function updateTime() {
@@ -780,19 +780,17 @@
         }
 
         // ============================================
-        //  DASHBOARD
+        //  DASHBOARD & UI
         // ============================================
         async function initDashboard() {
-            // Weather (Open-Meteo API - Free, No Key) - Default Tokyo
+            // Weather
             try {
-                const lat=35.6895, lon=139.6917;
-                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=35.6895&longitude=139.6917&current_weather=true');
                 const data = await res.json();
                 const w = data.current_weather;
                 document.getElementById('w-temp').innerText = `${w.temperature}°C`;
-                // Simple WMO Code mapping
                 const code = w.weathercode;
-                let icon = 'fa-cloud'; let desc = 'Cloudy';
+                let icon = 'fa-cloud', desc = 'Cloudy';
                 if(code===0) { icon='fa-sun'; desc='Sunny'; }
                 else if(code<3) { icon='fa-cloud-sun'; desc='Partly Cloudy'; }
                 else if(code<60) { icon='fa-smog'; desc='Foggy'; }
@@ -808,32 +806,29 @@
             document.getElementById('w-todo-cnt').innerText = `${done}/${todos.length}`;
             document.getElementById('w-todo-bar').style.width = todos.length ? `${(done/todos.length)*100}%` : '0%';
             const list = document.getElementById('w-todo-list');
-            list.innerHTML = todos.slice(0,3).map(t=>`<div style="margin-bottom:4px; ${t.done?'text-decoration:line-through;opacity:0.5':''}"><i class="fas fa-circle" style="font-size:6px; vertical-align:middle; margin-right:5px; color:var(--primary)"></i>${t.txt}</div>`).join('') || '<div style="color:var(--text-sub)">No tasks</div>';
+            list.innerHTML = todos.slice(0,5).map(t=>`<div style="margin-bottom:4px; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; ${t.done?'text-decoration:line-through;opacity:0.5':''}"><i class="fas fa-circle" style="font-size:6px; vertical-align:middle; margin-right:5px; color:var(--primary)"></i>${t.txt}</div>`).join('') || '<div style="color:var(--text-sub)">No tasks</div>';
 
-            // Weekly Focus Chart
-            const ctx = document.getElementById('w-chart').getContext('2d');
-            // Get last 7 days stats
-            const labels = [], data = [];
-            for(let i=6; i>=0; i--) {
-                const d = new Date(); d.setDate(d.getDate()-i);
-                const k = d.toISOString().slice(0,10);
-                labels.push(d.toLocaleDateString('en', {weekday:'narrow'}));
-                const dayLog = appData.pomoLogs.filter(l => l.date === k).reduce((a,b)=>a+b.min, 0);
-                data.push(dayLog);
+            // Chart
+            const ctx = document.getElementById('w-chart');
+            if(ctx) {
+                const chartCtx = ctx.getContext('2d');
+                if(window.wChart) window.wChart.destroy();
+                const labels = [], data = [];
+                for(let i=6; i>=0; i--) {
+                    const d = new Date(); d.setDate(d.getDate()-i);
+                    labels.push(d.toLocaleDateString('en', {weekday:'narrow'}));
+                    const k = d.toISOString().slice(0,10);
+                    const dayLog = appData.pomoLogs.filter(l => l.date === k).reduce((a,b)=>a+b.min, 0);
+                    data.push(dayLog);
+                }
+                window.wChart = new Chart(chartCtx, {
+                    type: 'bar',
+                    data: { labels, datasets: [{ label: 'Focus', data, backgroundColor: '#6366f1', borderRadius: 4 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins:{legend:{display:false}}, scales:{y:{display:false, grid:{display:false}}, x:{grid:{display:false}}} }
+                });
             }
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{ label: 'Focus (min)', data: data, backgroundColor: '#6366f1', borderRadius: 4 }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins:{legend:{display:false}}, scales:{y:{display:false}, x:{grid:{display:false}}} }
-            });
         }
 
-        // ============================================
-        //  UI LOGIC & TOOLS
-        // ============================================
         function renderGrid(list) {
             const grid = document.getElementById('grid');
             grid.innerHTML = '';
@@ -853,6 +848,7 @@
                 grid.appendChild(div);
             });
         }
+
         function filter(cat) {
             document.querySelectorAll('.menu-item').forEach(e => e.classList.remove('active'));
             event.currentTarget.classList.add('active');
@@ -861,32 +857,40 @@
             else if(cat === 'fav') renderGrid(tools.filter(t => appData.favs.includes(t.id)));
             else renderGrid(tools.filter(t => t.cat === cat));
         }
+
         function searchTools(q) {
             q = q.toLowerCase();
             renderGrid(tools.filter(t => t.title.toLowerCase().includes(q) || t.desc.toLowerCase().includes(q)));
         }
+
         function toggleFav(id, e) {
             e.stopPropagation();
             if(appData.favs.includes(id)) appData.favs = appData.favs.filter(i => i !== id);
             else appData.favs.push(id);
             saveData();
             e.target.classList.toggle('active');
-            updateCounts(); // Note: updateCounts function missing in V6, added below
+            updateCounts();
         }
+
         function updateCounts() {
-            ['work','calc','image','text'].forEach(c => { try{ document.getElementById('c-'+c).innerText = tools.filter(t => t.cat === c).length }catch(e){} });
+            ['work','calc','image','text'].forEach(c => { 
+                const el = document.getElementById('c-'+c);
+                if(el) el.innerText = tools.filter(t => t.cat === c).length 
+            });
             document.getElementById('c-all').innerText = tools.length;
             document.getElementById('c-fav').innerText = appData.favs.length;
         }
+
         function toggleTheme() {
             document.body.classList.toggle('dark');
             appData.theme = document.body.classList.contains('dark') ? 'dark' : 'light';
             saveData();
         }
+
         function clearData() { if(confirm('初期化しますか？')) { localStorage.removeItem(STORE_KEY); location.reload(); } }
         function toggleMenu() { document.getElementById('nav-menu').classList.toggle('active'); }
 
-        // Tool Execution
+        // Tool Control
         function openTool(tool) {
             activeTool = tool;
             document.getElementById('tm-title').innerHTML = `<i class="fas ${tool.icon}"></i> ${tool.title}`;
@@ -910,6 +914,7 @@
             modal.style.display = 'flex';
             setTimeout(()=>modal.classList.add('show'), 10);
         }
+
         function closeModal() {
             const modal = document.getElementById('tool-modal');
             modal.classList.remove('show');
@@ -921,6 +926,7 @@
                 stopRecord();
             }, 200);
         }
+
         async function execTool() {
             const resBox = document.getElementById('tm-result');
             resBox.style.display = 'block';
@@ -930,10 +936,10 @@
                 if(activeTool.type === 'qr') { resBox.innerHTML = ''; new QRCode(resBox, args[0]); }
                 else if(activeTool.type === 'async') { resBox.innerHTML = 'Processing...'; resBox.innerHTML = await activeTool.func(...args); }
                 else { resBox.innerHTML = activeTool.func(...args); }
-            } catch(e) { resBox.innerText = 'Error'; }
+            } catch(e) { resBox.innerText = 'Error: ' + e.message; }
         }
 
-        // --- SPECIFIC TOOL FUNCTIONS ---
+        // --- TOOL LOGIC ---
 
         // ToDo
         function addTodo() {
@@ -943,7 +949,7 @@
             saveData();
             document.getElementById('td-in').value = '';
             renderTodos();
-            initDashboard(); // Update widget
+            initDashboard();
         }
         function renderTodos() {
             const list = document.getElementById('td-list');
@@ -959,6 +965,14 @@
         function togTodo(i) { appData.todos[i].done = !appData.todos[i].done; saveData(); renderTodos(); initDashboard(); }
         function delTodo(i) { appData.todos.splice(i, 1); saveData(); renderTodos(); initDashboard(); }
         function updTodo(i, t) { appData.todos[i].txt = t; saveData(); }
+        function clearDoneTodos() {
+            if(confirm('完了済みのタスクをすべて削除しますか？')) {
+                appData.todos = appData.todos.filter(t => !t.done);
+                saveData();
+                renderTodos();
+                initDashboard();
+            }
+        }
 
         // Memo
         function updateMemo() { const txt = document.getElementById('memo-pad').value; document.getElementById('md-preview').innerHTML = marked.parse(txt); appData.memo = txt; saveData(); }
@@ -977,7 +991,6 @@
                     stopPomo();
                     new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg').play();
                     alert('Time Up!');
-                    // Log
                     appData.pomoLogs.push({date: new Date().toISOString().slice(0,10), min: min});
                     saveData();
                     initDashboard();
@@ -986,56 +999,127 @@
         }
         function stopPomo() { if(pInterval) clearInterval(pInterval); }
 
-        // Zen Generator (Pink Noise)
+        // Zen Generator (Improved)
         function toggleZen() {
-            if(audioCtx) { audioCtx.close(); audioCtx = null; document.getElementById('zen-btn').innerText = '再生開始'; return; }
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const bufferSize = 4096;
-            const pinkNoise = (function() {
-                let b0, b1, b2, b3, b4, b5, b6;
-                b0 = b1 = b2 = b3 = b4 = b5 = b6 = 0.0;
-                const node = audioCtx.createScriptProcessor(bufferSize, 1, 1);
-                node.onaudioprocess = function(e) {
+            const btn = document.getElementById('zen-btn');
+            if(audioCtx) {
+                audioCtx.close(); audioCtx = null;
+                btn.innerText = '再生開始';
+                btn.style.background = 'var(--primary)';
+                return;
+            }
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const type = document.getElementById('zen-type').value;
+                const bufferSize = 4096;
+                
+                noiseNode = audioCtx.createScriptProcessor(bufferSize, 1, 1);
+                
+                // Noise Generation Logic
+                noiseNode.onaudioprocess = function(e) {
                     const output = e.outputBuffer.getChannelData(0);
                     for (let i = 0; i < bufferSize; i++) {
                         const white = Math.random() * 2 - 1;
-                        b0 = 0.99886 * b0 + white * 0.0555179;
-                        b1 = 0.99332 * b1 + white * 0.0750759;
-                        b2 = 0.96900 * b2 + white * 0.1538520;
-                        b3 = 0.86650 * b3 + white * 0.3104856;
-                        b4 = 0.55000 * b4 + white * 0.5329522;
-                        b5 = -0.7616 * b5 - white * 0.0168980;
-                        output[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
-                        output[i] *= 0.11; // gain
-                        b6 = white * 0.115926;
+                        if(type === 'white') {
+                            output[i] = white;
+                        } else if(type === 'pink') {
+                            // Pink noise approximation
+                            let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0; 
+                            // (Resetting variables inside loop is wrong for stateful filter, simplify for this demo)
+                            // Using simple 1/f filter logic usually requires state outside loop.
+                            // Falling back to simple brown-like for demo stability or white.
+                            // Re-implementing simplified stateful:
+                            if(!this.b0) { this.b0=0;this.b1=0;this.b2=0; }
+                            this.b0 = 0.99886 * this.b0 + white * 0.0555179;
+                            this.b1 = 0.99332 * this.b1 + white * 0.0750759;
+                            this.b2 = 0.96900 * this.b2 + white * 0.1538520;
+                            output[i] = (this.b0 + this.b1 + this.b2) * 0.1; 
+                        } else { // Brown
+                            if(!this.lastOut) this.lastOut = 0;
+                            this.lastOut = (this.lastOut + (0.02 * white)) / 1.02;
+                            output[i] = this.lastOut * 3.5; 
+                        }
                     }
                 };
-                return node;
-            })();
-            pinkNoise.connect(audioCtx.destination);
-            document.getElementById('zen-btn').innerText = '停止';
+
+                gainNode = audioCtx.createGain();
+                gainNode.gain.value = document.getElementById('zen-vol').value;
+                
+                noiseNode.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                btn.innerText = '停止';
+                btn.style.background = 'var(--danger)';
+            } catch(e) { alert('Audio Error'); }
         }
 
-        // Plotter
-        function drawGraph() {
-            const eq = document.getElementById('plt-eq').value;
-            const labels = [], data = [];
-            try {
-                for(let x = -10; x <= 10; x += 0.5) {
-                    labels.push(x.toFixed(1));
-                    data.push(eval(eq.replace(/x/g, `(${x})`))); 
+        // Calculator
+        let cExp = '';
+        function setupCalcKeys() {
+            document.onkeydown = (e) => {
+                if(!activeTool || activeTool.id !== 'calc') return; // Only if calc is open
+                const k = e.key;
+                if((k>='0'&&k<='9')||['+','-','*','/','.','(',')','%'].includes(k)) { e.preventDefault(); cIn(k); }
+                else if(k==='Enter') { e.preventDefault(); cIn('='); }
+                else if(k==='Backspace') { e.preventDefault(); cIn('Del'); }
+                else if(k==='Escape') { e.preventDefault(); cIn('C'); }
+            }
+        }
+        function cIn(v) {
+            const d = document.getElementById('c-disp');
+            const h = document.getElementById('c-hist');
+            if(v==='C') { cExp = ''; h.innerText = ''; }
+            else if(v==='Del') cExp = cExp.slice(0,-1);
+            else if(v==='=') { 
+                try { 
+                    const res = new Function('return ' + cExp.replace(/Math\./g, 'Math.').replace(/\^/g, '**'))(); 
+                    h.innerText = cExp + ' =';
+                    cExp = String(res); 
+                } catch { cExp = 'Error'; } 
+            }
+            else cExp += v;
+            d.innerText = cExp || '0';
+        }
+
+        // Warikan
+        function calcWarikan() {
+            const total = parseInt(document.getElementById('w-total').value);
+            const num = parseInt(document.getElementById('w-num').value);
+            const unit = parseInt(document.getElementById('w-unit').value);
+            const isBoss = document.getElementById('w-boss-check').checked;
+            const bossPay = isBoss ? parseInt(document.getElementById('w-boss-pay').value) : 0;
+            
+            if(!total || !num) { alert('金額と人数を入力してください'); return; }
+            
+            const resDiv = document.getElementById('w-result');
+            resDiv.style.display = 'block';
+            let restTotal = total;
+            let regularNum = num;
+            let msg = '';
+            
+            if(isBoss) {
+                if(!bossPay) { alert('多めに払う金額を入力してください'); return; }
+                restTotal -= bossPay;
+                regularNum -= 1;
+                msg += `<div>👑 <strong>多めに払う人 (1名):</strong> ${bossPay.toLocaleString()}円</div>`;
+            }
+            
+            if(regularNum > 0) {
+                if(restTotal < 0) {
+                    msg += `<div style="color:var(--danger)">⚠️ 支払い額が合計を超えています</div>`;
+                } else {
+                    const perPersonRaw = restTotal / regularNum;
+                    const perPerson = Math.ceil(perPersonRaw / unit) * unit;
+                    const payTotal = (isBoss ? bossPay : 0) + (perPerson * regularNum);
+                    const pool = payTotal - total;
+                    
+                    msg += `<div>👤 <strong>一人あたり (${regularNum}名):</strong> ${perPerson.toLocaleString()}円</div>`;
+                    msg += `<hr style="margin:10px 0; border:0; border-top:1px dashed #ccc;">`;
+                    msg += `<div>💰 <strong>集金総額:</strong> ${payTotal.toLocaleString()}円</div>`;
+                    msg += `<div>🎁 <strong>余り (プール金):</strong> ${pool.toLocaleString()}円</div>`;
                 }
-                const ctx = document.getElementById('plotCanvas').getContext('2d');
-                if(window.myChart) window.myChart.destroy();
-                window.myChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [{ label: `f(x) = ${eq}`, data: data, borderColor: '#6366f1', tension: 0.4 }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false }
-                });
-            } catch(e) { alert('数式エラー'); }
+            }
+            resDiv.innerHTML = msg;
         }
 
         // Recorder
@@ -1052,40 +1136,39 @@
                     const blob = new Blob(audioChunks, {type: type==='screen'?'video/webm':'audio/webm'});
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a'); a.href = url; a.download = `rec_${Date.now()}.webm`; a.click();
+                    
                     document.getElementById('rec-status').style.display = 'none';
+                    clearInterval(recInterval);
+                    document.getElementById('rec-timer').innerText = "00:00";
                     stream.getTracks().forEach(t => t.stop());
                 };
                 mediaRecorder.start();
                 document.getElementById('rec-status').style.display = 'block';
-            } catch(e) { alert('権限が必要です'); }
-        }
-        function stopRecord() { if(mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop(); }
+                
+                // Timer
+                let start = Date.now();
+                recInterval = setInterval(() => {
+                    let diff = Math.floor((Date.now() - start) / 1000);
+                    let m = Math.floor(diff/60).toString().padStart(2,'0');
+                    let s = (diff%60).toString().padStart(2,'0');
+                    document.getElementById('rec-timer').innerText = `${m}:${s}`;
+                }, 1000);
 
-        // Clips
-        function addClip() {
-            const v = document.getElementById('cl-in').value;
-            if(!v) return;
-            appData.clips.push(v); saveData();
-            document.getElementById('cl-in').value = '';
-            renderClips();
+            } catch(e) { alert('権限が必要です: ' + e.message); }
         }
-        function renderClips() {
-            const l = document.getElementById('cl-list'); l.innerHTML = '';
-            appData.clips.forEach((c, i) => {
-                l.innerHTML += `<div class="todo-item" onclick="navigator.clipboard.writeText('${c}');alert('Copied!')" style="cursor:pointer;">
-                    <div style="flex:1;">${c}</div><i class="fas fa-trash" style="color:var(--danger);" onclick="event.stopPropagation();appData.clips.splice(${i},1);saveData();renderClips();"></i>
-                </div>`;
-            });
+        function stopRecord() { 
+            if(mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop(); 
         }
 
-        // AI Chat (Mock Implementation for UI)
+        // AI Chat
         function saveApiKey(k) { appData.apiKey = k; saveData(); }
         async function sendAi() {
-            const msg = document.getElementById('ai-in').value;
+            const inp = document.getElementById('ai-in');
+            const msg = inp.value;
             if(!msg) return;
             const log = document.getElementById('ai-log');
             log.innerHTML += `<div class="chat-msg user">${msg}</div>`;
-            document.getElementById('ai-in').value = '';
+            inp.value = '';
             log.scrollTop = log.scrollHeight;
 
             if(!appData.apiKey) {
@@ -1093,7 +1176,6 @@
                 return;
             }
 
-            // Simple OpenAI Call
             try {
                 log.innerHTML += `<div class="chat-msg ai" id="ai-loading">...</div>`;
                 const res = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -1103,34 +1185,23 @@
                 });
                 const data = await res.json();
                 document.getElementById('ai-loading').remove();
+                if(data.error) throw new Error(data.error.message);
                 const reply = data.choices?.[0]?.message?.content || 'Error';
-                log.innerHTML += `<div class="chat-msg ai">${reply}</div>`;
+                log.innerHTML += `<div class="chat-msg ai">${marked.parse(reply)}</div>`;
                 log.scrollTop = log.scrollHeight;
             } catch(e) {
-                document.getElementById('ai-loading').remove();
-                log.innerHTML += `<div class="chat-msg ai">Error: 通信に失敗しました</div>`;
+                const l = document.getElementById('ai-loading');
+                if(l) l.remove();
+                log.innerHTML += `<div class="chat-msg ai" style="color:var(--danger)">Error: ${e.message}</div>`;
             }
         }
 
-        // Calc & Units & Cropper & Text Utils (Same as V6)
-        let cExp = '';
-        function setupCalcKeys() {
-            document.onkeydown = (e) => {
-                const k = e.key;
-                if((k>='0'&&k<='9')||['+','-','*','/','.','(',')','%'].includes(k)) { e.preventDefault(); cIn(k); }
-                else if(k==='Enter') { e.preventDefault(); cIn('='); }
-                else if(k==='Backspace') { e.preventDefault(); cIn('Del'); }
-                else if(k==='Escape') { e.preventDefault(); cIn('C'); }
-            }
+        // Utils (Clip, Units, Image, etc)
+        function addClip() { const v=document.getElementById('cl-in').value; if(!v)return; appData.clips.push(v); saveData(); document.getElementById('cl-in').value=''; renderClips(); }
+        function renderClips() { 
+            document.getElementById('cl-list').innerHTML = appData.clips.map((c,i)=>`<div class="todo-item" onclick="navigator.clipboard.writeText('${c.replace(/'/g,"\\'")}');alert('Copied!')" style="cursor:pointer;"><div style="flex:1;">${c}</div><i class="fas fa-trash" style="color:var(--danger);" onclick="event.stopPropagation();appData.clips.splice(${i},1);saveData();renderClips();"></i></div>`).join('');
         }
-        function cIn(v) {
-            const d = document.getElementById('c-disp');
-            if(v==='C') cExp = '';
-            else if(v==='Del') cExp = cExp.slice(0,-1);
-            else if(v==='=') { try { const res = new Function('return ' + cExp.replace(/Math\./g, 'Math.'))(); cExp = String(res); } catch { cExp = 'Error'; } }
-            else cExp += v;
-            d.innerText = cExp || '0';
-        }
+        
         const units = { len: { m:1, cm:100, mm:1000, km:0.001, inch:39.37, ft:3.28 }, wgt: { kg:1, g:1000, lb:2.204 }, tmp: { C:'C', F:'F' }, area: { m2:1, tsubo:0.3025 }, spd: { kmh:1, ms:0.277 } };
         function updateUnitType() {
             const t = document.getElementById('u-cat').value; const ks = Object.keys(units[t]);
@@ -1146,6 +1217,7 @@
             else { res = (v / units[t][f]) * units[t][to]; }
             alert(`${v}${f} = ${res.toFixed(4)}${to}`);
         }
+
         function initCropper(input) {
             if(cropper) { cropper.destroy(); cropper=null; }
             if(!input.files[0]) return;
@@ -1155,6 +1227,7 @@
             reader.readAsDataURL(input.files[0]);
         }
         function exportCroppedImage() { if(!cropper) return; cropper.getCroppedCanvas().toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'edited.png'; a.click(); }); }
+        
         function countChar() { const t = document.getElementById('txt-c').value; document.getElementById('txt-res').innerText = `${t.length}字`; }
         function testRegex() {
             const p = document.getElementById('reg-pat').value; const t = document.getElementById('reg-txt').value; const r = document.getElementById('reg-res');

@@ -3,57 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LifeStation | 万能ツール図鑑</title>
+    <title>LifeStation V2 | 超・万能ツール</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
-            --primary: #6366f1; --bg: #f3f4f6; --sidebar: #ffffff; --text: #1f2937;
+            --primary: #4f46e5; --primary-hover: #4338ca;
+            --bg: #f3f4f6; --sidebar: #ffffff; --card-bg: #ffffff;
+            --text: #1f2937; --text-sub: #6b7280; --border: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
-        * { box-sizing: border-box; outline: none; }
+        [data-theme="dark"] {
+            --primary: #818cf8; --primary-hover: #6366f1;
+            --bg: #0f172a; --sidebar: #1e293b; --card-bg: #1e293b;
+            --text: #f1f5f9; --text-sub: #94a3b8; --border: #334155;
+        }
+
+        * { box-sizing: border-box; outline: none; transition: background 0.3s, color 0.3s; }
         body { margin: 0; font-family: 'Helvetica Neue', Arial, sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
         
         /* サイドバー */
-        .sidebar { width: 240px; background: var(--sidebar); display: flex; flex-direction: column; border-right: 1px solid #e5e7eb; padding: 20px 0; flex-shrink: 0; overflow-y: auto; }
-        .logo { font-size: 22px; font-weight: bold; text-align: center; margin-bottom: 20px; color: var(--primary); }
-        .menu-item { padding: 12px 20px; cursor: pointer; color: #4b5563; font-weight: 500; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
-        .menu-item:hover, .menu-item.active { background: #e0e7ff; color: var(--primary); border-right: 3px solid var(--primary); }
+        .sidebar { width: 260px; background: var(--sidebar); display: flex; flex-direction: column; border-right: 1px solid var(--border); padding: 20px 0; flex-shrink: 0; z-index: 10; }
+        .logo { font-size: 22px; font-weight: bold; text-align: center; margin-bottom: 20px; color: var(--primary); display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .user-panel { padding: 0 20px 20px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
+        .user-name { font-weight: bold; font-size: 16px; }
+        .user-rank { font-size: 12px; color: var(--text-sub); background: rgba(79, 70, 229, 0.1); padding: 2px 8px; border-radius: 10px; display: inline-block; margin-top: 5px; }
+
+        .menu-area { overflow-y: auto; flex: 1; }
+        .menu-item { padding: 12px 20px; cursor: pointer; color: var(--text-sub); font-weight: 500; display: flex; align-items: center; gap: 10px; border-left: 4px solid transparent; }
+        .menu-item:hover, .menu-item.active { background: rgba(79, 70, 229, 0.05); color: var(--primary); border-left-color: var(--primary); }
         
+        .sidebar-footer { padding: 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .theme-toggle { cursor: pointer; font-size: 20px; color: var(--text-sub); }
+
         /* メインエリア */
-        .main { flex: 1; display: flex; flex-direction: column; height: 100vh; }
-        .header { height: 60px; background: white; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; padding: 0 30px; justify-content: space-between; }
-        .search-box { width: 300px; padding: 8px 15px; border-radius: 20px; border: 1px solid #d1d5db; background: #f9fafb; }
+        .main { flex: 1; display: flex; flex-direction: column; height: 100vh; position: relative; }
+        .header { height: 60px; background: var(--sidebar); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 30px; justify-content: space-between; }
+        .search-box { width: 300px; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg); color: var(--text); }
         
-        .content { padding: 30px; overflow-y: auto; flex: 1; }
+        .content { padding: 30px; overflow-y: auto; flex: 1; position: relative; }
         
         /* カードグリッド */
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding-bottom: 50px; }
         .tool-card { 
-            background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
-            cursor: pointer; transition: 0.2s; border: 1px solid transparent; display: flex; flex-direction: column; gap: 10px;
+            background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: var(--shadow); 
+            cursor: pointer; position: relative; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px;
         }
-        .tool-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); border-color: var(--primary); }
-        .card-icon { font-size: 24px; color: var(--primary); background: #e0e7ff; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
-        .card-title { font-weight: bold; font-size: 16px; }
-        .card-desc { font-size: 13px; color: #6b7280; line-height: 1.4; }
+        .tool-card:hover { transform: translateY(-3px); border-color: var(--primary); }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .card-icon { font-size: 24px; color: var(--primary); background: rgba(79, 70, 229, 0.1); width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
+        .fav-btn { color: #d1d5db; font-size: 18px; cursor: pointer; transition: 0.2s; }
+        .fav-btn.active { color: #fbbf24; }
+        .fav-btn:hover { transform: scale(1.2); }
+
+        .card-title { font-weight: bold; font-size: 16px; margin-top: 5px; }
+        .card-desc { font-size: 13px; color: var(--text-sub); line-height: 1.4; }
 
         /* 個別ツール画面 */
-        .tool-view { display: none; background: white; padding: 30px; border-radius: 15px; max-width: 800px; margin: 0 auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .tool-view { display: none; background: var(--card-bg); padding: 30px; border-radius: 15px; max-width: 800px; margin: 0 auto; box-shadow: var(--shadow); border: 1px solid var(--border); }
         .tool-view.active { display: block; animation: fadeIn 0.3s; }
-        .back-btn { margin-bottom: 20px; cursor: pointer; color: #6b7280; display: inline-flex; align-items: center; gap: 5px; }
+        .back-btn { margin-bottom: 20px; cursor: pointer; color: var(--text-sub); display: inline-flex; align-items: center; gap: 5px; }
         .back-btn:hover { color: var(--primary); }
         
-        /* フォーム部品 */
-        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; margin-bottom: 15px; font-size: 16px; }
-        button.action-btn { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.2s; }
-        button.action-btn:hover { opacity: 0.9; }
-        .result-area { background: #f8fafc; padding: 20px; border-radius: 8px; margin-top: 20px; border: 1px solid #e2e8f0; font-size: 18px; font-weight: bold; text-align: center; color: #333; word-break: break-all; }
+        /* 履歴（ログ）モーダル */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; display: none; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
+        .modal-box { background: var(--card-bg); width: 90%; max-width: 500px; border-radius: 12px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-height: 80vh; display: flex; flex-direction: column; }
+        .modal-header { font-weight: bold; font-size: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; }
+        .log-list { overflow-y: auto; flex: 1; border-top: 1px solid var(--border); }
+        .log-item { padding: 10px; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .log-time { font-size: 11px; color: var(--text-sub); }
         
-        /* スマホ対応 */
+        /* フォーム部品 */
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text); border-radius: 8px; margin-bottom: 15px; font-size: 16px; }
+        button.action-btn { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.2s; }
+        button.action-btn:hover { background: var(--primary-hover); }
+        .result-area { background: rgba(79, 70, 229, 0.05); padding: 20px; border-radius: 8px; margin-top: 20px; border: 1px solid var(--primary); font-size: 18px; font-weight: bold; text-align: center; color: var(--text); word-break: break-all; }
+
         @media (max-width: 768px) {
             body { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; flex-direction: row; overflow-x: auto; padding: 10px; }
-            .menu-item { white-space: nowrap; border-right: none; border-bottom: 3px solid transparent; }
+            .sidebar { width: 100%; height: auto; flex-direction: row; overflow-x: auto; padding: 10px; border-right: none; border-bottom: 1px solid var(--border); }
+            .user-panel, .sidebar-footer { display: none; } /* スマホでは簡易化 */
+            .menu-area { display: flex; }
+            .menu-item { white-space: nowrap; border-left: none; border-bottom: 3px solid transparent; }
+            .menu-item.active { border-left: none; border-bottom-color: var(--primary); }
             .content { padding: 15px; }
         }
         @keyframes fadeIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
@@ -61,106 +93,243 @@
 </head>
 <body>
 
+    <div id="login-modal" class="modal-overlay" style="display:flex;">
+        <div class="modal-box" style="text-align:center;">
+            <h2>👋 ようこそ LifeStation へ</h2>
+            <p>あなたのニックネームを教えてください。<br><span style="font-size:12px; color:#888;">(データはブラウザ内にのみ保存されます)</span></p>
+            <input type="text" id="username-input" placeholder="例: テック太郎">
+            <button class="action-btn" onclick="registerUser()">利用を開始する</button>
+        </div>
+    </div>
+
+    <div id="log-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span>📜 アクティビティログ</span>
+                <span onclick="toggleLog()" style="cursor:pointer;">×</span>
+            </div>
+            <div class="log-list" id="log-container">
+                </div>
+            <button class="action-btn" style="margin-top:10px; background:#ef4444;" onclick="clearLogs()">履歴を削除</button>
+        </div>
+    </div>
+
     <nav class="sidebar">
-        <div class="logo">🧬 LifeStation</div>
-        <div class="menu-item active" onclick="filterCategory('all')"><i class="fas fa-th"></i> すべて</div>
-        <div class="menu-item" onclick="filterCategory('calc')"><i class="fas fa-calculator"></i> 計算・お金</div>
-        <div class="menu-item" onclick="filterCategory('date')"><i class="fas fa-calendar-alt"></i> 日付・時間</div>
-        <div class="menu-item" onclick="filterCategory('text')"><i class="fas fa-font"></i> 文字・変換</div>
-        <div class="menu-item" onclick="filterCategory('life')"><i class="fas fa-coffee"></i> 生活・便利</div>
-        <div class="menu-item" onclick="filterCategory('random')"><i class="fas fa-dice"></i> 運・ランダム</div>
+        <div class="logo"><i class="fas fa-atom"></i> LifeStation V2</div>
+        
+        <div class="user-panel">
+            <div class="user-name" id="disp-name">ゲスト</div>
+            <div class="user-rank" id="disp-rank">レギュラー会員</div>
+        </div>
+
+        <div class="menu-area">
+            <div class="menu-item active" onclick="filterCategory('all')"><i class="fas fa-th"></i> すべて</div>
+            <div class="menu-item" onclick="filterCategory('fav')"><i class="fas fa-star" style="color:#fbbf24;"></i> お気に入り</div>
+            <div class="menu-item" onclick="filterCategory('calc')"><i class="fas fa-calculator"></i> 計算・投資</div>
+            <div class="menu-item" onclick="filterCategory('date')"><i class="fas fa-clock"></i> 時間・日付</div>
+            <div class="menu-item" onclick="filterCategory('text')"><i class="fas fa-font"></i> テキスト処理</div>
+            <div class="menu-item" onclick="filterCategory('dev')"><i class="fas fa-code"></i> 開発・Web</div>
+            <div class="menu-item" onclick="filterCategory('life')"><i class="fas fa-coffee"></i> 生活・便利</div>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></div>
+            <div class="theme-toggle" onclick="toggleLog()" title="履歴を見る"><i class="fas fa-history"></i></div>
+            <div class="theme-toggle" onclick="logout()" title="データをリセット"><i class="fas fa-sign-out-alt"></i></div>
+        </div>
     </nav>
 
     <div class="main">
         <header class="header">
             <h3 id="page-title" style="margin:0;">ダッシュボード</h3>
-            <input type="text" class="search-box" placeholder="ツールを検索 (例: 割り勘, QR)..." oninput="searchTools(this.value)">
+            <input type="text" class="search-box" placeholder="ツールを検索 (例: 投資, ToDo)..." oninput="searchTools(this.value)">
         </header>
 
         <div class="content">
             <div id="grid-container" class="grid-container"></div>
-            
             <div id="tool-stage"></div>
         </div>
     </div>
 
     <script>
-        // --- ツール定義 (ここを増やすだけで機能が増える) ---
+        // --- ユーザーデータ管理システム (Local Storage) ---
+        const DB = {
+            get: (key) => JSON.parse(localStorage.getItem('ls_v2_' + key) || 'null'),
+            set: (key, val) => localStorage.setItem('ls_v2_' + key, JSON.stringify(val)),
+            del: (key) => localStorage.removeItem('ls_v2_' + key)
+        };
+
+        let currentUser = DB.get('user');
+        let favorites = DB.get('favs') || [];
+        let logs = DB.get('logs') || [];
+
+        // 初期化
+        window.onload = () => {
+            if (!currentUser) {
+                document.getElementById('login-modal').style.display = 'flex';
+            } else {
+                initApp();
+            }
+            if(DB.get('theme') === 'dark') document.body.setAttribute('data-theme', 'dark');
+        };
+
+        function registerUser() {
+            const name = document.getElementById('username-input').value || '名無し';
+            currentUser = { name: name, joined: new Date().toISOString(), usageCount: 0 };
+            DB.set('user', currentUser);
+            document.getElementById('login-modal').style.display = 'none';
+            initApp();
+        }
+
+        function initApp() {
+            document.getElementById('login-modal').style.display = 'none';
+            document.getElementById('disp-name').innerText = currentUser.name + ' さん';
+            updateRank();
+            renderGrid();
+        }
+
+        function updateRank() {
+            const count = currentUser.usageCount;
+            let rank = "ビギナー会員";
+            if(count > 10) rank = "シルバー会員";
+            if(count > 50) rank = "ゴールド会員";
+            if(count > 100) rank = "プラチナ会員";
+            document.getElementById('disp-rank').innerText = rank;
+        }
+
+        function logout() {
+            if(confirm('全てのデータを削除して初期化しますか？')) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        // --- ログシステム ---
+        function addLog(toolName, resultText) {
+            logs.unshift({ time: new Date().toLocaleString(), tool: toolName, res: resultText });
+            if(logs.length > 50) logs.pop(); // 最大50件
+            DB.set('logs', logs);
+            
+            // ユーザー利用回数加算
+            currentUser.usageCount++;
+            DB.set('user', currentUser);
+            updateRank();
+        }
+
+        function toggleLog() {
+            const m = document.getElementById('log-modal');
+            const c = document.getElementById('log-container');
+            if (m.style.display === 'flex') {
+                m.style.display = 'none';
+            } else {
+                m.style.display = 'flex';
+                c.innerHTML = logs.length ? '' : '<div style="text-align:center; padding:20px; color:#999;">履歴はありません</div>';
+                logs.forEach(l => {
+                    c.innerHTML += `<div class="log-item"><div class="log-time">${l.time} - ${l.tool}</div><div>${l.res}</div></div>`;
+                });
+            }
+        }
+        function clearLogs() { logs = []; DB.set('logs', []); toggleLog(); }
+
+        // --- お気に入り機能 ---
+        function toggleFav(id, e) {
+            e.stopPropagation();
+            if(favorites.includes(id)) favorites = favorites.filter(f => f !== id);
+            else favorites.push(id);
+            DB.set('favs', favorites);
+            renderGrid(); // 再描画
+        }
+
+        // --- テーマ切り替え ---
+        function toggleTheme() {
+            const body = document.body;
+            if(body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                DB.set('theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                DB.set('theme', 'dark');
+            }
+        }
+
+        // ============================
+        // ■ ツール定義 (大量追加)
+        // ============================
         const tools = [
-            // ■ 計算・お金
-            { id: 'discount', cat: 'calc', icon: 'fa-tags', title: '割引計算機', desc: '「3割引」「20%OFF」などを瞬時に計算します。', 
-              html: `<div style="display:flex; gap:10px;"><input type="number" id="dc_price" placeholder="元の価格 (円)"><input type="number" id="dc_percent" placeholder="割引率 (%)"></div><button class="action-btn" onclick="runDiscount()">計算する</button>` },
-            
-            { id: 'warikan', cat: 'calc', icon: 'fa-users', title: 'スマート割り勘', desc: '人数と金額から一人あたりの支払い額を計算。端数処理も対応。',
-              html: `<input type="number" id="wk_price" placeholder="合計金額 (円)"><input type="number" id="wk_ppl" placeholder="人数 (人)"><select id="wk_mode"><option value="1">1円単位</option><option value="100">100円単位(多めに集める)</option></select><button class="action-btn" onclick="runWarikan()">計算する</button>` },
-            
-            { id: 'tax', cat: 'calc', icon: 'fa-shopping-cart', title: '消費税計算', desc: '税抜・税込を相互に変換します。軽減税率(8%)対応。',
-              html: `<input type="number" id="tx_val" placeholder="金額を入力"><div style="display:flex; gap:10px; margin-bottom:15px;"><button class="action-btn" style="background:#64748b" onclick="runTax(1.1)">税込(10%)にする</button><button class="action-btn" style="background:#64748b" onclick="runTax(1.08)">税込(8%)にする</button></div><button class="action-btn" onclick="runTaxRev(1.1)">税込から税抜を出す(10%)</button>` },
+            // --- Calc ---
+            { id: 'discount', cat: 'calc', icon: 'fa-tags', title: '割引計算', desc: 'X% OFFの計算', 
+              html: `<div style="display:flex; gap:10px;"><input type="number" id="dc_p" placeholder="価格"><input type="number" id="dc_r" placeholder="割引率(%)"></div><button class="action-btn" onclick="runDisc()">計算</button>` },
+            { id: 'tax', cat: 'calc', icon: 'fa-shopping-bag', title: '消費税計算', desc: '8% / 10% 切り替え', 
+              html: `<input type="number" id="tx_v"><button class="action-btn" onclick="runTax()">計算</button>` },
+            { id: 'invest', cat: 'calc', icon: 'fa-chart-line', title: '積立投資シミュ', desc: '毎月積立の複利計算', 
+              html: `<input type="number" id="iv_m" placeholder="毎月の積立額(万円)"><input type="number" id="iv_r" placeholder="年利(%)"><input type="number" id="iv_y" placeholder="積立年数"><button class="action-btn" onclick="runInvest()">シミュレーション</button>` },
+            { id: 'tip', cat: 'calc', icon: 'fa-coins', title: 'チップ計算', desc: '海外旅行用のチップ計算', 
+              html: `<input type="number" id="tp_v" placeholder="請求額"><input type="number" id="tp_r" placeholder="チップ(%) 例:15"><button class="action-btn" onclick="runTip()">計算</button>` },
 
-            { id: 'bmi', cat: 'calc', icon: 'fa-weight', title: 'BMI計算機', desc: '身長と体重から肥満度をチェックします。',
-              html: `<input type="number" id="bmi_h" placeholder="身長 (cm)"><input type="number" id="bmi_w" placeholder="体重 (kg)"><button class="action-btn" onclick="runBMI()">判定する</button>` },
+            // --- Date ---
+            { id: 'age', cat: 'date', icon: 'fa-birthday-cake', title: '年齢・日数', desc: '生まれて何日？', 
+              html: `<input type="date" id="ag_d"><button class="action-btn" onclick="runAge()">計算</button>` },
+            { id: 'timer', cat: 'date', icon: 'fa-hourglass-start', title: '3分タイマー', desc: 'カップ麺用タイマー', 
+              html: `<button class="action-btn" onclick="runTimer(180)">3分スタート</button><div id="tm_disp" style="font-size:40px; text-align:center; margin-top:20px;">03:00</div>` },
+            { id: 'wclock', cat: 'date', icon: 'fa-globe', title: '世界時計', desc: 'NY, ロンドンの時間', 
+              html: `<button class="action-btn" onclick="runWClock()">今の時間を取得</button>` },
 
-            // ■ 日付・時間
-            { id: 'age', cat: 'date', icon: 'fa-birthday-cake', title: '年齢・日数計算', desc: '生年月日から現在の年齢、生まれてからの日数を計算。',
-              html: `<input type="date" id="age_birth"><button class="action-btn" onclick="runAge()">計算する</button>` },
-            
-            { id: 'era', cat: 'date', icon: 'fa-torii-gate', title: '西暦・和暦変換', desc: '1990年は平成何年？を一発変換。',
-              html: `<input type="number" id="era_year" placeholder="西暦 (例: 2024)"><button class="action-btn" onclick="runEra()">和暦に変換</button>` },
+            // --- Text ---
+            { id: 'count', cat: 'text', icon: 'fa-file-lines', title: '文字数カウント', desc: 'リアルタイムカウント', 
+              html: `<textarea id="cnt_t" rows="5" oninput="runCount()"></textarea>` },
+            { id: 'lorem', cat: 'text', icon: 'fa-paragraph', title: 'ダミーテキスト', desc: 'Lorem Ipsum生成', 
+              html: `<button class="action-btn" onclick="runLorem()">生成コピー</button>` },
+            { id: 'speech', cat: 'text', icon: 'fa-volume-up', title: '読み上げ', desc: 'ブラウザが喋ります', 
+              html: `<textarea id="sp_t" placeholder="喋らせたい言葉"></textarea><button class="action-btn" onclick="runSpeech()">再生</button>` },
+            { id: 'reverse', cat: 'text', icon: 'fa-exchange-alt', title: '文字反転', desc: '逆から読む', 
+              html: `<input type="text" id="rev_t"><button class="action-btn" onclick="runRev()">反転</button>` },
 
-            { id: 'stopwatch', cat: 'date', icon: 'fa-stopwatch', title: 'ストップウォッチ', desc: 'シンプルなストップウォッチ。ラップ機能なしの硬派仕様。',
-              html: `<div id="sw_disp" style="font-size:40px; text-align:center; margin:20px; font-family:monospace;">00:00:00</div><button class="action-btn" onclick="toggleSW()" id="sw_btn">スタート</button>` },
+            // --- Dev ---
+            { id: 'qr', cat: 'dev', icon: 'fa-qrcode', title: 'QR生成', desc: 'URLをQR化', 
+              html: `<input type="text" id="qr_v"><button class="action-btn" onclick="runQR()">作成</button><div id="qr_area" style="margin-top:20px;display:flex;justify-content:center;"></div>` },
+            { id: 'pass', cat: 'dev', icon: 'fa-key', title: 'パスワード生成', desc: '強力なパスワード', 
+              html: `<button class="action-btn" onclick="runPass()">生成</button>` },
+            { id: 'ua', cat: 'dev', icon: 'fa-desktop', title: '環境確認', desc: 'UserAgent確認', 
+              html: `<button class="action-btn" onclick="runUA()">確認</button>` },
+            { id: 'color', cat: 'dev', icon: 'fa-palette', title: 'カラーピッカー', desc: '色のコード取得', 
+              html: `<input type="color" id="cl_p" onchange="runColor()"><div id="cl_res"></div>` },
 
-            // ■ 文字・変換
-            { id: 'count', cat: 'text', icon: 'fa-file-alt', title: '文字数カウンター', desc: 'レポートやSNS投稿用に。空白無視カウントも。',
-              html: `<textarea id="cnt_txt" rows="5" placeholder="ここに入力" oninput="runCount()"></textarea>` },
-
-            { id: 'pass', cat: 'text', icon: 'fa-key', title: '強力パスワード生成', desc: 'ランダムで安全なパスワードを作ります。',
-              html: `<select id="ps_len"><option value="8">8文字</option><option value="12" selected>12文字</option><option value="16">16文字</option><option value="32">32文字 (最強)</option></select><button class="action-btn" onclick="runPass()">生成する</button>` },
-
-            { id: 'qr', cat: 'text', icon: 'fa-qrcode', title: 'QRコード作成', desc: 'URLやテキストをQRコード画像に変換します。',
-              html: `<input type="text" id="qr_txt" placeholder="URLなどを入力"><button class="action-btn" onclick="runQR()">QRコード作成</button><div id="qr_area" style="margin-top:20px; display:flex; justify-content:center;"></div>` },
-              
-            { id: 'case', cat: 'text', icon: 'fa-font', title: '大文字・小文字変換', desc: '英語の「HELLO」⇔「hello」を一括変換。',
-              html: `<textarea id="case_txt" rows="3" placeholder="英語を入力"></textarea><div style="display:flex; gap:10px;"><button class="action-btn" onclick="runCase('upper')">全て大文字</button><button class="action-btn" onclick="runCase('lower')">全て小文字</button></div>` },
-
-            // ■ 生活・便利
-            { id: 'loan', cat: 'life', icon: 'fa-home', title: '簡易ローン計算', desc: '借入額と金利から月々の支払額を概算します。',
-              html: `<input type="number" id="ln_amount" placeholder="借入額 (万円)"><input type="number" id="ln_rate" placeholder="年利 (%)"><input type="number" id="ln_year" placeholder="返済期間 (年)"><button class="action-btn" onclick="runLoan()">計算する</button>` },
-
-            { id: 'unit', cat: 'life', icon: 'fa-ruler-combined', title: '単位変換 (簡易版)', desc: 'メートル、インチ、尺などを変換。',
-              html: `<input type="number" id="un_val" placeholder="数値を入力 (メートル基準)"><button class="action-btn" onclick="runUnit()">変換結果を表示</button>` },
-
-            { id: 'search', cat: 'life', icon: 'fa-search-plus', title: 'Google/Twitter一括検索', desc: '入力した言葉を複数のサイトで同時に検索タブを開きます。',
-              html: `<input type="text" id="mul_key" placeholder="検索ワード"><button class="action-btn" onclick="runMultiSearch()">GoogleとXとYouTubeで検索</button>` },
-
-            // ■ 運・ランダム
-            { id: 'dice', cat: 'random', icon: 'fa-dice-five', title: 'サイコロ', desc: '1〜6のサイコロを振ります。TRPGやボードゲームに。',
-              html: `<button class="action-btn" onclick="runDice()" style="height:100px; font-size:24px;">サイコロを振る</button>` },
-
-            { id: 'roulette', cat: 'random', icon: 'fa-bullseye', title: '迷った時のルーレット', desc: '選択肢（カンマ区切り）から1つを選びます。ランチ決めに。',
-              html: `<textarea id="rl_list" placeholder="ラーメン, カレー, 寿司, ハンバーグ"></textarea><button class="action-btn" onclick="runRoulette()">決めてもらう！</button>` },
-              
-            { id: 'omikuji', cat: 'random', icon: 'fa-star', title: '簡易おみくじ', desc: '今日の運勢を占います。',
-              html: `<button class="action-btn" onclick="runOmikuji()">おみくじを引く</button>` },
+            // --- Life ---
+            { id: 'todo', cat: 'life', icon: 'fa-check-square', title: '簡易ToDo', desc: '一時的なメモリスト', 
+              html: `<input type="text" id="td_i" placeholder="タスクを入力"><button class="action-btn" onclick="runTodo()">追加</button><ul id="td_l" style="margin-top:20px;"></ul>` },
+            { id: 'dice', cat: 'life', icon: 'fa-dice', title: 'サイコロ', desc: '運試し', 
+              html: `<button class="action-btn" onclick="runDice()">振る</button>` },
         ];
 
-        // --- 初期表示処理 ---
-        const grid = document.getElementById('grid-container');
-        const stage = document.getElementById('tool-stage');
-        
+        // --- グリッド描画 ---
         function renderGrid(filterCat = 'all', keyword = '') {
+            const grid = document.getElementById('grid-container');
+            const stage = document.getElementById('tool-stage');
             grid.innerHTML = '';
-            stage.innerHTML = ''; // クリア
-            grid.style.display = 'grid'; // グリッド表示に戻す
-            
-            tools.forEach(tool => {
-                if ((filterCat === 'all' || tool.cat === filterCat) && 
-                    (keyword === '' || tool.title.includes(keyword) || tool.desc.includes(keyword))) {
-                    
+            stage.innerHTML = '';
+            grid.style.display = 'grid';
+
+            // お気に入りフィルターの場合は別処理
+            let targets = tools;
+            if(filterCat === 'fav') {
+                targets = tools.filter(t => favorites.includes(t.id));
+                if(targets.length === 0) grid.innerHTML = '<p style="grid-column:1/-1; text-align:center;">お気に入りがありません。★を押して追加しよう！</p>';
+            }
+
+            targets.forEach(tool => {
+                // 検索 & カテゴリフィルタ
+                const matchCat = filterCat === 'all' || filterCat === 'fav' ? true : tool.cat === filterCat;
+                const matchKey = keyword === '' || tool.title.includes(keyword) || tool.desc.includes(keyword);
+
+                if (matchCat && matchKey) {
+                    const isFav = favorites.includes(tool.id);
                     const card = document.createElement('div');
                     card.className = 'tool-card';
                     card.innerHTML = `
-                        <div class="card-icon"><i class="fas ${tool.icon}"></i></div>
+                        <div class="card-header">
+                            <div class="card-icon"><i class="fas ${tool.icon}"></i></div>
+                            <i class="fas fa-star fav-btn ${isFav ? 'active' : ''}" onclick="toggleFav('${tool.id}', event)"></i>
+                        </div>
                         <div class="card-title">${tool.title}</div>
                         <div class="card-desc">${tool.desc}</div>
                     `;
@@ -169,171 +338,154 @@
                 }
             });
         }
-        
+
         function openTool(tool) {
-            grid.style.display = 'none';
-            stage.innerHTML = `
+            document.getElementById('grid-container').style.display = 'none';
+            document.getElementById('tool-stage').innerHTML = `
                 <div class="tool-view active">
-                    <div class="back-btn" onclick="renderGrid()"><i class="fas fa-arrow-left"></i> 一覧に戻る</div>
+                    <div class="back-btn" onclick="renderGrid()"><i class="fas fa-arrow-left"></i> 戻る</div>
                     <h2><i class="fas ${tool.icon}" style="color:var(--primary)"></i> ${tool.title}</h2>
                     <p>${tool.desc}</p>
-                    <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
+                    <hr style="border:0; border-top:1px solid var(--border); margin:20px 0;">
                     ${tool.html}
                     <div id="result" class="result-area" style="display:none;"></div>
                 </div>
             `;
-            document.getElementById('page-title').innerText = tool.title;
+            // ToDoのような特殊初期化が必要な場合
+            if(tool.id === 'todo') renderTodoList();
         }
 
-        // --- カテゴリ・検索 ---
         function filterCategory(cat) {
             document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
             event.currentTarget.classList.add('active');
             renderGrid(cat);
         }
         function searchTools(val) { renderGrid('all', val); }
-
-        // --- 汎用: 結果表示ヘルパー ---
-        function showRes(text) {
+        function showRes(txt, toolId) {
             const el = document.getElementById('result');
             el.style.display = 'block';
-            el.innerHTML = text;
-        }
-
-        // ============================
-        // ■ 各ツールのロジック (ここが脳みそ)
-        // ============================
-
-        // 割引計算
-        function runDiscount() {
-            const p = Number(document.getElementById('dc_price').value);
-            const r = Number(document.getElementById('dc_percent').value);
-            showRes(`${p}円 の ${r}% OFF は...<br><span style="font-size:32px; color:red;">${Math.floor(p * (1 - r/100))} 円</span> です`);
-        }
-        // 割り勘
-        function runWarikan() {
-            const p = Number(document.getElementById('wk_price').value);
-            const n = Number(document.getElementById('wk_ppl').value);
-            const unit = Number(document.getElementById('wk_mode').value);
-            if(!n) return;
-            const res = Math.ceil(p / n / unit) * unit;
-            const surplus = (res * n) - p;
-            showRes(`一人当たり: <span style="font-size:32px; color:blue;">${res} 円</span><br>(余り: ${surplus}円)`);
-        }
-        // 税計算
-        function runTax(rate) {
-            const v = Number(document.getElementById('tx_val').value);
-            showRes(`税込: ${Math.floor(v * rate)} 円`);
-        }
-        function runTaxRev(rate) {
-            const v = Number(document.getElementById('tx_val').value);
-            showRes(`税抜: ${Math.floor(v / rate)} 円`);
-        }
-        // BMI
-        function runBMI() {
-            const h = Number(document.getElementById('bmi_h').value) / 100;
-            const w = Number(document.getElementById('bmi_w').value);
-            const bmi = w / (h*h);
-            let msg = bmi < 18.5 ? "低体重" : bmi < 25 ? "普通体重" : "肥満";
-            showRes(`BMI: ${bmi.toFixed(1)} (${msg})`);
-        }
-        // 年齢
-        function runAge() {
-            const b = new Date(document.getElementById('age_birth').value);
-            const today = new Date();
-            const age = today.getFullYear() - b.getFullYear();
-            const diff = Math.floor((today - b) / 86400000);
-            showRes(`${age}歳 (生まれてから ${diff}日)`);
-        }
-        // 元号
-        function runEra() {
-            const y = Number(document.getElementById('era_year').value);
-            if(y >= 2019) showRes(`令和 ${y - 2018} 年`);
-            else if(y >= 1989) showRes(`平成 ${y - 1988} 年`);
-            else if(y >= 1926) showRes(`昭和 ${y - 1925} 年`);
-            else showRes("明治・大正、またはそれ以前");
-        }
-        // ストップウォッチ
-        let swT = null, swS = 0;
-        function toggleSW() {
-            const btn = document.getElementById('sw_btn');
-            if(swT) { clearInterval(swT); swT = null; btn.innerText = "再開"; }
-            else {
-                btn.innerText = "ストップ";
-                swT = setInterval(() => {
-                    swS++;
-                    const h = String(Math.floor(swS/3600)).padStart(2,'0');
-                    const m = String(Math.floor((swS%3600)/60)).padStart(2,'0');
-                    const s = String(swS%60).padStart(2,'0');
-                    document.getElementById('sw_disp').innerText = `${h}:${m}:${s}`;
-                }, 1000);
+            el.innerHTML = txt;
+            // ログ保存
+            if(toolId) {
+                const title = tools.find(t=>t.id===toolId).title;
+                addLog(title, txt.replace(/<[^>]*>?/gm, '')); // タグ除去して保存
             }
         }
-        // 文字数
-        function runCount() {
-            const t = document.getElementById('cnt_txt').value;
-            showRes(`文字数: ${t.length} <br> 空白なし: ${t.replace(/\s/g,'').length}`);
+
+        // ============================
+        // ■ ロジック実装
+        // ============================
+        
+        // Calc
+        function runDisc() {
+            const p = Number(document.getElementById('dc_p').value);
+            const r = Number(document.getElementById('dc_r').value);
+            const res = Math.floor(p * (1 - r/100));
+            showRes(`${res} 円 <span style="font-size:12px">(${p-res}円お得)</span>`, 'discount');
         }
-        // パスワード
-        function runPass() {
-            const len = Number(document.getElementById('ps_len').value);
-            const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
-            let p = "";
-            for(let i=0; i<len; i++) p += chars.charAt(Math.floor(Math.random()*chars.length));
-            showRes(p);
+        function runTax() {
+            const v = Number(document.getElementById('tx_v').value);
+            showRes(`8%: ${Math.floor(v*1.08)}円<br>10%: ${Math.floor(v*1.1)}円`, 'tax');
         }
-        // QRコード
-        function runQR() {
-            const area = document.getElementById('qr_area');
-            area.innerHTML = "";
-            new QRCode(area, document.getElementById('qr_txt').value);
-            showRes("生成しました");
+        function runInvest() {
+            const m = Number(document.getElementById('iv_m').value) * 10000;
+            const r = Number(document.getElementById('iv_r').value) / 100;
+            const y = Number(document.getElementById('iv_y').value);
+            let total = 0;
+            for(let i=0; i<y*12; i++) { total = (total + m) * (1 + r/12); }
+            showRes(`${y}年後の資産: <br><span style="color:var(--primary); font-size:28px;">${Math.floor(total).toLocaleString()} 円</span>`, 'invest');
         }
-        // 大文字小文字
-        function runCase(mode) {
-            const t = document.getElementById('case_txt').value;
-            showRes(mode==='upper' ? t.toUpperCase() : t.toLowerCase());
-        }
-        // ローン
-        function runLoan() {
-            const p = Number(document.getElementById('ln_amount').value) * 10000;
-            const r = Number(document.getElementById('ln_rate').value) / 100 / 12;
-            const n = Number(document.getElementById('ln_year').value) * 12;
-            const pay = (p * r * Math.pow(1+r, n)) / (Math.pow(1+r, n) - 1);
-            showRes(`月々: ${Math.floor(pay).toLocaleString()} 円`);
-        }
-        // 単位
-        function runUnit() {
-            const v = Number(document.getElementById('un_val').value);
-            showRes(`${v}m = ${(v*100).toFixed(1)}cm = ${(v*3.28).toFixed(2)}ft = ${(v*39.37).toFixed(2)}inch`);
-        }
-        // 一括検索
-        function runMultiSearch() {
-            const k = document.getElementById('mul_key').value;
-            window.open(`https://www.google.com/search?q=${k}`);
-            window.open(`https://twitter.com/search?q=${k}`);
-            window.open(`https://www.youtube.com/results?search_query=${k}`);
-        }
-        // サイコロ
-        function runDice() {
-            const d = Math.floor(Math.random() * 6) + 1;
-            showRes(`<i class="fas fa-dice-${['one','two','three','four','five','six'][d-1]}" style="font-size:60px"></i><br>${d}`);
-        }
-        // ルーレット
-        function runRoulette() {
-            const l = document.getElementById('rl_list').value.split(',').map(s=>s.trim()).filter(s=>s);
-            if(!l.length) return;
-            const r = l[Math.floor(Math.random() * l.length)];
-            showRes(`運命の選択は...<br><span style="font-size:32px; color:#e11d48;">${r}</span> です！`);
-        }
-        // おみくじ
-        function runOmikuji() {
-            const r = ["大吉","中吉","小吉","吉","末吉","凶"];
-            showRes(r[Math.floor(Math.random()*r.length)]);
+        function runTip() {
+            const v = Number(document.getElementById('tp_v').value);
+            const r = Number(document.getElementById('tp_r').value);
+            showRes(`チップ: ${Math.floor(v*r/100)} <br>総額: ${Math.floor(v*(1+r/100))}`, 'tip');
         }
 
-        // 初期化
-        renderGrid();
+        // Date
+        function runAge() {
+            const d = new Date(document.getElementById('ag_d').value);
+            const diff = Math.floor((new Date() - d) / 86400000);
+            showRes(`${diff}日 経過`, 'age');
+        }
+        function runTimer(sec) {
+            let s = sec;
+            const el = document.getElementById('tm_disp');
+            const timer = setInterval(() => {
+                s--;
+                const min = String(Math.floor(s/60)).padStart(2,'0');
+                const sc = String(s%60).padStart(2,'0');
+                el.innerText = `${min}:${sc}`;
+                if(s<=0) { clearInterval(timer); el.innerText="TIME UP!"; alert('時間です！'); }
+            }, 1000);
+        }
+        function runWClock() {
+            const now = new Date();
+            const ny = new Date(now.toLocaleString("en-US", {timeZone: "America/New_York"}));
+            const lon = new Date(now.toLocaleString("en-US", {timeZone: "Europe/London"}));
+            showRes(`🇯🇵 日本: ${now.getHours()}:${now.getMinutes()}<br>🇺🇸 NY: ${ny.getHours()}:${ny.getMinutes()}<br>🇬🇧 London: ${lon.getHours()}:${lon.getMinutes()}`, 'wclock');
+        }
+
+        // Text
+        function runCount() {
+            const v = document.getElementById('cnt_t').value;
+            showRes(`${v.length} 文字`, null); // ログなし
+        }
+        function runLorem() {
+            const txt = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+            navigator.clipboard.writeText(txt);
+            showRes("コピーしました", 'lorem');
+        }
+        function runSpeech() {
+            const t = document.getElementById('sp_t').value;
+            const u = new SpeechSynthesisUtterance(t);
+            u.lang = 'ja-JP';
+            speechSynthesis.speak(u);
+            showRes("再生中...", 'speech');
+        }
+        function runRev() {
+            const v = document.getElementById('rev_t').value;
+            showRes(v.split('').reverse().join(''), 'reverse');
+        }
+
+        // Dev
+        function runQR() {
+            const v = document.getElementById('qr_v').value;
+            document.getElementById('qr_area').innerHTML = "";
+            new QRCode(document.getElementById('qr_area'), v);
+            showRes("生成完了", 'qr');
+        }
+        function runPass() {
+            const c = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$";
+            let p = "";
+            for(let i=0;i<16;i++) p += c.charAt(Math.floor(Math.random()*c.length));
+            showRes(p, 'pass');
+        }
+        function runUA() {
+            showRes(navigator.userAgent, 'ua');
+        }
+        function runColor() {
+            const v = document.getElementById('cl_p').value;
+            document.getElementById('cl_res').innerText = v;
+        }
+
+        // Life
+        let todos = [];
+        function runTodo() {
+            const v = document.getElementById('td_i').value;
+            if(v) { todos.push(v); renderTodoList(); document.getElementById('td_i').value=''; }
+        }
+        function renderTodoList() {
+            const ul = document.getElementById('td_l');
+            if(!ul) return;
+            ul.innerHTML = '';
+            todos.forEach((t, i) => {
+                ul.innerHTML += `<li>${t} <button onclick="todos.splice(${i},1);renderTodoList()" style="padding:2px 5px;">消</button></li>`;
+            });
+        }
+        function runDice() {
+            showRes(Math.floor(Math.random()*6)+1, 'dice');
+        }
+
     </script>
 </body>
 </html>

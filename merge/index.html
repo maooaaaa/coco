@@ -1,1 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF結合 - PDF神ツール</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+    <script src="https://unpkg.com/downloadjs@1.4.7/download.min.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
 
+    <nav class="bg-white shadow p-4">
+        <div class="container mx-auto">
+            <a href="../" class="text-blue-600 hover:underline font-bold">← トップへ戻る</a>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-6 flex-grow max-w-2xl">
+        <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">PDF結合ツール</h1>
+        
+        <div class="bg-white p-8 rounded-xl shadow-lg">
+            <div class="border-4 border-dashed border-blue-200 rounded-lg p-10 text-center hover:bg-blue-50 transition relative">
+                <input type="file" id="fileInput" multiple accept="application/pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                <p class="text-gray-500 text-lg">ここにPDFをドラッグ&ドロップ<br>またはクリックして選択</p>
+            </div>
+
+            <div id="fileList" class="mt-6 space-y-2">
+                </div>
+
+            <button id="mergeBtn" class="w-full bg-blue-600 text-white font-bold py-4 px-6 rounded-lg mt-6 hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed" disabled>
+                PDFを結合してダウンロード
+            </button>
+        </div>
+
+        <div class="mt-8 text-sm text-gray-500 text-center">
+            <p>※ファイルはサーバーに送信されません。あなたの端末内で安全に処理されます。</p>
+        </div>
+    </main>
+
+    <script>
+        const { PDFDocument } = PDFLib;
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        const mergeBtn = document.getElementById('mergeBtn');
+        let selectedFiles = [];
+
+        // ファイルが選択された時の処理
+        fileInput.addEventListener('change', async (e) => {
+            selectedFiles = Array.from(e.target.files);
+            renderFileList();
+            mergeBtn.disabled = selectedFiles.length < 2; // 2つ以上ないとボタン押せない
+        });
+
+        // ファイルリストを表示する関数
+        function renderFileList() {
+            fileList.innerHTML = '';
+            if (selectedFiles.length === 0) return;
+
+            selectedFiles.forEach((file, index) => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between bg-gray-100 p-3 rounded';
+                div.innerHTML = `
+                    <span class="truncate text-gray-700">📄 ${file.name}</span>
+                    <span class="text-xs text-gray-400">(${(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                `;
+                fileList.appendChild(div);
+            });
+        }
+
+        // 結合ボタンが押された時の処理
+        mergeBtn.addEventListener('click', async () => {
+            if (selectedFiles.length < 2) return;
+
+            // ボタンをロード中にする
+            const originalText = mergeBtn.innerText;
+            mergeBtn.innerText = '処理中...';
+            mergeBtn.disabled = true;
+
+            try {
+                // 空の新しいPDFを作成
+                const mergedPdf = await PDFDocument.create();
+
+                for (const file of selectedFiles) {
+                    // ファイルを読み込む
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await PDFDocument.load(arrayBuffer);
+                    
+                    // ページをコピーして新しいPDFに追加
+                    const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+                    copiedPages.forEach((page) => mergedPdf.addPage(page));
+                }
+
+                // PDFをバイナリデータとして生成
+                const pdfBytes = await mergedPdf.save();
+
+                // ブラウザでダウンロードさせる
+                download(pdfBytes, "merged-document.pdf", "application/pdf");
+
+            } catch (error) {
+                console.error(error);
+                alert('エラーが発生しました。ファイルが壊れているか、パスワードがかかっている可能性があります。');
+            } finally {
+                // ボタンを元に戻す
+                mergeBtn.innerText = originalText;
+                mergeBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF回転 - PDF神ツール</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+    <script src="https://unpkg.com/downloadjs@1.4.7/download.min.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+    <nav class="bg-white shadow p-4">
+        <div class="container mx-auto">
+            <a href="../" class="text-blue-600 hover:underline font-bold">← トップへ戻る</a>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-6 flex-grow max-w-2xl">
+        <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">PDFの回転</h1>
+        
+        <div class="bg-white p-8 rounded-xl shadow-lg">
+            <div class="border-4 border-dashed border-purple-200 rounded-lg p-10 text-center hover:bg-purple-50 transition relative">
+                <input type="file" id="fileInput" accept="application/pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                <p class="text-gray-500 text-lg">PDFをドラッグ&ドロップ<br>（クリックして選択）</p>
+            </div>
+
+            <p id="fileName" class="text-center mt-4 font-bold text-gray-700"></p>
+
+            <div id="controls" class="hidden mt-8">
+                <p class="mb-2 font-bold text-gray-700">回転角度を選択:</p>
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                    <button onclick="setRotation(90)" class="p-3 bg-gray-200 rounded hover:bg-purple-100 border border-gray-300">時計回り 90°</button>
+                    <button onclick="setRotation(180)" class="p-3 bg-gray-200 rounded hover:bg-purple-100 border border-gray-300">180°</button>
+                    <button onclick="setRotation(270)" class="p-3 bg-gray-200 rounded hover:bg-purple-100 border border-gray-300">反時計 90°</button>
+                </div>
+                
+                <button id="rotateBtn" class="w-full bg-purple-600 text-white font-bold py-4 px-6 rounded-lg hover:bg-purple-700 transition">
+                    回転してダウンロード
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const { PDFDocument, degrees } = PDFLib;
+        const fileInput = document.getElementById('fileInput');
+        const controls = document.getElementById('controls');
+        let currentFile = null;
+        let rotationAngle = 90; // デフォルト
+
+        fileInput.addEventListener('change', (e) => {
+            if(e.target.files[0]){
+                currentFile = e.target.files[0];
+                document.getElementById('fileName').innerText = "📄 " + currentFile.name;
+                controls.classList.remove('hidden');
+            }
+        });
+
+        function setRotation(angle) {
+            rotationAngle = angle;
+            // ボタンの見た目を変える処理（簡易版）
+            alert(angle + "度に設定しました。実行ボタンを押してください。");
+        }
+
+        document.getElementById('rotateBtn').addEventListener('click', async () => {
+            if (!currentFile) return;
+            const btn = document.getElementById('rotateBtn');
+            btn.innerText = "処理中...";
+            
+            try {
+                const arrayBuffer = await currentFile.arrayBuffer();
+                const pdfDoc = await PDFDocument.load(arrayBuffer);
+                const pages = pdfDoc.getPages();
+
+                // 全ページを回転
+                pages.forEach(page => {
+                    const currentRotation = page.getRotation().angle;
+                    page.setRotation(degrees(currentRotation + rotationAngle));
+                });
+
+                const pdfBytes = await pdfDoc.save();
+                download(pdfBytes, "rotated_" + currentFile.name, "application/pdf");
+            } catch (err) {
+                console.error(err);
+                alert("エラーが発生しました");
+            } finally {
+                btn.innerText = "回転してダウンロード";
+            }
+        });
+    </script>
+</body>
+</html>
